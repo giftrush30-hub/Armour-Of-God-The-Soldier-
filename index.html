@@ -16,11 +16,11 @@
 (()=>{
 const c=document.getElementById('game'),x=c.getContext('2d'),W=960,H=540;
 const $=id=>document.getElementById(id);
-let running=false,ended=false,frame=0,shake=0,flash=0,coins=Number(localStorage.getItem('aogs-coins')||0),held={},cool={},last=0;
+let running=false,ended=false,frame=0,shake=0,flash=0,coins=Number(localStorage.getItem('aogs-coins')||0),held={},cool={},last=0,particles=[];
 const p={x:250,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0};
 const e={x:680,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0,ai:0};
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-function reset(){Object.assign(p,{x:250,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0});Object.assign(e,{x:680,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0});ended=false;running=true;frame=0;shake=0;flash=0;$('result').classList.add('hidden');$('intro').classList.add('hidden');$('status').innerHTML='The ridge awaits. <strong>Stay within the light.</strong>';ui()}
+function reset(){particles=[];Object.assign(p,{x:250,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0});Object.assign(e,{x:680,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0});ended=false;running=true;frame=0;shake=0;flash=0;particles=[];$('result').classList.add('hidden');$('intro').classList.add('hidden');$('status').innerHTML='The ridge awaits. <strong>Stay within the light.</strong>';ui()}
 function ui(){$('hp').style.width=clamp(p.hp,0,100)+'%';$('ehp').style.width=clamp(e.hp,0,100)+'%';$('hpnum').textContent=Math.ceil(clamp(p.hp,0,100))+' / 100';$('ehpnum').textContent=Math.ceil(clamp(e.hp,0,100))+' / 100';$('coins').textContent='◈ '+coins}
 function poly(points,fill,stroke){x.beginPath();points.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.closePath();x.fillStyle=fill;x.fill();if(stroke){x.strokeStyle=stroke;x.lineWidth=2;x.stroke()}}
 function mountain(points,fill){poly(points,fill)}
@@ -88,11 +88,12 @@ for(let i=0;i<20;i++){let xx=(i*83-frame*(.7+(i%3)*.35))%980;if(xx<0)xx+=980;let
 // luminous ground marks between the combatants
 x.save();x.globalAlpha=.2+.08*Math.sin(frame*.04);x.strokeStyle='#e7c77f';x.lineWidth=1.5;x.beginPath();x.ellipse(480,426,105,8,0,0,Math.PI*2);x.stroke();for(let q=0;q<7;q++){let qx=420+q*20;x.beginPath();x.moveTo(qx,421);x.lineTo(qx+4,415);x.lineTo(qx+8,421);x.stroke()}x.restore();
 fighter(p,true);fighter(e,false);
+for(let i=particles.length-1;i>=0;i--){let q=particles[i];q.x+=q.vx;q.y+=q.vy;q.vy+=.12;q.life--;x.save();x.globalAlpha=Math.max(0,q.life/q.max);if(q.text){x.font='900 22px system-ui';x.textAlign='center';x.lineWidth=4;x.strokeStyle='#080b12';x.strokeText(q.text,q.x,q.y);x.fillStyle=q.color;x.fillText(q.text,q.x,q.y)}else{x.fillStyle=q.color;x.shadowColor=q.color;x.shadowBlur=12;x.beginPath();x.arc(q.x,q.y,q.size*Math.max(.2,q.life/q.max),0,Math.PI*2);x.fill()}x.restore();if(q.life<=0)particles.splice(i,1)}
 if(flash>0){let gr=x.createRadialGradient(p.x,360,4,p.x,360,190);gr.addColorStop(0,'#fff1b7aa');gr.addColorStop(1,'#f3c35b00');x.fillStyle=gr;x.fillRect(0,180,W,300);flash--}
 if(p.fall>0||e.fall>0){x.fillStyle='#f5d58e';x.font='bold 24px system-ui';x.textAlign='center';x.fillText('THE RIDGE CLAIMS THE FALLEN',W/2,170)}
 x.restore();
 }
-function hit(a,b,damage,force){if(b.inv>0||b.fall>0)return;b.hp=Math.max(0,b.hp-damage);b.inv=16;b.vx=a.face*force;shake=8;flash=8;$('status').innerHTML=damage>14?' <strong>IMPACT!</strong> The strike breaks through.':'<strong>HIT CONFIRMED.</strong> Keep pressing forward.';if(b.hp<=0){b.fall=1;b.vx=a.face*7;finish(a===p)}}
+function hit(a,b,damage,force){if(b.inv>0||b.fall>0)return;b.hp=Math.max(0,b.hp-damage);b.inv=16;b.vx=a.face*force;shake=8;flash=8;let hx=b.x,hy=425+b.y-62;for(let i=0;i<13;i++){let ang=(Math.PI*2*i/13)+Math.random()*.22,spd=1.5+Math.random()*4;particles.push({x:hx,y:hy,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-1,life:12+Math.random()*10,max:22,size:1.8+Math.random()*3,color:a.kind==='special'?'#a8f4ff':(a===p?'#ffd875':'#ff7770')})}particles.push({x:hx,y:hy-25,vx:(Math.random()-.5)*1.5,vy:-2.2,life:34,max:34,size:0,text:'-'+damage,color:a.kind==='special'?'#a8f4ff':'#fff0bd'});$('status').innerHTML=damage>14?' <strong>IMPACT!</strong> The strike breaks through.':'<strong>HIT CONFIRMED.</strong> Keep pressing forward.';if(b.hp<=0){b.fall=1;b.vx=a.face*7;finish(a===p)}}
 function act(k){if(!running||ended)return;if(k==='guard'){p.kind='guard';p.attack=12;return}if((cool[k]||0)>frame)return;cool[k]=frame+(k==='special'?100:20);p.kind=k;p.attack=k==='special'?28:16;
 if(k==='special'){flash=24;shake=3;$('status').innerHTML='<strong>RADIANT BURST!</strong> The special strike is unleashed.'}
 let d=Math.abs(p.x-e.x);if(d<105&&Math.abs(p.y-e.y)<55){if(k==='sword')hit(p,e,13,8);if(k==='kick')hit(p,e,10,11);if(k==='special')hit(p,e,27,15)}
