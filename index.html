@@ -613,10 +613,20 @@ p.vx*=.82;p.x+=p.vx;p.y+=p.vy;p.vy+=.55;if(p.y>=0){p.y=0;p.vy=0;p.ground=true}
 p.x=clamp(p.x,55,905);if(Math.abs(p.x-e.x)<48&&p.y===0){p.x+=p.x<e.x?-1.5:1.5}e.face=p.x<e.x?-1:1;
 // Maintain readable melee spacing and reposition during recovery.
 if(e.fall===0&&e.stagger===0&&e.kind!=='windup'&&e.attack===0){
- let dx=p.x-e.x,dist=Math.abs(dx),toward=dx===0?e.face:Math.sign(dx),style=spiritStyle();
- if(dist>e.preferredRange+30){e.vx+=toward*style.speed}
- else if(dist<e.preferredRange-34){e.vx-=toward*(style.speed*.82)}
- else if(e.recovery>0){if(e.strafeTimer<=0){e.strafeDir=Math.random()<.5?-1:1;e.strafeTimer=24+Math.floor(Math.random()*20)}e.strafeTimer--;e.vx+=e.strafeDir*.12}
+ let dx=p.x-e.x,dist=Math.abs(dx),toward=dx===0?e.face:Math.sign(dx),style=spiritStyle(),tactic=spiritIndex%6;
+ // Each family uses a different approach rhythm: direct, feinting, rushing, spacing, tanking, or patient stalking.
+ let desiredRange=e.preferredRange+(tactic===1?22:(tactic===2?-18:(tactic===3?26:(tactic===4?8:14))));
+ if(dist>desiredRange+30){e.vx+=toward*style.speed*(tactic===1?.78:((tactic===2||tactic===3)?1.12:1))}
+ else if(dist<desiredRange-34){e.vx-=toward*(style.speed*(tactic===2?.38:(tactic===3?1.15:(tactic===4?.58:.82))))}
+ else if(e.recovery>0){
+   if(e.strafeTimer<=0){e.strafeDir=Math.random()<.5?-1:1;e.strafeTimer=24+Math.floor(Math.random()*20)}e.strafeTimer--;
+   if(tactic===1)e.vx+=e.strafeDir*.24;
+   else if(tactic===2)e.vx+=toward*.12;
+   else if(tactic===3)e.vx-=toward*.13;
+   else if(tactic===4)e.vx*=.94;
+   else if(tactic===5)e.vx+=e.strafeDir*.08;
+   else e.vx+=e.strafeDir*.12;
+ }
  e.x+=e.vx;e.vx*=.82;e.x=clamp(e.x,95,865);
 }
 else if(e.attack===0&&e.inv===0&&e.recovery===0&&e.kind!=='windup'&&Math.abs(p.x-e.x)<215&&frame%(spiritIndex===0&&e.phase===2?38:52)===0){e.ai=(e.ai||0)+1;const style=spiritStyle();e.attackType=spiritIndex===15?(e.ai%3===0?'judgment':(e.ai%2===0?'heavy':'sword')):(spiritIndex===17?(e.ai%3===0?'storm':(e.ai%2===0?'heavy':'kick')):(style.attack==='feint'?(e.ai%2===0?'kick':'sword'):(style.attack==='heavy'?(e.ai%3===0?'heavy':'sword'):(e.ai%3===0?'heavy':(e.ai%2===0?'kick':'sword')))));if(e.phase===2){if(spiritIndex===0)e.attackType=e.ai%3===0?'heavy':'sword';if(spiritIndex===15)e.attackType=e.ai%2===0?'judgment':'heavy';if(spiritIndex===17)e.attackType=e.ai%2===0?'storm':'heavy'};e.windupTotal=(e.attackType==='judgment'?(e.phase===2?43:54):(e.attackType==='storm'?(e.phase===2?35:44):(e.attackType==='heavy'?style.windup:(e.attackType==='kick'?style.windup-3:style.windup))))+trialWindupBonus();e.kind='windup';e.attack=e.windupTotal;e.hitDone=false;e.attackConnected=false;e.aiState='windup';e.vx*=.25;setDivineMood('warning',e.windupTotal);if(frame-lastCompanionWarningFrame>=240){companionSpeak('warning',true);lastCompanionWarningFrame=frame;}$('status').innerHTML=spiritIndex===15?(e.attackType==='judgment'?'<strong>JUDGMENT SWEEP!</strong> The Accuser is committing to a wide arc. Retreat or guard.':'<strong>THE ACCUSER JUDGES!</strong> A marked strike is coming. Raise your shield or retreat.'):(spiritIndex===17?(e.attackType==='storm'?'<strong>STORM RUSH!</strong> Wrath locks its direction before charging. Move aside or guard.':'<strong>WRATH IS RISING!</strong> Watch the storm-mark, then guard or retreat.'):(e.attackType==='heavy'?'<strong>HEAVY STRIKE!</strong> A slower, stronger blow is coming. Guard or create distance.':'<strong>WATCH OUT!</strong> The Spirit is winding up an attack. Guard or move away.'))}
