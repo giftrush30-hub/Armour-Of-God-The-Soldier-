@@ -983,4 +983,76 @@ $('film-next').onclick=()=>{if(openingTransitionLock)return;if(openingMode==='qu
 $('again').onclick=()=>{reset()};document.addEventListener('keydown',ev=>{if(ev.target&&(ev.target.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName)))return;let k=ev.key.toLowerCase();const gameplayKeys=['arrowleft','a','arrowright','d','arrowup','w',' ','j','k','l','i'];if(!gameplayKeys.includes(k))return;ev.preventDefault();if(['arrowleft','a'].includes(k))held.left=true;if(['arrowright','d'].includes(k))held.right=true;if(['arrowup','w',' '].includes(k))held.jump=true;if(k==='j')act('sword');if(k==='k')act('kick');if(k==='l')act('special');if(k==='i')held.guard=true});const clearHeld=()=>{held={};document.querySelectorAll('.ctrl.active').forEach(el=>el.classList.remove('active'));if(p.kind==='guard'){p.kind='';p.attack=0}};window.addEventListener('blur',clearHeld);let resumeAfterVisibility=false;document.addEventListener('visibilitychange',()=>{if(document.hidden){clearHeld();if(window.speechSynthesis)window.speechSynthesis.cancel();if(running&&!ended){running=false;resumeAfterVisibility=true;$('status').textContent='Mountain trial paused while this page is hidden. Your progress in this fight will remain on this screen.';}}else if(resumeAfterVisibility&&!ended){running=true;resumeAfterVisibility=false;$('status').textContent='You are back on the mountain. Continue your trial.';}});document.addEventListener('keyup',ev=>{let k=ev.key.toLowerCase();if(['arrowleft','a'].includes(k))held.left=false;if(['arrowright','d'].includes(k))held.right=false;if(['arrowup','w',' '].includes(k))held.jump=false;if(['i'].includes(k)){held.guard=false;p.kind='';p.attack=0}});
 ui();draw();requestAnimationFrame(update)
 })();
-</script></body></html>
+</script>
+<script id="AOG_OPENING_FALLBACK">
+/* Resilient mobile opening controls: recover if an earlier gameplay script error
+   prevents the normal opening handlers from being registered. */
+(function(){
+  const byId=id=>document.getElementById(id);
+  const intro=byId('intro'), film=byId('opening-film'), start=byId('start'), next=byId('film-next'), skip=byId('film-skip');
+  if(!intro||!film||!start||!next||!skip)return;
+  const questions=[
+    ['WHEN EVERYTHING IS TAKEN FROM YOU, WHAT WILL REMAIN OF YOUR FAITH?','Take a breath. Let the question settle.'],
+    ['WHEN FEAR STANDS BEFORE YOU, WILL YOU STAND FIRM OR TURN AWAY?','The mountain wind grows colder.'],
+    ['WHAT GOOD IS STRENGTH IF YOU USE IT TO DESTROY THE WEAK?','A broken blade lies among the stones.'],
+    ['WHEN NO ONE SEES YOUR STRUGGLE, WILL YOU STILL DO WHAT IS RIGHT?','The path ahead is yours alone.'],
+    ['WHEN YOUR OWN HEART BECOMES YOUR GREATEST ENEMY, HOW WILL YOU FIGHT?','The hardest battle may begin within.'],
+    ['IF THE BATTLE COSTS YOU EVERYTHING, WILL YOU STILL STAND FOR WHAT YOU BELIEVE?','Thunder rolls above the summit.']
+  ];
+  const scenes=[
+    ['THE FIRST ASCENT','ARMOUR OF GOD: THE SOLDIER','One mountain. Eighteen trials. One choice to stand firm.','APPROACH THE SPIRIT →'],
+    ['A VOICE IN THE MIST','“ANOTHER SOLDIER COMES… BELIEVING HE CAN STAND AGAINST WHAT HE CANNOT SEE.”','FIRST SPIRIT: “Tell me, warrior… when your strength fails you, what will you have left?”','ANSWER HIM →'],
+    ['THE SOLDIER ANSWERS','“MY STRENGTH WAS NEVER THE SOURCE OF MY VICTORY.”','THE SOLDIER: “You may test my body. You may trouble my mind. But you will not decide whom I serve.”','FACE THE THREAT →'],
+    ['THE SPIRIT DRAWS NEAR','“THEN LET YOUR FAITH SAVE YOU.”','The spirit steps forward. Wind tears across the ridge. Its weapon rises.','STAND YOUR GROUND →'],
+    ['TRIAL I · THE RIDGE','THE SPIRIT OF FEAR','The camera pulls back. The mountain opens before you. The battle is yours now.','ENTER THE BATTLE ⚔']
+  ];
+  let active=false, mode='questions', step=0;
+  function showQuestion(){
+    byId('film-topline').textContent='THE MOUNTAIN REMEMBERS';
+    byId('film-kicker').textContent='A QUESTION FOR THE SOUL';
+    byId('film-heading').textContent=questions[step][0];
+    byId('film-subcopy').textContent=questions[step][1];
+    byId('film-count').textContent='REFLECTION '+String(step+1).padStart(2,'0')+' / 06';
+    next.textContent=step===5?'FACE THE MOUNTAIN →':'REFLECT →';
+    film.classList.remove('closeup','pullback');
+    byId('film-figures').classList.remove('show');
+  }
+  function showScene(){
+    const s=scenes[step];
+    byId('film-topline').textContent='ARMOUR OF GOD · THE SOLDIER';
+    byId('film-kicker').textContent=s[0]; byId('film-heading').textContent=s[1];
+    byId('film-subcopy').textContent=s[2]; byId('film-count').textContent='THE FIRST CONFRONTATION';
+    next.textContent=s[3]; film.classList.remove('pullback');
+    for(let i=0;i<5;i++)film.classList.remove('scene-step-'+i);
+    film.classList.add('scene-step-'+step); film.classList.toggle('closeup',step===1||step===2||step===3);
+    byId('film-figures').classList.toggle('show',step>0);
+  }
+  start.addEventListener('click',function(){
+    if(intro.classList.contains('hidden'))return;
+    active=true;mode='questions';step=0;intro.classList.add('hidden');
+    byId('result').classList.add('hidden');film.classList.remove('hidden','pullback');showQuestion();
+  });
+  next.addEventListener('click',function(){
+    if(!active)return;
+    if(mode==='questions'){
+      if(step<5){step++;showQuestion();}
+      else{mode='scenes';step=0;showScene();}
+    }else if(step<scenes.length-1){step++;showScene();}
+    else{
+      active=false;film.classList.add('hidden');
+      /* Ask the original game to initialise if its controller is available. */
+      try{if(typeof window.startMountainTrial==='function')window.startMountainTrial();}catch(_){}
+      const status=byId('status');
+      if(status)status.textContent='Opening complete. If the battle does not begin, reload the game page and tap BEGIN THE ASCENT once.';
+    }
+  });
+  skip.addEventListener('click',function(){
+    if(!active&&intro.classList.contains('hidden'))return;
+    active=false;film.classList.add('hidden');intro.classList.add('hidden');
+    try{if(typeof window.startMountainTrial==='function')window.startMountainTrial();}catch(_){}
+    const status=byId('status');
+    if(status)status.textContent='Opening skipped. If the battle has not started, reload the game page and tap BEGIN THE ASCENT once.';
+  });
+})();
+</script>
+</body></html>
