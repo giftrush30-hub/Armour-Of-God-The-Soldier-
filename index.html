@@ -190,6 +190,13 @@ if(running&&!ended&&e.kind==='windup'){
   x.beginPath();x.ellipse(p.x,425+p.y+3,rad,7+progress*3,0,0,Math.PI*2);x.stroke();
   x.globalAlpha=.75;x.font='900 12px system-ui';x.textAlign='center';x.fillStyle='#ffaaa2';x.fillText('GUARD!',p.x,385+p.y);x.restore();
 }
+// Distinct contact cue: keep the danger signal visible at phone scale during the active frames.
+if(running&&!ended&&(e.kind==='sword'||e.kind==='kick')&&e.attack<=11&&e.attack>=8){
+  x.save();let pulse=1+Math.sin(frame*1.4)*.12;
+  x.globalAlpha=.72+.2*Math.sin(frame*1.4);x.strokeStyle='#ff6a5f';x.lineWidth=3;x.shadowColor='#ff3c43';x.shadowBlur=12;
+  x.beginPath();x.moveTo(p.x-34*pulse,385+p.y-12);x.lineTo(p.x+34*pulse,385+p.y+7);x.stroke();
+  x.textAlign='center';x.font='900 12px system-ui';x.lineWidth=4;x.strokeStyle='#251015';x.strokeText('STRIKE!',p.x,365+p.y);x.fillStyle='#ffd1c7';x.fillText('STRIKE!',p.x,365+p.y);x.restore();
+}
 if(comboCount>=2&&frame<comboUntil){x.save();x.textAlign='center';let pulse=1+Math.sin(frame*.32)*.035;x.translate(480,205);x.scale(pulse,pulse);x.font='900 21px system-ui';x.lineWidth=5;x.strokeStyle='#10141c';x.strokeText(comboCount+' HIT COMBO',0,0);x.fillStyle='#ffe29a';x.shadowColor='#ffcf66';x.shadowBlur=12;x.fillText(comboCount+' HIT COMBO',0,0);x.restore()}
 if(p.hp<=30){x.save();x.globalAlpha=.08+.06*Math.sin(frame*.25);x.fillStyle='#ff263b';x.fillRect(0,0,W,H);x.restore()}
 for(let i=particles.length-1;i>=0;i--){let q=particles[i];q.x+=q.vx;q.y+=q.vy;q.vy+=.12;q.life--;x.save();x.globalAlpha=Math.max(0,q.life/q.max);if(q.text){x.font='900 22px system-ui';x.textAlign='center';x.lineWidth=4;x.strokeStyle='#080b12';x.strokeText(q.text,q.x,q.y);x.fillStyle=q.color;x.fillText(q.text,q.x,q.y)}else{x.fillStyle=q.color;x.shadowColor=q.color;x.shadowBlur=12;x.beginPath();x.arc(q.x,q.y,q.size*Math.max(.2,q.life/q.max),0,Math.PI*2);x.fill()}x.restore();if(q.life<=0)particles.splice(i,1)}
