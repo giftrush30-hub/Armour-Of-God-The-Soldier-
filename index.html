@@ -71,6 +71,17 @@ button{touch-action:manipulation}
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
 }
+
+/* Keep touch-control clusters inside narrow phones instead of squeezing or clipping actions. */
+@media(max-width:520px){
+ .controls{flex-wrap:wrap;justify-content:center;align-items:center}
+ .controls>.cluster{flex:0 1 auto;justify-content:center;max-width:100%}
+ .controls .ctrl{flex:0 1 48px;min-width:44px}
+}
+@media(max-width:360px){
+ .controls>.cluster{gap:4px}
+ .controls .ctrl{flex-basis:44px;min-width:44px;padding-left:2px;padding-right:2px}
+}
 </style></head><body><main class="app">
 <header class="top"><div><div class="eyebrow">A 2.5D biblical combat experience</div><div class="brand">ARMOUR OF GOD <span>: THE SOLDIER</span></div></div><div class="pill">✦ DIVINE GOLD <span id="coins">◈ 0</span></div></header>
 <section class="stage"><canvas id="game" width="960" height="540" aria-label="Playable mountain-edge battle"></canvas>
