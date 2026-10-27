@@ -16,11 +16,11 @@
 (()=>{
 const c=document.getElementById('game'),x=c.getContext('2d'),W=960,H=540;
 const $=id=>document.getElementById(id);
-let running=false,ended=false,frame=0,shake=0,flash=0,hitStop=0,coins=Number(localStorage.getItem('aogs-coins')||0),held={},cool={},last=0,particles=[],comboCount=0,comboUntil=0;
+let running=false,ended=false,frame=0,shake=0,flash=0,hitStop=0,specialFX=0,coins=Number(localStorage.getItem('aogs-coins')||0),held={},cool={},last=0,particles=[],comboCount=0,comboUntil=0;
 const p={x:300,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0,hitDone:false,attackDamage:0,attackReach:0,stagger:0,hitFlash:0};
 const e={x:650,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0,ai:0,stagger:0,hitFlash:0};
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-function reset(){particles=[];comboCount=0;comboUntil=0;held={};Object.assign(p,{x:300,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0,hitDone:false,attackDamage:0,attackReach:0,stagger:0,hitFlash:0});Object.assign(e,{x:650,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0,stagger:0,hitFlash:0});ended=false;running=true;frame=0;shake=0;flash=0;hitStop=0;particles=[];$('result').classList.add('hidden');$('intro').classList.add('hidden');$('status').innerHTML='The ridge awaits. <strong>Stay within the light.</strong>';ui()}
+function reset(){particles=[];comboCount=0;comboUntil=0;held={};Object.assign(p,{x:300,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0,hitDone:false,attackDamage:0,attackReach:0,stagger:0,hitFlash:0});Object.assign(e,{x:650,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0,stagger:0,hitFlash:0});ended=false;running=true;frame=0;shake=0;flash=0;hitStop=0;specialFX=0;particles=[];$('result').classList.add('hidden');$('intro').classList.add('hidden');$('status').innerHTML='The ridge awaits. <strong>Stay within the light.</strong>';ui()}
 function ui(){$('hp').style.width=clamp(p.hp,0,100)+'%';$('ehp').style.width=clamp(e.hp,0,100)+'%';$('hpnum').textContent=Math.ceil(clamp(p.hp,0,100))+' / 100';$('ehpnum').textContent=Math.ceil(clamp(e.hp,0,100))+' / 100';$('coins').textContent='◈ '+coins;let wait=Math.max(0,(cool.special||0)-frame);$('specialstate').textContent=wait>0?'CHARGING '+Math.ceil(wait/60)+'s':'SPECIAL · READY';$('specialstate').style.color=wait>0?'#c5a978':'#ffe39b'}
 function poly(points,fill,stroke){x.beginPath();points.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.closePath();x.fillStyle=fill;x.fill();if(stroke){x.strokeStyle=stroke;x.lineWidth=2;x.stroke()}}
 function mountain(points,fill){poly(points,fill)}
@@ -164,6 +164,25 @@ for(let i=0;i<20;i++){let xx=(i*83-frame*(.7+(i%3)*.35))%980;if(xx<0)xx+=980;let
 // luminous ground marks between the combatants
 x.save();x.globalAlpha=.2+.08*Math.sin(frame*.04);x.strokeStyle='#e7c77f';x.lineWidth=1.5;x.beginPath();x.ellipse(480,426,105,8,0,0,Math.PI*2);x.stroke();for(let q=0;q<7;q++){let qx=420+q*20;x.beginPath();x.moveTo(qx,421);x.lineTo(qx+4,415);x.lineTo(qx+8,421);x.stroke()}x.restore();
 fighter(p,true);fighter(e,false);
+// Radiant Burst telegraph: layered runes bloom under the hero, then collapse into light.
+if(specialFX>0){
+  let progress=1-specialFX/34, radius=18+progress*112, fade=Math.min(1,specialFX/8);
+  x.save();x.translate(p.x,426+p.y);x.globalAlpha=fade*(.72-progress*.28);
+  for(let ring=0;ring<3;ring++){
+    let rr=radius*(.58+ring*.24);
+    x.save();x.rotate((ring%2? -1:1)*(frame*.025+progress*1.8));
+    x.strokeStyle=ring===1?'#9af3ff':'#ffdf91';x.lineWidth=ring===1?2.2:1.4;
+    x.shadowColor=x.strokeStyle;x.shadowBlur=ring===1?15:9;
+    x.beginPath();x.ellipse(0,0,rr,rr*.22,0,0,Math.PI*2);x.stroke();
+    for(let mark=0;mark<8;mark++){
+      let a=mark*Math.PI/4, inner=rr*.82, outer=rr*(.94+(mark%2)*.07);
+      x.beginPath();x.moveTo(Math.cos(a)*inner,Math.sin(a)*inner*.22);x.lineTo(Math.cos(a)*outer,Math.sin(a)*outer*.22);x.stroke();
+    }
+    x.restore();
+  }
+  x.globalAlpha=fade*(.18+.24*Math.sin(frame*.7));x.fillStyle='#c6f8ff';x.shadowColor='#8deeff';x.shadowBlur=22;
+  x.beginPath();x.ellipse(0,0,Math.max(3,radius*.48),Math.max(2,radius*.11),0,0,Math.PI*2);x.fill();x.restore();
+}
 // Original cinematic telegraph: the enemy's crimson warning ring grows before its strike.
 if(running&&!ended&&e.kind==='windup'){
   x.save();let progress=1-clamp(e.attack/36,0,1),rad=34+progress*38;
@@ -185,12 +204,12 @@ function hit(a,b,damage,force){if(b.inv>0||b.fall>0)return;b.hp=Math.max(0,b.hp-
  for(let i=0;i<13;i++){let ang=(Math.PI*2*i/13)+Math.random()*.22,spd=1.5+Math.random()*4;particles.push({x:hx,y:hy,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-1,life:12+Math.random()*10,max:22,size:1.8+Math.random()*3,color:a.kind==='special'?'#a8f4ff':(a===p?'#ffd875':'#ff7770')})}particles.push({x:hx,y:hy-25,vx:(Math.random()-.5)*1.5,vy:-2.2,life:34,max:34,size:0,text:'-'+damage,color:a.kind==='special'?'#a8f4ff':'#fff0bd'});$('status').innerHTML=damage>14?' <strong>IMPACT!</strong> The strike breaks through.':'<strong>HIT CONFIRMED.</strong> Keep pressing forward.';if(b.hp<=0){b.fall=1;b.vx=a.face*7;finish(a===p)}}
 function act(k){if(!running||ended)return;if(k==='guard'){p.kind='guard';p.attack=12;return}if((cool[k]||0)>frame)return;cool[k]=frame+(k==='special'?100:20);p.kind=k;p.attack=k==='special'?28:16;p.hitDone=false;p.attackDamage=k==='sword'?16:(k==='kick'?12:30);p.attackReach=k==='sword'?175:(k==='kick'?132:205);
 p.face=p.x<=e.x?1:-1;
-if(k==='special'){flash=24;shake=5;$('status').innerHTML='<strong>RADIANT BURST!</strong> Time the strike as the light bursts.'}
+if(k==='special'){flash=24;shake=5;specialFX=34;for(let i=0;i<18;i++){let ang=Math.random()*Math.PI*2,spd=1+Math.random()*3;particles.push({x:p.x,y:425+p.y-4,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-1,life:18+Math.random()*10,max:28,size:2+Math.random()*2,color:i%2?'#ffe39a':'#8deeff'})}$('status').innerHTML='<strong>RADIANT BURST!</strong> Time the strike as the light bursts.'}
 else if(k==='sword'){$('status').innerHTML='<strong>SWORD READY!</strong> The blade will connect at the swing.'}
 }
 function finish(win){if(ended)return;ended=true;running=false;held={};if(win){coins+=25;localStorage.setItem('aogs-coins',coins);$('resulttag').textContent='TRIAL COMPLETE · +25 COINS';$('resulttitle').textContent='VICTORY';$('resulttext').textContent='You stood firm on the ridge. Your reward has been saved on this device.';$('reward').textContent='+25 COINS'}else{$('resulttag').textContent='THE TRIAL CONTINUES';$('resulttitle').textContent='RISE AGAIN';$('resulttext').textContent='The warrior has fallen. Every defeat is a lesson. Return to the ridge and try a new strategy.';$('reward').textContent='TRY AGAIN'}ui();$('result').classList.remove('hidden')}
 function update(){
-frame++;if(!running){draw();requestAnimationFrame(update);return}
+frame++;if(specialFX>0)specialFX--;if(!running){draw();requestAnimationFrame(update);return}
 // Brief hit-stop pauses the action at contact so powerful blows feel deliberate.
 if(hitStop>0){hitStop--;draw();requestAnimationFrame(update);return}
 for(let k in cool){};if(p.inv>0)p.inv--;if(e.inv>0)e.inv--;if(p.stagger>0)p.stagger--;if(e.stagger>0)e.stagger--;
