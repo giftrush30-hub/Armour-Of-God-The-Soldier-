@@ -301,7 +301,8 @@ body{padding-bottom:170px}
 </main>
 <script>
 (()=>{
-const c=document.getElementById('game'),x=c.getContext('2d'),W=960,H=540;const reducedMotionQuery=window.matchMedia?window.matchMedia('(prefers-reduced-motion: reduce)'):null;let reduceMotion=!!(reducedMotionQuery&&reducedMotionQuery.matches);if(reducedMotionQuery){const syncReducedMotion=ev=>{reduceMotion=ev.matches;if(reduceMotion)shake=0;};if(reducedMotionQuery.addEventListener)reducedMotionQuery.addEventListener('change',syncReducedMotion);else if(reducedMotionQuery.addListener)reducedMotionQuery.addListener(syncReducedMotion);}
+const c=document.getElementById('game'),x=c.getContext('2d'),W=960,H=540;
+const mobilePerf=!!(window.matchMedia&&window.matchMedia('(max-width: 700px)').matches);const reducedMotionQuery=window.matchMedia?window.matchMedia('(prefers-reduced-motion: reduce)'):null;let reduceMotion=!!(reducedMotionQuery&&reducedMotionQuery.matches);if(reducedMotionQuery){const syncReducedMotion=ev=>{reduceMotion=ev.matches;if(reduceMotion)shake=0;};if(reducedMotionQuery.addEventListener)reducedMotionQuery.addEventListener('change',syncReducedMotion);else if(reducedMotionQuery.addListener)reducedMotionQuery.addListener(syncReducedMotion);}
 const $=id=>document.getElementById(id);
 function safeGet(key,fallback=""){try{const value=localStorage.getItem(key);return value===null?fallback:value;}catch(_){return fallback;}}
 let running=false,ended=false,frame=0,shake=0,flash=0,hitStop=0,specialFX=0,swordChain=0,swordChainUntil=0,coins=Number(safeGet('aogs-coins')||0),held={},cool={},last=0,particles=[],comboCount=0,comboUntil=0,spiritIndex=Number(safeGet('aogs-spirit')||0);
@@ -688,11 +689,44 @@ x.fillStyle=isPlayer?'#f4d17a':'#aeb9c9';x.beginPath();x.arc(-20,-24,1.5,0,Math.
 if(guard){x.save();x.globalAlpha=.6+.35*Math.sin(frame*.7);x.strokeStyle='#a8f3ff';x.lineWidth=2;x.shadowColor='#75e7ff';x.shadowBlur=13;x.beginPath();x.arc(-33,-65,20,-1.1,.9);x.stroke();x.restore()}
 x.restore();
 }
-function drawDivinePresence(){const visualFrame=reduceMotion?0:frame;const activeMood=frame<divineMoodUntil?divineMood:'calm';const moodPower=activeMood==='rescue'?1.8:activeMood==='warning'?1.48:activeMood==='counter'?1.42:activeMood==='hit'?.55:activeMood==='guard'?1.28:activeMood==='dodge'?1.35:activeMood==='strike'?1.22:1;const px=clamp(p.x-(p.face||1)*76,42,W-42),py=352+p.y+Math.sin(visualFrame*(activeMood==='rescue'?.13:.075))*5,breath=1+Math.sin(visualFrame*.16)*.09*moodPower; x.save();x.globalCompositeOperation='lighter';let halo=x.createRadialGradient(px,py,2,px,py,43*moodPower);halo.addColorStop(0,activeMood==='hit'?'#fff0e8cc':activeMood==='warning'?'#ffb06acc':'#fff6c9bb');halo.addColorStop(.28,activeMood==='hit'?'#ff8b6977':activeMood==='warning'?'#ff6d4d88':'#ffd56b77');halo.addColorStop(1,'#ffad3200');x.fillStyle=halo;x.beginPath();x.arc(px,py,43,0,Math.PI*2);x.fill();x.globalAlpha=.62+.2*Math.sin(visualFrame*.13);x.strokeStyle='#ffe7a0';x.lineWidth=1.5;x.beginPath();x.ellipse(px,py+8,24*breath,31/breath,Math.sin(visualFrame*.025)*.15,0,Math.PI*2);x.stroke();for(let i=0;i<5;i++){const a=visualFrame*.045+i*Math.PI*2/5,rx=13+Math.sin(visualFrame*.08+i)*3,ry=20+Math.cos(visualFrame*.06+i)*4;const sx=px+Math.cos(a)*rx,sy=py+Math.sin(a)*ry;x.globalAlpha=.72;x.fillStyle=i%2?'#fff4c0':'#ffbd50';x.beginPath();x.ellipse(sx,sy,2.4,4.8,a,0,Math.PI*2);x.fill()}x.globalAlpha=.95;x.fillStyle='#fff8d8';x.shadowColor='#ffd56b';x.shadowBlur=18;x.beginPath();x.ellipse(px,py,7*breath,13/breath,0,0,Math.PI*2);x.fill();x.shadowBlur=0;x.globalAlpha=.8;x.fillStyle='#fff0b0';x.beginPath();x.arc(px,py+16,2,0,Math.PI*2);x.fill();if(activeMood==='rescue'){x.globalAlpha=.85;x.strokeStyle='#b8f5ff';x.lineWidth=2;x.beginPath();x.arc(px,py,33+Math.sin(visualFrame*.22)*5,0,Math.PI*2);x.stroke()}x.restore();}function drawScene(){
+function drawDivinePresence(){
+  const visualFrame=reduceMotion?0:frame;
+  const mood=frame<divineMoodUntil?divineMood:'calm';
+  const px=clamp(p.x-(p.face||1)*112,55,W-55);
+  const py=365+p.y+(reduceMotion?0:Math.sin(visualFrame*.06)*2);
+  x.save();
+  // Clear, recognisable full-body Divine Presence: head, shoulders, arms, robe and feet.
+  x.globalAlpha=.95;
+  x.shadowColor='#ffe7a0';x.shadowBlur=mobilePerf?5:12;
+  // radiant halo behind the figure
+  x.strokeStyle='#ffe8a0';x.lineWidth=2.5;
+  x.beginPath();x.ellipse(px,py-42,26,49,0,0,Math.PI*2);x.stroke();
+  x.globalAlpha=.28;x.fillStyle='#ffe7a0';x.beginPath();x.ellipse(px,py-42,23,45,0,0,Math.PI*2);x.fill();
+  x.globalAlpha=.98;x.fillStyle='#fff4cb';x.strokeStyle='#fff0bd';x.lineWidth=5;
+  // head and neck
+  x.beginPath();x.arc(px,py-91,11,0,Math.PI*2);x.fill();
+  x.fillStyle='#f5d58e';x.fillRect(px-4,py-80,8,8);
+  // shoulders and flowing robe
+  x.fillStyle='#fff4cb';x.beginPath();x.moveTo(px-12,py-75);x.lineTo(px+12,py-75);x.lineTo(px+18,py-38);x.lineTo(px+11,py-15);x.lineTo(px-11,py-15);x.lineTo(px-18,py-38);x.closePath();x.fill();
+  // arms spread in a protective, welcoming pose
+  x.strokeStyle='#fff4cb';x.lineWidth=7;x.lineCap='round';
+  x.beginPath();x.moveTo(px-11,py-68);x.lineTo(px-27,py-49);x.lineTo(px-31,py-32);x.moveTo(px+11,py-68);x.lineTo(px+27,py-49);x.lineTo(px+31,py-32);x.stroke();
+  // robe folds and feet
+  x.strokeStyle='#d6a94e';x.lineWidth=2;x.beginPath();x.moveTo(px,py-58);x.lineTo(px-2,py-18);x.moveTo(px-8,py-30);x.lineTo(px-11,py-17);x.moveTo(px+8,py-30);x.lineTo(px+11,py-17);x.stroke();
+  x.strokeStyle='#fff4cb';x.lineWidth=6;x.beginPath();x.moveTo(px-7,py-17);x.lineTo(px-12,py-5);x.moveTo(px+7,py-17);x.lineTo(px+12,py-5);x.stroke();
+  // small cross-shaped light above the head
+  x.lineWidth=2.5;x.beginPath();x.moveTo(px,py-116);x.lineTo(px,py-103);x.moveTo(px-6,py-110);x.lineTo(px+6,py-110);x.stroke();
+  // readable label confirms the presence is a visible game character
+  x.shadowBlur=0;x.globalAlpha=1;x.fillStyle='#fff0b8';x.font='bold 12px Georgia';x.textAlign='center';x.fillText('DIVINE PRESENCE',px,py+13);
+  if(mood==='rescue'||mood==='warning'){x.strokeStyle=mood==='rescue'?'#a8f3ff':'#ffb06a';x.lineWidth=2;x.beginPath();x.arc(px,py-45,37+(reduceMotion?0:Math.sin(visualFrame*.12)*3),0,Math.PI*2);x.stroke();}
+  x.restore();
+}
+function drawScene(){
 x.save();if(reduceMotion){shake=0}else if(shake>0){x.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake*=.85}
 background();
 // Cinematic edge falloff keeps the fighters and gold effects as the visual focus.
 let vignette=x.createRadialGradient(W*.5,H*.48,H*.18,W*.5,H*.5,H*.72);vignette.addColorStop(0,'#05081200');vignette.addColorStop(.72,'#05081222');vignette.addColorStop(1,'#03050bd9');x.fillStyle=vignette;x.fillRect(0,0,W,H);
+if(!mobilePerf){
 // 2.5D depth pass: drifting fog bands at different speeds, layered by distance
 for(let layer=0;layer<3;layer++){
   let speed=reduceMotion?0:[.18,.42,.78][layer], ybase=[302,352,395][layer], alpha=[.055,.075,.06][layer];
@@ -705,6 +739,8 @@ for(let layer=0;layer<3;layer++){
     x.fillStyle=fog;x.beginPath();x.ellipse(fx,fy,130+layer*15,15+layer*3,0,0,Math.PI*2);x.fill();
   }
   x.restore();
+}
+
 }
 // foreground stones are larger and move faster to reinforce camera depth
 x.save();x.globalAlpha=.72;
@@ -719,8 +755,11 @@ x.save();x.globalAlpha=.16;x.strokeStyle='#c9b58a';x.lineWidth=1;
 for(let n=0;n<9;n++){x.beginPath();x.moveTo(480,414);x.lineTo(n*125-20,540);x.stroke()}
 for(let n=0;n<4;n++){let gy=432+n*n*7;x.beginPath();x.moveTo(35,gy);x.lineTo(925,gy);x.stroke()}
 x.restore();
+if(!mobilePerf){
 // wind streaks, drifting sparks, and impact motes add depth to the ridge
 for(let i=0;i<20;i++){let xx=(i*83-(reduceMotion?0:frame)*(.7+(i%3)*.35))%980;if(xx<0)xx+=980;let yy=285+(i*37)%145;x.strokeStyle=i%4===0?'#f4d28b35':'#d7c6aa18';x.lineWidth=i%4===0?2:1;x.beginPath();x.moveTo(xx,yy);x.lineTo(xx+12+(i%5)*4,yy-2);x.stroke()}
+
+}
 // fractured mineral seams follow the narrow mountain path; no arena markings
 x.save();x.globalAlpha=.22;x.strokeStyle='#c8a778';x.lineWidth=1;
 for(let q=0;q<7;q++){let qx=350+q*43, bend=Math.sin(q*1.7)*9;x.beginPath();x.moveTo(qx,424);x.lineTo(qx+8+bend,430);x.lineTo(qx+3+bend,437);x.lineTo(qx+18+bend,445);x.stroke()}
