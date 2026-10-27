@@ -118,6 +118,11 @@ x.fillStyle=isPlayer?'#fff0ae':'#ffb6a9';x.fillRect(-7,-101,5,2);x.fillRect(3,-1
 poly([[-4,-113],[0,-129],[4,-113]],isPlayer?'#f8e3a0':'#c9d5e6','#fff');
 poly([[-2,-115],[0,-125],[2,-115]],isPlayer?'#9a6d27':'#596678');
 poly([[-8,-85],[0,-79],[8,-85],[5,-72],[0,-68],[-5,-72]],isPlayer?'#f0ce75':'#a9b7c8','#fff0ae');
+// articulated knee and elbow accents improve the limb silhouette
+x.strokeStyle=isPlayer?'#f5d47b':'#aab6c8';x.lineWidth=2.2;x.beginPath();x.arc(-20,-24,4.2,0,Math.PI*2);x.arc(20,-24,4.2,0,Math.PI*2);x.stroke();
+x.fillStyle=isPlayer?'#f4d17a':'#aeb9c9';x.beginPath();x.arc(-20,-24,1.5,0,Math.PI*2);x.arc(20,-24,1.5,0,Math.PI*2);x.fill();
+// guard impact glints, visible only while braced against an attack
+if(guard){x.save();x.globalAlpha=.6+.35*Math.sin(frame*.7);x.strokeStyle='#a8f3ff';x.lineWidth=2;x.shadowColor='#75e7ff';x.shadowBlur=13;x.beginPath();x.arc(-33,-65,20,-1.1,.9);x.stroke();x.restore()}
 if(a.fall>0){x.rotate(Math.min(1.2,a.fall*.05))}
 x.restore();
 }
@@ -151,13 +156,13 @@ const activeFrame=p.kind==='special'?p.attack<=13&&p.attack>=9:p.attack<=8&&p.at
 if(activeFrame&&!p.hitDone){p.hitDone=true;let distance=Math.abs(p.x-e.x);if(distance<p.attackReach&&Math.abs(p.y-e.y)<75){hit(p,e,p.attackDamage,p.kind==='sword'?10:(p.kind==='kick'?12:17));if(p.kind==='special'){flash=18;shake=7}}else{$('status').innerHTML='<strong>MISS!</strong> Move closer and time your strike.'}}
 if(p.attack===0)p.kind=''}
 if(e.stagger>0&&e.kind!=='windup'){e.attack=0;e.kind=''}
-if(e.kind==='windup'){e.attack--;if(e.attack<=0){e.kind=e.ai%2===0?'kick':'sword';e.attack=17;e.aiState='strike';if(Math.abs(p.x-e.x)<190){if(held.guard||p.kind==='guard'){p.hp=Math.max(0,p.hp-2);p.vx+=(e.x<p.x?1:-1)*2;shake=4;flash=4;$('status').innerHTML='<strong>SHIELD BLOCK!</strong> Your shield absorbs most of the strike.';for(let z=0;z<9;z++)particles.push({x:p.x-12,y:365+Math.random()*35,vx:(Math.random()-.5)*4,vy:-Math.random()*3,life:12,max:12,size:2+Math.random()*2,color:'#9cecff'})}else hit(e,p,e.kind==='kick'?12:10,e.kind==='kick'?9:7)}}}
+if(e.kind==='windup'){e.attack--;if(e.attack<=0){e.kind=e.ai%2===0?'kick':'sword';e.attack=17;e.aiState='strike';if(Math.abs(p.x-e.x)<190){if(held.guard||p.kind==='guard'){p.hp=Math.max(0,p.hp-2);p.vx+=(e.x<p.x?1:-1)*2;p.hitFlash=5;p.stagger=3;shake=4;flash=4;$('status').innerHTML='<strong>SHIELD BLOCK!</strong> Your shield absorbs most of the strike.';for(let z=0;z<9;z++)particles.push({x:p.x-12,y:365+Math.random()*35,vx:(Math.random()-.5)*4,vy:-Math.random()*3,life:12,max:12,size:2+Math.random()*2,color:'#9cecff'})}else hit(e,p,e.kind==='kick'?12:10,e.kind==='kick'?9:7)}}}
 else if(e.attack>0){e.attack--;if(e.attack===0){e.kind='';e.aiState='';}}
 if(p.stagger===0){if(held.left){p.vx-=.72;p.face=-1}if(held.right){p.vx+=.72;p.face=1}}
 if(held.jump&&p.ground){p.vy=-11;p.ground=false;held.jump=false}
 p.vx*=.82;p.x+=p.vx;p.y+=p.vy;p.vy+=.55;if(p.y>=0){p.y=0;p.vy=0;p.ground=true}
 p.x=clamp(p.x,55,905);if(Math.abs(p.x-e.x)<48&&p.y===0){p.x+=p.x<e.x?-1.5:1.5}e.face=p.x<e.x?-1:1;
-if(Math.abs(p.x-e.x)>132&&e.fall===0){e.vx+=(p.x<e.x?-1:1)*.32;e.x+=e.vx;e.vx*=.86}
+if(Math.abs(p.x-e.x)>132&&e.fall===0&&e.stagger===0){e.vx+=(p.x<e.x?-1:1)*.32;e.x+=e.vx;e.vx*=.86}
 else if(e.attack===0&&e.inv===0&&e.kind!=='windup'&&frame%52===0){e.kind='windup';e.attack=36;e.ai=(e.ai||0)+1;e.aiState='windup';$('status').innerHTML='<strong>WATCH OUT!</strong> The Spirit is winding up an attack. Guard now.'}
 if(p.x<95||p.x>865){p.vx+=(p.x<95?1:-1)*.6}
 if(p.inv>0&&p.x<45||p.inv>0&&p.x>915)p.fall=1;
