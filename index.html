@@ -139,6 +139,17 @@ if(spiritIndex===15){ // The Accuser: judicial crown, severe pauldrons and hangi
 }else{ // Delay: narrow swept-back crest and trailing streamers
  poly([[-5,-105],[-28,-119],[-12,-101]],'#3d3021',accent);poly([[12,-83],[31,-75],[39,-58],[25,-70]],'#3d3021',accent);
 }
+// Additional stage-specific armor marks give the remaining spirits their own readable identity.
+if(spiritIndex===2){poly([[-9,-76],[-4,-82],[0,-76],[4,-82],[9,-76],[4,-68],[0,-65],[-4,-68]],'#42253f',accent)}
+if(spiritIndex===3){poly([[-8,-78],[0,-88],[8,-78],[4,-66],[0,-62],[-4,-66]],'#552218','#ffc078')}
+if(spiritIndex===6){x.strokeStyle=accent;x.lineWidth=2;x.beginPath();x.moveTo(-12,-78);x.lineTo(-3,-69);x.lineTo(-8,-60);x.moveTo(10,-82);x.lineTo(3,-73);x.lineTo(8,-64);x.stroke()}
+if(spiritIndex===7){poly([[-9,-109],[-6,-123],[0,-115],[6,-123],[9,-109]],'#4a3820',accent)}
+if(spiritIndex===8){x.strokeStyle=accent;x.lineWidth=2;x.strokeRect(-8,-76,16,10);x.beginPath();x.moveTo(-4,-76);x.lineTo(-4,-66);x.moveTo(4,-76);x.lineTo(4,-66);x.stroke()}
+if(spiritIndex===9){poly([[-24,-82],[-32,-96],[-19,-88]],'#1c3426',accent);poly([[24,-82],[32,-96],[19,-88]],'#1c3426',accent)}
+if(spiritIndex===10){poly([[-14,-64],[-23,-54],[-13,-57]],'#392720',accent);poly([[14,-64],[23,-54],[13,-57]],'#392720',accent)}
+if(spiritIndex===11){poly([[-11,-110],[-17,-101],[-13,-88],[-5,-91]],'#252b34',accent);poly([[11,-110],[17,-101],[13,-88],[5,-91]],'#252b34',accent)}
+if(spiritIndex===12){x.strokeStyle=accent;x.lineWidth=2;x.beginPath();x.arc(0,-116,15,Math.PI,Math.PI*2);x.stroke()}
+if(spiritIndex===14){x.strokeStyle=accent;x.lineWidth=2;x.beginPath();x.moveTo(-7,-109);x.lineTo(1,-101);x.lineTo(-3,-94);x.lineTo(6,-86);x.stroke()}
 x.restore()}
 if(!isPlayer){x.save();x.scale(face,1);x.fillStyle='#ffb6a9';x.font='900 13px system-ui';x.textAlign='center';x.shadowColor='#000';x.shadowBlur=8;x.fillText(currentSpirit().name,0,-145);x.shadowBlur=0;x.strokeStyle=currentSpirit().cue+'88';x.lineWidth=1;x.beginPath();x.moveTo(-44,-137);x.lineTo(44,-137);x.stroke();x.restore()}
 // animated cape, split folds and gold hem catch the ridge light
