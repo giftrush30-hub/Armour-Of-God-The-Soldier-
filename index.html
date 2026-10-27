@@ -63,8 +63,8 @@ let cape=walk*.8+Math.sin(frame*.09+(isPlayer?0:1))*5+(a.kind==='special'?Math.s
 poly([[-10,-87],[-25,-79],[-38+cape,-45],[-31+cape,-25],[-13,-50],[-3,-70]],isPlayer?'#7b2922':'#281c2b','#0a0c12');
 limb(-25,-68,-31+cape*.5,-43,2,isPlayer?'#d7a84d':'#9aa5b5');limb(-20,-65,-23+cape*.6,-39,2,isPlayer?'#d7a84d':'#9aa5b5');
 // legs with visible joints, readable movement poses, and heavy boots
-let kickPose=a.kind==='kick'&&a.attack>7; limb(-8,-39,-14+walk,-18,13,'#11151c');limb(-14+walk,-18,-24+walk,-5,14,isPlayer?'#bd8b36':'#7d8795');
-if(kickPose){limb(8,-39,22,-48,13,'#11151c');limb(22,-48,48,-43,14,isPlayer?'#bd8b36':'#7d8795');poly([[39,-49],[54,-47],[58,-40],[42,-38]],'#0b0e14','#d7b15e')}else{limb(8,-39,14-walk,-18,13,'#11151c');limb(14-walk,-18,25-walk,-5,14,isPlayer?'#bd8b36':'#7d8795');}
+let kickPhase=a.kind==='kick'&&a.attack>0?Math.sin((1-a.attack/16)*Math.PI):0;let kickPose=a.kind==='kick'&&a.attack>7; limb(-8,-39,-14+walk,-18,13,'#11151c');limb(-14+walk,-18,-24+walk,-5,14,isPlayer?'#bd8b36':'#7d8795');
+if(kickPose){limb(8,-39,22,-48,13,'#11151c');limb(22,-48,48+kickPhase*10,-43-kickPhase*7,14,isPlayer?'#bd8b36':'#7d8795');poly([[39,-49],[54,-47],[58,-40],[42,-38]],'#0b0e14','#d7b15e')}else{limb(8,-39,14-walk,-18,13,'#11151c');limb(14-walk,-18,25-walk,-5,14,isPlayer?'#bd8b36':'#7d8795');}
 poly([[-34,-7],[-12,-10],[-5,-3],[-7,1],[-34,1]],'#0b0e14','#d7b15e');poly([[9,-7],[31,-9],[36,-3],[34,1],[10,1]],'#0b0e14','#d7b15e');
 // layered leather under-tunic, sculpted cuirass and bevelled metal plates
 poly([[-18,-84],[15,-84],[22,-49],[15,-33],[-15,-33],[-23,-49]],isPlayer?'#48221e':'#1a202a','#080b11');
@@ -86,7 +86,7 @@ limb(-13,-75,-25+Math.sin(frame*.14)*Math.min(1,Math.abs(a.vx)/4)*4,-60,12,isPla
 if(guard){x.save();x.translate(-31,-59);poly([[-12,-18],[8,-16],[14,-2],[1,17],[-14,2]],'#e0b14a','#fff0ae');poly([[-6,-11],[3,-10],[7,-1],[0,8],[-7,0]],'#67451c','#f7d88a');x.restore()}
 else{x.save();x.translate(-29,-58);poly([[-10,-15],[8,-13],[12,0],[0,13],[-12,0]],isPlayer?'#9c742e':'#535f72','#e9cc7a');x.beginPath();x.moveTo(-5,-8);x.lineTo(4,6);x.moveTo(5,-8);x.lineTo(-4,6);x.strokeStyle='#f8df94';x.lineWidth=2;x.stroke();x.restore()}
 // right arm swings while walking; sword lifts during attack
-let sx=atk?25:14,sy=atk?-61:-54,ex=atk?57:24,ey=atk?-79:-42;
+let swing=atk?Math.sin((1-a.attack/16)*Math.PI):0;let sx=atk?18+22*swing:14,sy=atk?-54-10*swing:-54,ex=atk?30+38*swing:24,ey=atk?-55-25*swing:-42;
 limb(13,-75,sx,sy,12,isPlayer?'#d9ad50':'#7c8798');limb(sx,sy,ex,ey,9,'#222936');
 // visible blade, crossguard and grip remain connected to the weapon hand
 x.save();let bladeGlow=atk?(a.kind==='special'?'#a9f5ff':'#fff0a5'):(isPlayer?'#d9e8f5':'#b8c3d3');x.shadowColor=bladeGlow;x.shadowBlur=atk?18:5;
