@@ -258,7 +258,7 @@ if(e.fall===0&&e.stagger===0&&e.kind!=='windup'&&e.attack===0){
 }
 else if(e.attack===0&&e.inv===0&&e.recovery===0&&e.kind!=='windup'&&Math.abs(p.x-e.x)<215&&frame%52===0){e.ai=(e.ai||0)+1;e.attackType=e.ai%3===0?'heavy':(e.ai%2===0?'kick':'sword');e.windupTotal=e.attackType==='heavy'?48:(e.attackType==='kick'?30:36);e.kind='windup';e.attack=e.windupTotal;e.hitDone=false;e.aiState='windup';e.vx*=.25;$('status').innerHTML=e.attackType==='heavy'?'<strong>HEAVY STRIKE!</strong> A slower, stronger blow is coming. Guard or create distance.':'<strong>WATCH OUT!</strong> The Spirit is winding up an attack. Guard or move away.'}
 if(p.x<95||p.x>865){p.vx+=(p.x<95?1:-1)*.6}
-if(p.fall===0&&(p.x<45||p.x>915)&&Math.abs(p.vx)>1.4){p.fall=1;p.hitDir=p.x<45?-1:1;p.vy=-1.5;$('status').innerHTML='<strong>CLIFF EDGE!</strong> Recover your footing before the next strike.';}
+if(p.fall===0&&((p.x<=55&&p.vx< -1.4)||(p.x>=905&&p.vx>1.4))){p.fall=1;p.hitDir=p.x<=55?-1:1;p.vy=-1.5;$('status').innerHTML='<strong>CLIFF EDGE!</strong> Recover your footing before the next strike.';}
 if(p.fall>0){p.x+=p.vx;p.vx*=.96;p.vy+=.42;p.y+=p.vy;p.fall++;if(p.fall>25)finish(false)}
 if(e.fall>0){e.x+=e.vx;e.vx*=.96;e.vy+=.42;e.y+=e.vy;e.fall++;if(e.fall>25)finish(true)}
 if(p.hp<=0&&p.fall===0)finish(false);if(p.fall===0&&p.x>=55&&p.x<=905&&Math.abs(p.vx)<1.4){/* safe footing restored */}ui();draw();requestAnimationFrame(update)
