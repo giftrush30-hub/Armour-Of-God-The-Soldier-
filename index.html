@@ -19,10 +19,19 @@ const $=id=>document.getElementById(id);
 let running=false,ended=false,frame=0,shake=0,flash=0,hitStop=0,specialFX=0,swordChain=0,swordChainUntil=0,coins=Number(localStorage.getItem('aogs-coins')||0),held={},cool={},last=0,particles=[],comboCount=0,comboUntil=0,spiritIndex=Number(localStorage.getItem('aogs-spirit')||0);
 const spirits=[{name:'SPIRIT OF FEAR',color:'#d52d3a',cue:'#ff615c',trial:'THE RIDGE'},{name:'SPIRIT OF TEMPTATION',color:'#9b4acb',cue:'#e1a0ff',trial:'THE VEILED PASS'},{name:'SPIRIT OF DOUBT',color:'#3976bf',cue:'#8bc7ff',trial:'THE BROKEN SUMMIT'},{name:'SPIRIT OF SORROW',color:'#2d8d91',cue:'#8ce7df',trial:'THE WEEPING CLIFF'},{name:'SPIRIT OF STAGNATION',color:'#6b7a42',cue:'#d4e88b',trial:'THE STONE ASCENT'},{name:'SPIRIT OF DELAY',color:'#b06b31',cue:'#ffd08a',trial:'THE LAST PASS'}];
 const currentSpirit=()=>spirits[spiritIndex%spirits.length];
+const spiritStyles=[
+ {health:100,damage:10,reach:190,range:160,windup:36,recovery:24,speed:.34,attack:'sword'},
+ {health:88,damage:11,reach:205,range:174,windup:31,recovery:19,speed:.42,attack:'feint'},
+ {health:112,damage:9,reach:180,range:148,windup:43,recovery:27,speed:.25,attack:'feint'},
+ {health:118,damage:12,reach:185,range:145,windup:32,recovery:28,speed:.3,attack:'heavy'},
+ {health:145,damage:13,reach:190,range:137,windup:50,recovery:31,speed:.2,attack:'heavy'},
+ {health:92,damage:10,reach:195,range:168,windup:28,recovery:17,speed:.46,attack:'kick'}
+];
+const spiritStyle=()=>spiritStyles[spiritIndex%spiritStyles.length];
 const p={x:300,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0,hitDone:false,attackDamage:0,attackReach:0,stagger:0,hitFlash:0};
 const e={x:650,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0,ai:0,stagger:0,hitFlash:0,hitDone:false,recovery:0,attackType:'',windupTotal:36,strafeDir:1,strafeTimer:0,preferredRange:156};
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-function reset(){particles=[];comboCount=0;comboUntil=0;held={};cool={};Object.assign(p,{x:300,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0,hitDone:false,attackDamage:0,attackReach:0,stagger:0,hitFlash:0});Object.assign(e,{x:650,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0,ai:0,stagger:0,hitFlash:0,hitDone:false,recovery:0,attackType:'',windupTotal:36,strafeDir:1,strafeTimer:0,preferredRange:156});ended=false;running=true;frame=0;shake=0;flash=0;hitStop=0;specialFX=0;swordChain=0;swordChainUntil=0;particles=[];$('enemyname').textContent=currentSpirit().name;$('round').innerHTML='TRIAL '+(spiritIndex+1)+' · '+currentSpirit().trial+'<br><span style="font-size:8px;letter-spacing:.12em;color:#d8c8aa">DEFEAT THE SPIRIT</span>';$('result').classList.add('hidden');$('intro').classList.add('hidden');$('status').innerHTML='The mountain pass awaits. <strong>Stand firm.</strong>';ui()}
+function reset(){particles=[];comboCount=0;comboUntil=0;held={};cool={};Object.assign(p,{x:300,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0,hitDone:false,attackDamage:0,attackReach:0,stagger:0,hitFlash:0});Object.assign(e,{x:650,y:0,vx:0,vy:0,hp:spiritStyle().health,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0,ai:0,stagger:0,hitFlash:0,hitDone:false,recovery:0,attackType:'',windupTotal:spiritStyle().windup,strafeDir:1,strafeTimer:0,preferredRange:spiritStyle().range});ended=false;running=true;frame=0;shake=0;flash=0;hitStop=0;specialFX=0;swordChain=0;swordChainUntil=0;particles=[];$('enemyname').textContent=currentSpirit().name;$('ehp').style.width='100%';$('ehpnum').textContent=spiritStyle().health+' / '+spiritStyle().health;$('round').innerHTML='TRIAL '+(spiritIndex+1)+' · '+currentSpirit().trial+'<br><span style="font-size:8px;letter-spacing:.12em;color:#d8c8aa">DEFEAT THE SPIRIT</span>';$('result').classList.add('hidden');$('intro').classList.add('hidden');$('status').innerHTML='The mountain pass awaits. <strong>Stand firm.</strong>';ui()}
 function ui(){$('hp').style.width=clamp(p.hp,0,100)+'%';$('ehp').style.width=clamp(e.hp,0,100)+'%';$('hpnum').textContent=Math.ceil(clamp(p.hp,0,100))+' / 100';$('ehpnum').textContent=Math.ceil(clamp(e.hp,0,100))+' / 100';$('coins').textContent='◈ '+coins;let wait=Math.max(0,(cool.special||0)-frame);$('specialstate').textContent=wait>0?'CHARGING '+Math.ceil(wait/60)+'s':'SPECIAL · READY';$('specialstate').style.color=wait>0?'#c5a978':'#ffe39b'}
 function poly(points,fill,stroke){x.beginPath();points.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.closePath();x.fillStyle=fill;x.fill();if(stroke){x.strokeStyle=stroke;x.lineWidth=2;x.stroke()}}
 function mountain(points,fill){poly(points,fill)}
@@ -252,9 +261,9 @@ else if(e.attack>0){
       particles.push({x:p.x-16,y:365,vx:0,vy:0,life:8,max:8,size:20,text:'✦',color:heavyBlock?'#ffd36b':'#9cecff'});
       for(let z=0;z<(heavyBlock?14:9);z++)particles.push({x:p.x-12,y:365+Math.random()*35,vx:(Math.random()-.5)*(heavyBlock?6:4),vy:-Math.random()*(heavyBlock?4:3),life:12,max:12,size:2+Math.random()*2,color:heavyBlock?'#ffd36b':'#9cecff'});
     }
-    else hit(e,p,e.attackType==='heavy'?16:(e.kind==='kick'?12:10),e.attackType==='heavy'?11:(e.kind==='kick'?9:7));
+    else hit(e,p,e.attackType==='heavy'?spiritStyle().damage+4:(e.kind==='kick'?spiritStyle().damage+1:spiritStyle().damage),e.attackType==='heavy'?11:(e.kind==='kick'?9:7));
   }}
-  if(e.attack===0){e.kind='';e.aiState='recovery';e.recovery=24;e.hitDone=false;}
+  if(e.attack===0){e.kind='';e.aiState='recovery';e.recovery=spiritStyle().recovery;e.hitDone=false;}
 }
 if(p.stagger===0){if(held.left){p.vx-=.72;p.face=-1}if(held.right){p.vx+=.72;p.face=1}}
 if(held.jump&&p.ground){p.vy=-11;p.ground=false;held.jump=false}
@@ -262,13 +271,13 @@ p.vx*=.82;p.x+=p.vx;p.y+=p.vy;p.vy+=.55;if(p.y>=0){p.y=0;p.vy=0;p.ground=true}
 p.x=clamp(p.x,55,905);if(Math.abs(p.x-e.x)<48&&p.y===0){p.x+=p.x<e.x?-1.5:1.5}e.face=p.x<e.x?-1:1;
 // Maintain readable melee spacing and reposition during recovery.
 if(e.fall===0&&e.stagger===0&&e.kind!=='windup'&&e.attack===0){
- let dx=p.x-e.x,dist=Math.abs(dx),toward=dx===0?e.face:Math.sign(dx);
- if(dist>e.preferredRange+30){e.vx+=toward*.34}
- else if(dist<e.preferredRange-34){e.vx-=toward*.28}
+ let dx=p.x-e.x,dist=Math.abs(dx),toward=dx===0?e.face:Math.sign(dx),style=spiritStyle();
+ if(dist>e.preferredRange+30){e.vx+=toward*style.speed}
+ else if(dist<e.preferredRange-34){e.vx-=toward*(style.speed*.82)}
  else if(e.recovery>0){if(e.strafeTimer<=0){e.strafeDir=Math.random()<.5?-1:1;e.strafeTimer=24+Math.floor(Math.random()*20)}e.strafeTimer--;e.vx+=e.strafeDir*.12}
  e.x+=e.vx;e.vx*=.82;e.x=clamp(e.x,95,865);
 }
-else if(e.attack===0&&e.inv===0&&e.recovery===0&&e.kind!=='windup'&&Math.abs(p.x-e.x)<215&&frame%52===0){e.ai=(e.ai||0)+1;e.attackType=e.ai%3===0?'heavy':(e.ai%2===0?'kick':'sword');e.windupTotal=e.attackType==='heavy'?48:(e.attackType==='kick'?30:36);e.kind='windup';e.attack=e.windupTotal;e.hitDone=false;e.aiState='windup';e.vx*=.25;$('status').innerHTML=e.attackType==='heavy'?'<strong>HEAVY STRIKE!</strong> A slower, stronger blow is coming. Guard or create distance.':'<strong>WATCH OUT!</strong> The Spirit is winding up an attack. Guard or move away.'}
+else if(e.attack===0&&e.inv===0&&e.recovery===0&&e.kind!=='windup'&&Math.abs(p.x-e.x)<215&&frame%52===0){e.ai=(e.ai||0)+1;const style=spiritStyle();e.attackType=style.attack==='feint'?(e.ai%2===0?'kick':'sword'):(style.attack==='heavy'?(e.ai%3===0?'heavy':'sword'):(e.ai%3===0?'heavy':(e.ai%2===0?'kick':'sword')));e.windupTotal=e.attackType==='heavy'?style.windup:(e.attackType==='kick'?style.windup-3:style.windup);e.kind='windup';e.attack=e.windupTotal;e.hitDone=false;e.aiState='windup';e.vx*=.25;$('status').innerHTML=e.attackType==='heavy'?'<strong>HEAVY STRIKE!</strong> A slower, stronger blow is coming. Guard or create distance.':'<strong>WATCH OUT!</strong> The Spirit is winding up an attack. Guard or move away.'}
 if(p.x<95||p.x>865){p.vx+=(p.x<95?1:-1)*.6}
 if(p.fall===0&&((p.x<=55&&p.vx< -1.4)||(p.x>=905&&p.vx>1.4))){p.fall=1;p.hitDir=p.x<=55?-1:1;p.vy=-1.5;$('status').innerHTML='<strong>CLIFF EDGE!</strong> Recover your footing before the next strike.';}
 // A living opponent can also be knocked off the ridge by sustained pressure.
