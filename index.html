@@ -446,6 +446,10 @@ if(kickPose){limb(8,-39,22,-48,13,'#11151c');limb(22,-48,48+kickPhase*10,-43-kic
 poly([[-34,-7],[-12,-10],[-5,-3],[-7,1],[-34,1]],'#0b0e14','#d7b15e');poly([[9,-7],[31,-9],[36,-3],[34,1],[10,1]],'#0b0e14','#d7b15e');
 poly([[-25,-20],[-14,-22],[-9,-9],[-18,-7]],isPlayer?(selectedCharacter==='deborah'?'#63b99a':'#d4a13f'):'#8794a7',isPlayer?'#ffe6a0':'#d9e1ed');
 poly([[15,-20],[25,-22],[30,-9],[20,-7]],isPlayer?'#bd8732':'#748195',isPlayer?'#ffe6a0':'#d9e1ed');
+// Cross-strapped boot cuffs and knee-cap rims keep the lower-body armour readable during kicks.
+poly([[-24,-17],[-15,-19],[-13,-15],[-22,-13]],isPlayer?(selectedCharacter==='deborah'?'#286c59':'#80531e'):'#3b4554',isPlayer?'#f0ce79':'#b7c3d2');
+poly([[16,-17],[25,-19],[27,-15],[18,-13]],isPlayer?'#80531e':'#3b4554',isPlayer?'#f0ce79':'#b7c3d2');
+x.strokeStyle=isPlayer?'#f7d985':'#c5ceda';x.lineWidth=1;x.beginPath();x.moveTo(-22,-16);x.lineTo(-15,-17);x.moveTo(17,-17);x.lineTo(24,-16);x.stroke();
 x.strokeStyle=isPlayer?'#fff0b0':'#e0e6ef';x.lineWidth=1.6;x.beginPath();x.moveTo(-32,0);x.lineTo(-8,0);x.moveTo(11,0);x.lineTo(35,0);x.stroke();
 // layered leather under-tunic, sculpted cuirass and bevelled metal plates
 poly([[-18,-84],[15,-84],[22,-49],[15,-33],[-15,-33],[-23,-49]],isPlayer?'#48221e':'#1a202a','#080b11');
