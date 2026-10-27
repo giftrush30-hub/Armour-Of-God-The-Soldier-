@@ -128,7 +128,7 @@ x.strokeStyle='#d8b16c55';x.lineWidth=2;x.beginPath();x.moveTo(190,425);x.lineTo
 function limb(ax,ay,bx,by,width,color){x.strokeStyle=color;x.lineWidth=width;x.lineCap='round';x.beginPath();x.moveTo(ax,ay);x.lineTo(bx,by);x.stroke()}
 function fighter(a,isPlayer){
 let xx=a.x,breath=Math.sin(frame*.09+(isPlayer?0:1.4))*1.2,yy=425+a.y+(a.ground?breath:0),face=a.face,walk=Math.sin(frame*.24+(isPlayer?0:1))*Math.min(8,Math.abs(a.vx)*1.4),atk=a.attack>0,swordAtk=a.attack>0&&(a.kind==='sword'||a.kind==='special'),guard=a.kind==='guard'&&a.attack>0;
-x.save();x.translate(xx,yy);if(a.fall>0){let fallProgress=clamp(a.fall/25,0,1);x.rotate(Math.min(1.18,fallProgress*1.5)*(a.hitDir||face));x.translate(0,fallProgress*7)}else if(a.stagger>0){let recoil=clamp(a.stagger/14,0,1);x.rotate((isPlayer?-.16:.19)*recoil*(a.hitDir||1));x.translate(-(a.hitDir||1)*recoil*2,0)}else if(!isPlayer&&a.kind==='windup'){let prep=1-clamp(a.attack/(a.windupTotal||36),0,1);x.rotate((a.attackType==='heavy'?.13:(a.attackType==='kick'?.06:-.08))*prep)}else if(isPlayer&&a.attack>0&&a.kind!=='guard'){let progress=1-clamp(a.attack/(a.attackTotal||16),0,1);if(a.kind==='sword')x.rotate(-.13+Math.sin(progress*Math.PI)*.2);else if(a.kind==='kick')x.rotate(-.1-Math.sin(progress*Math.PI)*.14);else if(a.kind==='special')x.rotate(-.08+Math.sin(progress*Math.PI)*.13)}x.scale(face,1);x.scale(1.82,1.2);
+x.save();x.translate(xx,yy);if(isPlayer&&a.kind==='dodge'&&a.attack>0){x.save();x.globalAlpha=.45+.35*Math.sin(frame*.9);x.strokeStyle='#8deaff';x.lineWidth=3;x.shadowColor='#61dfff';x.shadowBlur=18;x.beginPath();x.ellipse(0,-39,31,57,-.18,0,Math.PI*2);x.stroke();x.restore()}if(isPlayer&&a.inv>0&&a.kind==='dodge'&&frame%4<2)x.globalAlpha=.62;if(a.fall>0){let fallProgress=clamp(a.fall/25,0,1);x.rotate(Math.min(1.18,fallProgress*1.5)*(a.hitDir||face));x.translate(0,fallProgress*7)}else if(a.stagger>0){let recoil=clamp(a.stagger/14,0,1);x.rotate((isPlayer?-.16:.19)*recoil*(a.hitDir||1));x.translate(-(a.hitDir||1)*recoil*2,0)}else if(!isPlayer&&a.kind==='windup'){let prep=1-clamp(a.attack/(a.windupTotal||36),0,1);x.rotate((a.attackType==='heavy'?.13:(a.attackType==='kick'?.06:-.08))*prep)}else if(isPlayer&&a.attack>0&&a.kind!=='guard'){let progress=1-clamp(a.attack/(a.attackTotal||16),0,1);if(a.kind==='sword')x.rotate(-.13+Math.sin(progress*Math.PI)*.2);else if(a.kind==='kick')x.rotate(-.1-Math.sin(progress*Math.PI)*.14);else if(a.kind==='special')x.rotate(-.08+Math.sin(progress*Math.PI)*.13)}x.scale(face,1);x.scale(1.82,1.2);
 x.globalAlpha=a.inv>0&&frame%4<2?.55:1;if(a.hitFlash>0){x.shadowColor=isPlayer?'#fff0b0':'#ff665f';x.shadowBlur=16;x.globalAlpha=.82+.18*Math.sin(frame*1.8);a.hitFlash--}
 // Ground contact shadow tightens and softens with jump height for a stronger 2.5D read.
 let shadowScale=clamp(1+Math.abs(a.y)*-.018,.35,1);
@@ -402,7 +402,8 @@ else if(e.attack>0){
   e.attack--;
   // Resolve enemy contact only during the visible strike window, once per attack.
   if(!e.hitDone&&e.attack<=11&&e.attack>=8){e.hitDone=true;const signatureReach=e.attackType==='judgment'?spiritStyle().reach+48:(e.attackType==='storm'?spiritStyle().reach+24:spiritStyle().reach);if(Math.abs(p.x-e.x)<signatureReach&&Math.abs(p.y-e.y)<75){
-    e.attackConnected=true;
+    if(p.inv>0&&p.kind==='dodge'){e.attackConnected=false;$('status').innerHTML='<strong>PERFECT DODGE!</strong> The strike passes by. Counter while the spirit is exposed.';particles.push({x:p.x,y:340+p.y,vx:0,vy:-1.2,life:34,max:34,size:0,text:'PERFECT DODGE',color:'#9deaff'});for(let z=0;z<7;z++)particles.push({x:p.x+(Math.random()-.5)*38,y:390+p.y,vx:(Math.random()-.5)*3,vy:-Math.random()*2,life:16,max:16,size:2+Math.random()*2,color:'#9deaff'})}
+    else {e.attackConnected=true;
     if(held.guard&&p.fall===0&&p.hp>0&&p.stagger===0||p.kind==='guard'&&p.fall===0&&p.hp>0&&p.stagger===0){
       const heavyBlock=e.attackType==='heavy'||e.attackType==='judgment'||e.attackType==='storm';
       wearArmour('shield',heavyBlock?11:5,'blocked impact');
@@ -416,6 +417,7 @@ else if(e.attack>0){
       for(let z=0;z<(heavyBlock?14:9);z++)particles.push({x:impactX,y:impactY+Math.random()*20,vx:(e.x<p.x?1:-1)*(1+Math.random()*(heavyBlock?5:3)),vy:(Math.random()-.5)*(heavyBlock?5:3),life:12,max:12,size:2+Math.random()*2,color:heavyBlock?'#ffd36b':'#9cecff'});
     }
     else hit(e,p,e.attackType==='judgment'?spiritStyle().damage+6:(e.attackType==='storm'?spiritStyle().damage+3:(e.attackType==='heavy'?spiritStyle().damage+4:(e.kind==='kick'?spiritStyle().damage+1:spiritStyle().damage))),e.attackType==='storm'?15:(e.attackType==='judgment'?10:(e.attackType==='heavy'?11:(e.kind==='kick'?9:7))));
+    }
   }}
   if(e.attack===0){e.kind='';e.aiState='recovery';e.recovery=spiritStyle().recovery+(e.attackConnected?0:30);if(!e.attackConnected){$('status').innerHTML='<strong>SPIRIT EXPOSED!</strong> Its strike missed. Counterattack now!';particles.push({x:e.x,y:320,vx:0,vy:-.7,life:34,max:34,size:0,text:'OPENING!',color:'#ffe29a'})}e.hitDone=false;e.vx*=.55;e.attackConnected=false;}
 }
