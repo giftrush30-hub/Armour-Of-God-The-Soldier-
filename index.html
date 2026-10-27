@@ -199,7 +199,7 @@ if(specialFX>0){
 if(running&&!ended&&e.kind==='windup'){
   x.save();
   let progress=1-clamp(e.attack/(e.windupTotal||36),0,1),heavy=e.attackType==='heavy',kick=e.attackType==='kick';
-  let cue=heavy?'HEAVY STRIKE!':(kick?'LOW KICK!':'SWORD SLASH!');
+  let cue=heavy?'HEAVY STRIKE!':(kick?'LOW KICK!':(currentSpirit().name==='SPIRIT OF DOUBT'?'FEINTING SLASH!':'SWORD SLASH!'));
   let cueColor=heavy?'#ffd36b':(kick?'#ff9b68':currentSpirit().cue);
   let reach=heavy?112:(kick?72:92), baseY=425+p.y+3;
   x.globalAlpha=.24+progress*.55;x.strokeStyle=cueColor;x.lineWidth=2+progress*2;
@@ -249,7 +249,7 @@ if(e.kind==='windup'){e.attack--;if(e.attack<=0){e.kind=e.attackType==='kick'?'k
 else if(e.attack>0){
   e.attack--;
   // Resolve enemy contact only during the visible strike window, once per attack.
-  if(!e.hitDone&&e.attack<=11&&e.attack>=8){e.hitDone=true;if(Math.abs(p.x-e.x)<190&&Math.abs(p.y-e.y)<75){
+  if(!e.hitDone&&e.attack<=11&&e.attack>=8){e.hitDone=true;if(Math.abs(p.x-e.x)<spiritStyle().reach&&Math.abs(p.y-e.y)<75){
     if(held.guard&&p.fall===0&&p.hp>0&&p.stagger===0||p.kind==='guard'&&p.fall===0&&p.hp>0&&p.stagger===0){
       const heavyBlock=e.attackType==='heavy';
       p.hp=Math.max(0,p.hp-(heavyBlock?5:1));
