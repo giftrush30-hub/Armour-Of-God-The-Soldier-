@@ -433,9 +433,12 @@ if(spiritIndex===14){x.strokeStyle=accent;x.lineWidth=2;x.beginPath();x.moveTo(-
 x.restore()}
 if(!isPlayer){x.save();x.scale(face,1);x.fillStyle='#ffb6a9';x.font='700 13px Georgia,serif';x.textAlign='center';x.shadowColor='#000';x.shadowBlur=8;x.fillText(currentSpirit().name,0,-145);x.shadowBlur=0;x.strokeStyle=currentSpirit().cue+'88';x.lineWidth=1;x.beginPath();x.moveTo(-44,-137);x.lineTo(44,-137);x.stroke();x.restore()}
 // animated cape, split folds and gold hem catch the ridge light
+const clothPhase=reduceMotion?0:frame*.11+(isPlayer?0:1.7),clothFlutter=Math.sin(clothPhase)*3.2+Math.sin(clothPhase*.57)*1.8;
 let cape=walk*.8+Math.sin(frame*.09+(isPlayer?0:1))*5+(a.kind==='special'?Math.sin(frame*.5)*3:0);
-poly([[-10,-87],[-25,-79],[-38+cape,-45],[-31+cape,-25],[-13,-50],[-3,-70]],isPlayer?(selectedCharacter==='deborah'?'#235f55':'#7b2922'):'#281c2b','#0a0c12');
+// Cape fabric now has two independently moving hem points, so it reads as cloth rather than a rigid shield.
+poly([[-10,-87],[-25,-79],[-38+cape+clothFlutter,-45],[-31+cape-clothFlutter*.65,-25],[-13+clothFlutter*.35,-50],[-3,-70]],isPlayer?(selectedCharacter==='deborah'?'#235f55':'#7b2922'):'#281c2b','#0a0c12');
 limb(-25,-68,-31+cape*.5,-43,2,isPlayer?(selectedCharacter==='deborah'?'#7bd5b6':'#d7a84d'):'#9aa5b5');limb(-20,-65,-23+cape*.6,-39,2,isPlayer?'#d7a84d':'#9aa5b5');
+if(!reduceMotion){x.save();x.globalAlpha=.46;x.strokeStyle=isPlayer?(selectedCharacter==='deborah'?'#a7e8ce':'#f4d887'):'#aeb7c5';x.lineWidth=1;x.beginPath();x.moveTo(-13,-79);x.quadraticCurveTo(-24+cape*.3,-61,-27+cape*.65,-38);x.stroke();x.restore();}
 // legs with visible joints, readable movement poses, and heavy boots
 let kickProgress=a.kind==='kick'&&a.attack>0?1-a.attack/Math.max(1,a.attackTotal||16):0;let kickPhase=a.kind==='kick'&&a.attack>0?Math.sin(kickProgress*Math.PI):0;let kickPose=a.kind==='kick'&&a.attack>4; limb(-8,-39,-14+walk,-18,13,'#11151c');limb(-14+walk,-18,-24+walk,-5,14,isPlayer?(selectedCharacter==='deborah'?'#428c77':'#bd8b36'):'#7d8795');
 if(kickPose){limb(8,-39,22,-48,13,'#11151c');limb(22,-48,48+kickPhase*10,-43-kickPhase*7,14,isPlayer?'#bd8b36':'#7d8795');poly([[39,-49],[54,-47],[58,-40],[42,-38]],'#0b0e14','#d7b15e')}else{limb(8,-39,14-walk,-18,13,'#11151c');limb(14-walk,-18,25-walk,-5,14,isPlayer?'#bd8b36':'#7d8795');}
