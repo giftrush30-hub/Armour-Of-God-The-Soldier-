@@ -53,7 +53,7 @@ x.strokeStyle='#d8b16c55';x.lineWidth=2;x.beginPath();x.moveTo(190,425);x.lineTo
 function limb(ax,ay,bx,by,width,color){x.strokeStyle=color;x.lineWidth=width;x.lineCap='round';x.beginPath();x.moveTo(ax,ay);x.lineTo(bx,by);x.stroke()}
 function fighter(a,isPlayer){
 let xx=a.x,breath=Math.sin(frame*.09+(isPlayer?0:1.4))*1.2,yy=425+a.y+(a.ground?breath:0),face=a.face,walk=Math.sin(frame*.24+(isPlayer?0:1))*Math.min(8,Math.abs(a.vx)*1.4),atk=a.attack>0,swordAtk=a.attack>0&&(a.kind==='sword'||a.kind==='special'),guard=a.kind==='guard'&&a.attack>0;
-x.save();x.translate(xx,yy);if(a.stagger>0){x.rotate((a.stagger/12)*.11*(a.hitDir||1));a.stagger--}x.scale(face,1);x.scale(1.82,1.2);
+x.save();x.translate(xx,yy);if(a.fall>0){let fallProgress=clamp(a.fall/25,0,1);x.rotate(Math.min(1.18,fallProgress*1.5)*(a.hitDir||face));x.translate(0,fallProgress*7)}else if(a.stagger>0){x.rotate((a.stagger/12)*.11*(a.hitDir||1));a.stagger--}x.scale(face,1);x.scale(1.82,1.2);
 x.globalAlpha=a.inv>0&&frame%4<2?.55:1;if(a.hitFlash>0){x.shadowColor=isPlayer?'#fff0b0':'#ff665f';x.shadowBlur=16;x.globalAlpha=.82+.18*Math.sin(frame*1.8);a.hitFlash--}
 // Ground contact shadow tightens and softens with jump height for a stronger 2.5D read.
 let shadowScale=clamp(1+Math.abs(a.y)*-.018,.35,1);
@@ -125,7 +125,6 @@ x.strokeStyle=isPlayer?'#f5d47b':'#aab6c8';x.lineWidth=2.2;x.beginPath();x.arc(-
 x.fillStyle=isPlayer?'#f4d17a':'#aeb9c9';x.beginPath();x.arc(-20,-24,1.5,0,Math.PI*2);x.arc(20,-24,1.5,0,Math.PI*2);x.fill();
 // guard impact glints, visible only while braced against an attack
 if(guard){x.save();x.globalAlpha=.6+.35*Math.sin(frame*.7);x.strokeStyle='#a8f3ff';x.lineWidth=2;x.shadowColor='#75e7ff';x.shadowBlur=13;x.beginPath();x.arc(-33,-65,20,-1.1,.9);x.stroke();x.restore()}
-if(a.fall>0){x.rotate(Math.min(1.2,a.fall*.05))}
 x.restore();
 }
 function draw(){
@@ -201,7 +200,7 @@ x.restore();
 function hit(a,b,damage,force){if(b.inv>0||b.fall>0)return;b.hp=Math.max(0,b.hp-damage);b.inv=19;b.vx=a.face*force;b.stagger=12;b.hitDir=a.face;b.hitFlash=8;shake=a.kind==='special'?12:8;flash=a.kind==='special'?15:8;hitStop=Math.max(hitStop,a.kind==='special'?5:3);if(a===p){comboCount=frame<comboUntil?comboCount+1:1;comboUntil=frame+95;if(comboCount>=2){$('status').innerHTML='<strong>'+comboCount+' HIT COMBO!</strong> Keep the pressure on the Spirit.'}}let hx=b.x,hy=425+b.y-62;
  // Ring-shaped impact flash: readable at phone size without expensive post-processing.
  particles.push({x:hx,y:hy,vx:0,vy:0,life:9,max:9,size:24,text:'✦',color:a.kind==='special'?'#a8f4ff':(a===p?'#ffe39a':'#ff8178')});
- for(let i=0;i<13;i++){let ang=(Math.PI*2*i/13)+Math.random()*.22,spd=1.5+Math.random()*4;particles.push({x:hx,y:hy,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-1,life:12+Math.random()*10,max:22,size:1.8+Math.random()*3,color:a.kind==='special'?'#a8f4ff':(a===p?'#ffd875':'#ff7770')})}particles.push({x:hx,y:hy-25,vx:(Math.random()-.5)*1.5,vy:-2.2,life:34,max:34,size:0,text:'-'+damage,color:a.kind==='special'?'#a8f4ff':'#fff0bd'});$('status').innerHTML=damage>14?' <strong>IMPACT!</strong> The strike breaks through.':'<strong>HIT CONFIRMED.</strong> Keep pressing forward.';if(b.hp<=0){b.fall=1;b.vx=a.face*7;finish(a===p)}}
+ for(let i=0;i<13;i++){let ang=(Math.PI*2*i/13)+Math.random()*.22,spd=1.5+Math.random()*4;particles.push({x:hx,y:hy,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-1,life:12+Math.random()*10,max:22,size:1.8+Math.random()*3,color:a.kind==='special'?'#a8f4ff':(a===p?'#ffd875':'#ff7770')})}particles.push({x:hx,y:hy-25,vx:(Math.random()-.5)*1.5,vy:-2.2,life:34,max:34,size:0,text:'-'+damage,color:a.kind==='special'?'#a8f4ff':'#fff0bd'});$('status').innerHTML=damage>14?' <strong>IMPACT!</strong> The strike breaks through.':'<strong>HIT CONFIRMED.</strong> Keep pressing forward.';if(b.hp<=0){b.fall=1;b.vx=a.face*7;b.hitDir=a.face;b.vy=-2;for(let i=0;i<16;i++){let ang=Math.random()*Math.PI*2,spd=1+Math.random()*4;particles.push({x:b.x,y:425+b.y-34,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-2,life:16+Math.random()*12,max:28,size:2+Math.random()*3,color:i%3===0?'#a8f4ff':(a.kind==='special'?'#ffe39a':'#c6b99e')})}if(a===p)finish(false)}}
 function act(k){if(!running||ended)return;if(k==='guard'){p.kind='guard';p.attack=12;return}if((cool[k]||0)>frame)return;cool[k]=frame+(k==='special'?100:20);p.kind=k;if(k==='sword'){swordChain=frame<swordChainUntil?(swordChain%3)+1:1;swordChainUntil=frame+38;p.attack=[16,18,20][swordChain-1];p.attackDamage=[16,19,23][swordChain-1];p.attackReach=[175,188,202][swordChain-1];p.attackTotal=p.attack}else{p.attack=k==='special'?28:16;p.attackTotal=p.attack;p.attackDamage=k==='kick'?12:30;p.attackReach=k==='kick'?132:205}p.hitDone=false;
 p.face=p.x<=e.x?1:-1;
 if(k==='special'){flash=24;shake=5;specialFX=34;for(let i=0;i<18;i++){let ang=Math.random()*Math.PI*2,spd=1+Math.random()*3;particles.push({x:p.x,y:425+p.y-4,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-1,life:18+Math.random()*10,max:28,size:2+Math.random()*2,color:i%2?'#ffe39a':'#8deeff'})}$('status').innerHTML='<strong>RADIANT BURST!</strong> Time the strike as the light bursts.'}
@@ -228,8 +227,8 @@ if(Math.abs(p.x-e.x)>132&&e.fall===0&&e.stagger===0){e.vx+=(p.x<e.x?-1:1)*.32;e.
 else if(e.attack===0&&e.inv===0&&e.kind!=='windup'&&frame%52===0){e.kind='windup';e.attack=36;e.ai=(e.ai||0)+1;e.aiState='windup';$('status').innerHTML='<strong>WATCH OUT!</strong> The Spirit is winding up an attack. Guard now.'}
 if(p.x<95||p.x>865){p.vx+=(p.x<95?1:-1)*.6}
 if(p.inv>0&&p.x<45||p.inv>0&&p.x>915)p.fall=1;
-if(p.fall>0){p.x+=p.vx;p.y+=4;p.fall++;if(p.fall>25)finish(false)}
-if(e.fall>0){e.x+=e.vx;e.y+=4;e.fall++;if(e.fall>25)finish(true)}
+if(p.fall>0){p.x+=p.vx;p.vx*=.96;p.vy+=.42;p.y+=p.vy;p.fall++;if(p.fall>25)finish(false)}
+if(e.fall>0){e.x+=e.vx;e.vx*=.96;e.vy+=.42;e.y+=e.vy;e.fall++;if(e.fall>25)finish(true)}
 if(p.hp<=0)finish(false);ui();draw();requestAnimationFrame(update)
 }
 document.querySelectorAll('[data-hold]').forEach(b=>{let k=b.dataset.hold;const on=ev=>{ev.preventDefault();held[k]=true;b.classList.add('active')},off=ev=>{ev.preventDefault();held[k]=false;b.classList.remove('active')};b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('pointerleave',off)});
