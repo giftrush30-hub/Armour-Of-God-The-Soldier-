@@ -444,7 +444,12 @@ if(running&&!ended&&e.kind==='windup'){
   x.shadowColor=cueColor;x.shadowBlur=8+progress*12;
   // A directional ground slash points from the attacker toward the threatened approach.
   let dir=e.x<p.x?1:-1, startX=e.x+dir*18, endX=startX+dir*(reach+progress*20);
-  if(judgment){
+  if(feint){
+    // A deliberately broken, short shale mark signals a bluff, not a committed strike.
+    x.lineWidth=2.5;x.beginPath();x.moveTo(startX,baseY);x.lineTo(startX+dir*20,baseY-4);x.moveTo(startX+dir*31,baseY+2);x.lineTo(startX+dir*48,baseY-2);x.moveTo(startX+dir*59,baseY-5);x.lineTo(startX+dir*68,baseY-7);x.stroke();
+    x.globalAlpha*=.8;x.fillStyle=cueColor;for(let j=0;j<3;j++){x.beginPath();x.arc(startX+dir*(24+j*18),baseY+10-(j%2)*3,1.8,0,Math.PI*2);x.fill()}
+  }
+  else if(judgment){
     // A broken, directional shale-sweep warning reads as a strike across the ridge, never an arena ring.
     x.beginPath();x.moveTo(startX,baseY);x.lineTo(endX,baseY-5);x.lineTo(endX-dir*10,baseY+5);x.stroke();
     x.lineWidth=1.5+progress;x.beginPath();x.moveTo(startX+dir*18,baseY+8);x.lineTo(startX+dir*(reach*.56),baseY+5);x.moveTo(startX+dir*42,baseY-9);x.lineTo(startX+dir*(reach*.78),baseY-12);x.stroke();
