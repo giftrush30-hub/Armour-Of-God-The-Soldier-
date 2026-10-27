@@ -287,6 +287,14 @@ poly([[-18,-57],[18,-57],[15,-50],[-15,-50]],'#f3d58b','#fff3c8');
 poly([[-19,-82],[-10,-88],[-5,-81],[-8,-72],[-19,-73]],isPlayer?'#e7bb56':'#9ba8ba',isPlayer?'#fff0ad':'#e2e8f0');
 poly([[19,-82],[10,-88],[5,-81],[8,-72],[19,-73]],isPlayer?'#b88732':'#6c7889',isPlayer?'#fff0ad':'#d1dbe8');
 for(let j=0;j<3;j++){poly([[-10,-51+j*4],[10,-51+j*4],[8,-48+j*4],[-8,-48+j*4]],isPlayer?'#c39136':'#697586',isPlayer?'#f3d47e':'#aab6c5')}
+// Moving, clipped specular highlight gives the layered cuirass a polished metal read.
+// Uses the native Canvas 2D gradient/clip APIs and freezes when reduced motion is requested.
+x.save();
+x.beginPath();x.moveTo(-17,-80);x.lineTo(-7,-87);x.lineTo(0,-81);x.lineTo(7,-87);x.lineTo(17,-80);x.lineTo(13,-55);x.lineTo(0,-46);x.lineTo(-13,-55);x.closePath();x.clip();
+const sheenShift=reduceMotion?0:Math.sin(frame*.035)*18;
+const armourSheen=x.createLinearGradient(-30+sheenShift,-76,30+sheenShift,-48);
+armourSheen.addColorStop(0,'#ffffff00');armourSheen.addColorStop(.42,'#fff6d966');armourSheen.addColorStop(.5,'#ffffffaa');armourSheen.addColorStop(.58,'#fff6d944');armourSheen.addColorStop(1,'#ffffff00');
+x.globalAlpha=isPlayer?.34:.22;x.fillStyle=armourSheen;x.fillRect(-32,-91,64,54);x.restore();
 for(let side of [-1,1]){x.fillStyle=isPlayer?'#fff0b0':'#e3e9f0';for(let j=0;j<2;j++){x.beginPath();x.arc(side*(15+j),-75+j*7,1.3,0,Math.PI*2);x.fill()}}
 // belt emblem
 x.fillStyle='#fff0b0';x.fillRect(-2,-63,4,13);x.beginPath();x.arc(0,-66,4,0,Math.PI*2);x.fill();
