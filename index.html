@@ -129,12 +129,38 @@ x.restore();
 function draw(){
 x.save();if(shake>0){x.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake*=.85}
 background();
+// 2.5D depth pass: drifting fog bands at different speeds, layered by distance
+for(let layer=0;layer<3;layer++){
+  let speed=[.18,.42,.78][layer], ybase=[302,352,395][layer], alpha=[.055,.075,.06][layer];
+  x.save();x.globalAlpha=alpha;
+  for(let n=0;n<4;n++){
+    let fx=((n*287+frame*speed)%(W+360))-180;
+    let fy=ybase+n*9+Math.sin(frame*.018+n+layer)*5;
+    let fog=x.createRadialGradient(fx,fy,4,fx,fy,120+layer*18);
+    fog.addColorStop(0,layer===2?'#e6cba5':'#b6c7d9');fog.addColorStop(1,'#8fa3ba00');
+    x.fillStyle=fog;x.beginPath();x.ellipse(fx,fy,130+layer*15,15+layer*3,0,0,Math.PI*2);x.fill();
+  }
+  x.restore();
+}
+// foreground stones are larger and move faster to reinforce camera depth
+x.save();x.globalAlpha=.72;
+for(let n=0;n<8;n++){
+  let fx=((n*151-frame*1.35)%(W+80)+W+80)%(W+80)-30;
+  let fy=456+(n%3)*18;
+  poly([[fx,fy],[fx+10,fy-8-(n%4)*3],[fx+24,fy-3],[fx+31,fy+5],[fx+5,fy+7]],n%2?'#111923':'#25282c',n%2?'#56616c66':'#9d876455');
+}
+x.restore();
+// perspective seams converge toward the distant ridge to strengthen the 2.5D stage
+x.save();x.globalAlpha=.16;x.strokeStyle='#c9b58a';x.lineWidth=1;
+for(let n=0;n<9;n++){x.beginPath();x.moveTo(480,414);x.lineTo(n*125-20,540);x.stroke()}
+for(let n=0;n<4;n++){let gy=432+n*n*7;x.beginPath();x.moveTo(35,gy);x.lineTo(925,gy);x.stroke()}
+x.restore();
 // wind streaks, drifting sparks, and impact motes add depth to the ridge
 for(let i=0;i<20;i++){let xx=(i*83-frame*(.7+(i%3)*.35))%980;if(xx<0)xx+=980;let yy=285+(i*37)%145;x.strokeStyle=i%4===0?'#f4d28b35':'#d7c6aa18';x.lineWidth=i%4===0?2:1;x.beginPath();x.moveTo(xx,yy);x.lineTo(xx+12+(i%5)*4,yy-2);x.stroke()}
 // luminous ground marks between the combatants
 x.save();x.globalAlpha=.2+.08*Math.sin(frame*.04);x.strokeStyle='#e7c77f';x.lineWidth=1.5;x.beginPath();x.ellipse(480,426,105,8,0,0,Math.PI*2);x.stroke();for(let q=0;q<7;q++){let qx=420+q*20;x.beginPath();x.moveTo(qx,421);x.lineTo(qx+4,415);x.lineTo(qx+8,421);x.stroke()}x.restore();
 fighter(p,true);fighter(e,false);
-if(comboCount>=2&&frame<comboUntil){x.save();x.textAlign='center';x.font='900 21px system-ui';x.lineWidth=5;x.strokeStyle='#10141c';x.strokeText(comboCount+' HIT COMBO',480,205);x.fillStyle='#ffe29a';x.fillText(comboCount+' HIT COMBO',480,205);x.restore()}
+if(comboCount>=2&&frame<comboUntil){x.save();x.textAlign='center';let pulse=1+Math.sin(frame*.32)*.035;x.translate(480,205);x.scale(pulse,pulse);x.font='900 21px system-ui';x.lineWidth=5;x.strokeStyle='#10141c';x.strokeText(comboCount+' HIT COMBO',0,0);x.fillStyle='#ffe29a';x.shadowColor='#ffcf66';x.shadowBlur=12;x.fillText(comboCount+' HIT COMBO',0,0);x.restore()}
 if(p.hp<=30){x.save();x.globalAlpha=.08+.06*Math.sin(frame*.25);x.fillStyle='#ff263b';x.fillRect(0,0,W,H);x.restore()}
 for(let i=particles.length-1;i>=0;i--){let q=particles[i];q.x+=q.vx;q.y+=q.vy;q.vy+=.12;q.life--;x.save();x.globalAlpha=Math.max(0,q.life/q.max);if(q.text){x.font='900 22px system-ui';x.textAlign='center';x.lineWidth=4;x.strokeStyle='#080b12';x.strokeText(q.text,q.x,q.y);x.fillStyle=q.color;x.fillText(q.text,q.x,q.y)}else{x.fillStyle=q.color;x.shadowColor=q.color;x.shadowBlur=12;x.beginPath();x.arc(q.x,q.y,q.size*Math.max(.2,q.life/q.max),0,Math.PI*2);x.fill()}x.restore();if(q.life<=0)particles.splice(i,1)}
 if(flash>0){let gr=x.createRadialGradient(p.x,360,4,p.x,360,190);gr.addColorStop(0,'#fff1b7aa');gr.addColorStop(1,'#f3c35b00');x.fillStyle=gr;x.fillRect(0,180,W,300);flash--}
