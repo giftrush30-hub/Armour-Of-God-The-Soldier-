@@ -88,7 +88,11 @@ else{x.save();x.translate(-29,-58);poly([[-10,-15],[8,-13],[12,0],[0,13],[-12,0]
 // right arm swings while walking; sword lifts during attack
 let sx=atk?25:14,sy=atk?-61:-54,ex=atk?57:24,ey=atk?-79:-42;
 limb(13,-75,sx,sy,12,isPlayer?'#d9ad50':'#7c8798');limb(sx,sy,ex,ey,9,'#222936');
-if(atk){x.save();x.shadowColor=a.kind==='special'?'#b9f8ff':'#fff0a5';x.shadowBlur=a.kind==='special'?34:25;limb(ex,ey,ex+17,ey-32,7,a.kind==='special'?'#d7fbff':'#fff0b0');limb(ex+17,ey-32,ex+22,ey-48,4,'#ffffff');x.restore();x.strokeStyle=a.kind==='special'?'#9cf4ff':'#ffd86a';x.lineWidth=a.kind==='special'?8:5;x.globalAlpha=.8;x.beginPath();x.arc(2,-57,a.kind==='sword'?78:61,-1.1,.52);x.stroke();x.globalAlpha=1}
+// visible blade, crossguard and grip remain connected to the weapon hand
+x.save();let bladeGlow=atk?(a.kind==='special'?'#a9f5ff':'#fff0a5'):(isPlayer?'#d9e8f5':'#b8c3d3');x.shadowColor=bladeGlow;x.shadowBlur=atk?18:5;
+limb(ex-4,ey+5,ex+4,ey-3,5,'#45301c');limb(ex-7,ey+1,ex+7,ey-7,3,isPlayer?'#f4d27c':'#aab5c5');
+poly([[ex+1,ey-5],[ex+7,ey-11],[ex+14,ey-38],[ex+12,ey-43],[ex+5,ey-38],[ex-1,ey-10]],bladeGlow,atk?'#ffffff':'#e4e9ef');x.restore();
+if(atk){x.strokeStyle=a.kind==='special'?'#9cf4ff':'#ffd86a';x.lineWidth=a.kind==='special'?8:5;x.globalAlpha=.8;x.beginPath();x.arc(2,-57,a.kind==='sword'?78:61,-1.1,.52);x.stroke();x.globalAlpha=1}
 if(a.kind==='special'&&atk){x.save();x.globalAlpha=.8;x.strokeStyle='#a9f5ff';x.lineWidth=2;x.beginPath();x.ellipse(0,-44,49+Math.sin(frame*.7)*5,13,0,0,Math.PI*2);x.stroke();x.beginPath();x.ellipse(0,-44,35,8,frame*.04,0,Math.PI*2);x.stroke();x.restore()}
 else{limb(ex,ey,ex+10,ey-43,7,'#dce8f5');limb(ex+3,ey-18,ex+16,ey-22,4,'#8f6427')}
 // enemy telegraph: a warning rune appears before the Spirit attacks
