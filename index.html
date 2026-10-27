@@ -196,6 +196,38 @@ html,body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Ari
 @media(prefers-reduced-motion:reduce){.film-sky,.film-dust{animation:none}.film-figures{transition:none}}
 @media(max-width:520px){.film-topline{padding-top:13px;letter-spacing:.18em}.film-copy{margin: auto 5% 15%}.film-copy h2{font-size:clamp(16px,5vw,24px)}.film-copy p{font-size:10px}.film-footer{padding:9px 9px max(10px,env(safe-area-inset-bottom));gap:6px}.film-footer>span{font-size:7px;letter-spacing:.06em}.film-skip{padding:9px 7px;font-size:8px}.film-next.primary{min-width:94px;padding:10px 8px;font-size:9px}.film-warrior{left:12%;width:24%}.film-spirit{right:11%;width:26%}}
 
+/* Cinematic camera choreography and character acting. */
+.opening-film .film-sky{transform-origin:50% 45%;transition:transform 1.4s cubic-bezier(.2,.7,.2,1),filter 1.4s}
+.opening-film .film-ridge{transition:transform 1.4s cubic-bezier(.2,.7,.2,1),filter 1.4s}
+.opening-film .film-dust{transition:opacity 1s,transform 1.8s}
+.opening-film .film-figures{transition:opacity .65s,transform 1.25s cubic-bezier(.18,.72,.18,1),left 1.25s,right 1.25s}
+.opening-film .film-copy{transition:transform .55s,opacity .55s}
+.opening-film .film-copy.changing{opacity:0;transform:translateY(10px)}
+.opening-film.scene-step-0 .film-sky{transform:scale(1.1) translateY(2%)}
+.opening-film.scene-step-0 .ridge-back{transform:scale(1.16) translate(-2%,1%)}
+.opening-film.scene-step-1 .film-sky{transform:scale(1.19) translate(1%,2%);filter:brightness(.78)}
+.opening-film.scene-step-1 .ridge-back{transform:scale(1.22) translate(-3%,2%)}
+.opening-film.scene-step-1 .film-dust{opacity:.58;transform:translateX(4%)}
+.opening-film.scene-step-2 .film-sky{transform:scale(1.22) translate(-1%,1%);filter:brightness(.9)}
+.opening-film.scene-step-2 .ridge-back{transform:scale(1.25) translate(2%,1%)}
+.opening-film.scene-step-2 .film-warrior{filter:drop-shadow(0 0 22px #d8b66b30);transform:translateX(3%)}
+.opening-film.scene-step-2 .film-spirit{transform:translateX(-3%)}
+.opening-film.scene-step-3 .film-sky{transform:scale(1.26) translate(0,2%);filter:brightness(.65)}
+.opening-film.scene-step-3 .film-dust{opacity:.72;transform:translateX(-5%)}
+.opening-film.scene-step-3 .film-spirit{filter:drop-shadow(0 0 25px #d84c3b55);transform:translate(-2%,-1%)}
+.opening-film.scene-step-4 .film-sky{transform:scale(1) translateY(0);filter:brightness(1.08)}
+.opening-film.scene-step-4 .film-ridge{transform:scale(1) translateY(0)}
+.opening-film.scene-step-4 .film-figures{transform:scale(.86);opacity:1}
+.opening-film.scene-step-4 .film-copy{margin-bottom:11%}
+.opening-film.pullback .film-sky{transform:scale(.88);filter:brightness(1.16)}
+.opening-film.pullback .film-ridge{transform:scale(.86) translateY(4%)}
+.opening-film.pullback .film-figures{transform:scale(.66);opacity:.6}
+.opening-film.pullback .film-copy{opacity:0;transform:translateY(18px)}
+.opening-film.pullback .film-footer{opacity:0;transition:opacity .25s}
+.film-footer{transition:opacity .25s}
+.film-warrior,.film-spirit{transition:transform .65s cubic-bezier(.2,.7,.2,1),filter .65s}
+.film-spirit i{position:absolute;left:42%;top:24%;width:5px;height:3px;background:#ffd7b0;box-shadow:0 0 12px 4px #e76a4f66}
+@media(prefers-reduced-motion:reduce){.opening-film .film-sky,.opening-film .film-ridge,.opening-film .film-dust,.opening-film .film-figures,.opening-film .film-copy,.film-warrior,.film-spirit,.film-footer{transition:none!important}.opening-film.pullback .film-copy{opacity:1;transform:none}.opening-film.pullback .film-footer{opacity:1}}
 </style></head><body><main class="app">
 <header class="top"><div><div class="eyebrow">A CINEMATIC BIBLICAL COMBAT JOURNEY</div><div class="brand">ARMOUR OF GOD <span>: THE SOLDIER</span></div></div><div class="pill">✦ DIVINE GOLD <span id="coins">◈ 0</span></div></header>
 <section class="stage"><canvas id="game" width="960" height="540" aria-label="Playable mountain-edge battle"></canvas>
@@ -788,14 +820,15 @@ const openingScenes=[
 {kind:'THE SPIRIT DRAWS NEAR',title:'“THEN LET YOUR FAITH SAVE YOU.”',sub:'The spirit steps forward. Wind tears across the ridge. Its weapon rises.',close:true,button:'STAND YOUR GROUND →'},
 {kind:'TRIAL I · THE RIDGE',title:'THE SPIRIT OF FEAR',sub:'The camera pulls back. The mountain opens before you. The battle is yours now.',close:false,button:'ENTER THE BATTLE ⚔'}
 ];
-let openingStep=0,openingMode='questions';
-function showOpeningQuestion(){const item=openingQuestions[openingStep];$('film-topline').textContent='THE MOUNTAIN REMEMBERS';$('film-kicker').textContent='A QUESTION FOR THE SOUL';$('film-heading').textContent=item.q;$('film-subcopy').textContent=item.sub;$('film-count').textContent='REFLECTION '+String(openingStep+1).padStart(2,'0')+' / 06';$('film-next').textContent=openingStep===5?'FACE THE MOUNTAIN →':'REFLECT →';$('opening-film').classList.remove('closeup');$('film-figures').classList.remove('show');}
-function showOpeningScene(){const item=openingScenes[openingStep];$('film-topline').textContent='ARMOUR OF GOD · THE SOLDIER';$('film-kicker').textContent=item.kind;$('film-heading').textContent=item.title;$('film-subcopy').textContent=item.sub;$('film-count').textContent='THE FIRST CONFRONTATION';$('film-next').textContent=item.button;$('opening-film').classList.toggle('closeup',item.close);$('film-figures').classList.toggle('show',openingStep>0);}
-function beginOpening(){openingStep=0;openingMode='questions';$('intro').classList.add('hidden');$('result').classList.add('hidden');$('opening-film').classList.remove('hidden');showOpeningQuestion();}
-function skipOpening(){ $('opening-film').classList.add('hidden');reset();}
+let openingStep=0,openingMode='questions',openingTransitionLock=false;
+function animateOpeningCopy(){const copy=$('film-copy');copy.classList.add('changing');window.setTimeout(()=>copy.classList.remove('changing'),reduceMotion?0:90);}
+function showOpeningQuestion(){const item=openingQuestions[openingStep];animateOpeningCopy();$('film-topline').textContent='THE MOUNTAIN REMEMBERS';$('film-kicker').textContent='A QUESTION FOR THE SOUL';$('film-heading').textContent=item.q;$('film-subcopy').textContent=item.sub;$('film-count').textContent='REFLECTION '+String(openingStep+1).padStart(2,'0')+' / 06';$('film-next').textContent=openingStep===5?'FACE THE MOUNTAIN →':'REFLECT →';$('opening-film').classList.remove('closeup','pullback');for(let i=0;i<5;i++)$('opening-film').classList.remove('scene-step-'+i);$('film-figures').classList.remove('show');}
+function showOpeningScene(){const item=openingScenes[openingStep];animateOpeningCopy();$('film-topline').textContent='ARMOUR OF GOD · THE SOLDIER';$('film-kicker').textContent=item.kind;$('film-heading').textContent=item.title;$('film-subcopy').textContent=item.sub;$('film-count').textContent='THE FIRST CONFRONTATION';$('film-next').textContent=item.button;$('opening-film').classList.remove('pullback');for(let i=0;i<5;i++)$('opening-film').classList.remove('scene-step-'+i);$('opening-film').classList.add('scene-step-'+openingStep);$('opening-film').classList.toggle('closeup',item.close);$('film-figures').classList.toggle('show',openingStep>0);}
+function beginOpening(){openingTransitionLock=false;openingStep=0;openingMode='questions';$('intro').classList.add('hidden');$('result').classList.add('hidden');$('opening-film').classList.remove('hidden','pullback');showOpeningQuestion();}
+function skipOpening(){if(openingTransitionLock)return;openingTransitionLock=true;$('opening-film').classList.add('hidden');reset();openingTransitionLock=false;}
 $('start').onclick=beginOpening;
 $('film-skip').onclick=skipOpening;
-$('film-next').onclick=()=>{if(openingMode==='questions'){if(openingStep<5){openingStep++;showOpeningQuestion();}else{openingMode='scenes';openingStep=0;showOpeningScene();}}else if(openingStep<openingScenes.length-1){openingStep++;showOpeningScene();}else{skipOpening();}};
+$('film-next').onclick=()=>{if(openingTransitionLock)return;if(openingMode==='questions'){if(openingStep<5){openingStep++;showOpeningQuestion();}else{openingMode='scenes';openingStep=0;showOpeningScene();}}else if(openingStep<openingScenes.length-1){openingStep++;showOpeningScene();}else{openingTransitionLock=true;$('film-next').textContent='ENTERING THE TRIAL…';$('film-skip').style.visibility='hidden';$('opening-film').classList.add('pullback');window.setTimeout(()=>{$('film-skip').style.visibility='';$('opening-film').classList.remove('pullback');$('opening-film').classList.add('hidden');openingTransitionLock=false;reset();},reduceMotion?0:1050);}};
 $('again').onclick=()=>{reset()};document.addEventListener('keydown',ev=>{if(ev.target&&(ev.target.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName)))return;let k=ev.key.toLowerCase();const gameplayKeys=['arrowleft','a','arrowright','d','arrowup','w',' ','j','k','l','i'];if(!gameplayKeys.includes(k))return;ev.preventDefault();if(['arrowleft','a'].includes(k))held.left=true;if(['arrowright','d'].includes(k))held.right=true;if(['arrowup','w',' '].includes(k))held.jump=true;if(k==='j')act('sword');if(k==='k')act('kick');if(k==='l')act('special');if(k==='i')held.guard=true});const clearHeld=()=>{held={};document.querySelectorAll('.ctrl.active').forEach(el=>el.classList.remove('active'));if(p.kind==='guard'){p.kind='';p.attack=0}};window.addEventListener('blur',clearHeld);let resumeAfterVisibility=false;document.addEventListener('visibilitychange',()=>{if(document.hidden){clearHeld();if(window.speechSynthesis)window.speechSynthesis.cancel();if(running&&!ended){running=false;resumeAfterVisibility=true;$('status').textContent='Mountain trial paused while this page is hidden. Your progress in this fight will remain on this screen.';}}else if(resumeAfterVisibility&&!ended){running=true;resumeAfterVisibility=false;$('status').textContent='You are back on the mountain. Continue your trial.';}});document.addEventListener('keyup',ev=>{let k=ev.key.toLowerCase();if(['arrowleft','a'].includes(k))held.left=false;if(['arrowright','d'].includes(k))held.right=false;if(['arrowup','w',' '].includes(k))held.jump=false;if(['i'].includes(k)){held.guard=false;p.kind='';p.attack=0}});
 ui();draw();requestAnimationFrame(update)
 })();
