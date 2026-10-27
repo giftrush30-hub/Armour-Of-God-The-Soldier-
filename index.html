@@ -551,6 +551,41 @@ if(isPlayer){
     x.strokeStyle='#e5c078';x.lineWidth=1.2;x.beginPath();x.moveTo(-7,-49);x.lineTo(-5,-40);x.moveTo(7,-49);x.lineTo(5,-40);x.stroke();
   }
 }
+// Full-body anatomy pass: layered shoulders, articulated arms, waist and boot details.
+if(isPlayer){
+  const female=selectedCharacter==='deborah';
+  const skin=female?'#c98260':'#b9784d', skinHi=female?'#f0b18b':'#e0a16d';
+  const metal=female?'#b77c49':'#d1a34d', edge=female?'#f0ca82':'#ffe5a0';
+  // Shoulder pauldrons receive a second bevel and rivets so they read as solid fitted armour.
+  poly([[-21,-81],[-13,-88],[-7,-84],[-9,-76],[-18,-74]],female?'#8c4a31':'#775027',edge);
+  poly([[21,-81],[13,-88],[7,-84],[9,-76],[18,-74]],female?'#8c4a31':'#775027',edge);
+  x.fillStyle=edge;for(const side of [-1,1]){x.beginPath();x.arc(side*15,-81,1.5,0,Math.PI*2);x.fill()}
+  // Armoured upper-arm seams and elbow guards follow the joint positions.
+  x.strokeStyle=edge;x.lineWidth=1.4;x.beginPath();
+  x.moveTo(-20,-72);x.lineTo(-24,-64);x.moveTo(-29,-58);x.lineTo(-23,-54);
+  x.moveTo(19,-72);x.lineTo(23,-63);x.moveTo(21,-56);x.lineTo(28,-53);x.stroke();
+  poly([[-30,-61],[-24,-64],[-20,-59],[-24,-54],[-30,-56]],metal,edge);
+  poly([[20,-60],[24,-64],[30,-60],[29,-55],[23,-53]],metal,edge);
+  // Bracers on the forearms and small visible seams make the arms less like plain tubes.
+  x.strokeStyle=female?'#e7b77c':'#f6d77c';x.lineWidth=2.2;x.beginPath();
+  x.moveTo(-31,-56);x.lineTo(-24,-53);x.moveTo(-29,-51);x.lineTo(-23,-49);
+  x.moveTo(24,-53);x.lineTo(31,-56);x.moveTo(23,-49);x.lineTo(29,-51);x.stroke();
+  // Chest panels, seams and collar add depth while retaining the existing combat silhouette.
+  x.strokeStyle=female?'#f0c17c':'#ffe7a1';x.lineWidth=1.35;x.beginPath();
+  x.moveTo(-7,-81);x.lineTo(-3,-72);x.lineTo(0,-69);x.lineTo(3,-72);x.lineTo(7,-81);
+  x.moveTo(-12,-61);x.lineTo(-5,-58);x.moveTo(12,-61);x.lineTo(5,-58);x.stroke();
+  // Belt, side plates and layered hip guards bridge the torso to both legs.
+  poly([[-14,-39],[14,-39],[17,-33],[9,-29],[-9,-29],[-17,-33]],female?'#542722':'#3c2b1d',edge);
+  x.fillStyle=edge;x.fillRect(-2,-38,4,6);
+  poly([[-15,-34],[-7,-31],[-9,-20],[-17,-23]],female?'#7a302d':'#805a29',metal);
+  poly([[15,-34],[7,-31],[9,-20],[17,-23]],female?'#7a302d':'#805a29',metal);
+  x.strokeStyle=edge;x.lineWidth=1;x.beginPath();x.moveTo(-14,-30);x.lineTo(-11,-23);x.moveTo(14,-30);x.lineTo(11,-23);x.stroke();
+  // Boot straps and toe caps clarify the ankles and feet in the side-on view.
+  x.strokeStyle=edge;x.lineWidth=1.4;x.beginPath();x.moveTo(-31,-10);x.lineTo(-13,-10);x.moveTo(12,-10);x.lineTo(33,-10);x.stroke();
+  x.fillStyle=skinHi;
+  // Small knuckle highlights stay subtle so the sword grip remains readable.
+  for(let k=0;k<3;k++){x.beginPath();x.arc(28+k*2,-49+(k%2),.8,0,Math.PI*2);x.fill()}
+}
 // articulated knee and elbow accents improve the limb silhouette
 x.strokeStyle=isPlayer?'#f5d47b':'#aab6c8';x.lineWidth=2.2;x.beginPath();x.arc(-20,-24,4.2,0,Math.PI*2);x.arc(20,-24,4.2,0,Math.PI*2);x.stroke();
 x.fillStyle=isPlayer?'#f4d17a':'#aeb9c9';x.beginPath();x.arc(-20,-24,1.5,0,Math.PI*2);x.arc(20,-24,1.5,0,Math.PI*2);x.fill();
