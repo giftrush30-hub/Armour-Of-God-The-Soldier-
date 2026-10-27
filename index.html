@@ -1055,56 +1055,5 @@ ui();draw();requestAnimationFrame(update)
   });
 })();
 </script>
-<script id="AOG_VISIBLE_FIGHTER_RECOVERY">
-/* Last-resort visual recovery: if the arena canvas remains blank, show both fighters
-   instead of leaving the player staring at an empty battlefield. */
-(function(){
-  const canvas=document.getElementById('game');
-  if(!canvas) return;
-  window.setTimeout(function(){
-    try {
-      const ctx=canvas.getContext('2d');
-      if(!ctx) return;
-      const samples=[[90,100],[480,260],[870,390],[180,450],[760,450]];
-      const pixels=samples.map(([px,py])=>Array.from(ctx.getImageData(px,py,1,1).data).slice(0,3).join(','));
-      if(new Set(pixels).size>2) return;
-      const W=canvas.width,H=canvas.height;
-      const grad=ctx.createLinearGradient(0,0,0,H);
-      grad.addColorStop(0,'#101827');grad.addColorStop(.68,'#293342');grad.addColorStop(1,'#080b11');
-      ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
-      ctx.fillStyle='#b69a68';ctx.globalAlpha=.3;ctx.beginPath();ctx.moveTo(0,430);ctx.lineTo(250,270);ctx.lineTo(430,405);ctx.lineTo(650,245);ctx.lineTo(960,420);ctx.lineTo(960,540);ctx.lineTo(0,540);ctx.closePath();ctx.fill();ctx.globalAlpha=1;
-      function fighter(cx,base,scale,hero){
-        ctx.save();ctx.translate(cx,base);ctx.scale(scale,scale);
-        const skin=hero?'#a96f4b':'#858b9a', cloth=hero?'#7b2922':'#343244', gold=hero?'#e4bd66':'#b8c1ce';
-        ctx.fillStyle='#0009';ctx.beginPath();ctx.ellipse(0,5,47,10,0,0,Math.PI*2);ctx.fill();
-        // legs, boots, and visible joints
-        ctx.strokeStyle=cloth;ctx.lineWidth=17;ctx.lineCap='round';
-        ctx.beginPath();ctx.moveTo(-12,-58);ctx.lineTo(-20,-24);ctx.lineTo(-27,-5);ctx.stroke();
-        ctx.beginPath();ctx.moveTo(12,-58);ctx.lineTo(20,-25);ctx.lineTo(26,-5);ctx.stroke();
-        ctx.fillStyle='#171b24';ctx.fillRect(-39,-9,22,10);ctx.fillRect(16,-9,23,10);
-        // torso, belt, and chest armour
-        ctx.fillStyle=cloth;ctx.beginPath();ctx.moveTo(-22,-112);ctx.lineTo(22,-112);ctx.lineTo(28,-61);ctx.lineTo(-27,-61);ctx.closePath();ctx.fill();
-        ctx.strokeStyle=gold;ctx.lineWidth=3;ctx.stroke();
-        ctx.fillStyle=hero?'#c49a48':'#777f91';ctx.fillRect(-24,-104,48,24);
-        ctx.strokeStyle=gold;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-22,-80);ctx.lineTo(22,-80);ctx.stroke();
-        // shoulders, arms, hands
-        ctx.strokeStyle=skin;ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(-22,-105);ctx.lineTo(-38,-82);ctx.lineTo(-43,-61);ctx.stroke();ctx.beginPath();ctx.moveTo(22,-105);ctx.lineTo(38,-84);ctx.lineTo(43,-67);ctx.stroke();
-        ctx.fillStyle=skin;ctx.beginPath();ctx.arc(-43,-59,7,0,Math.PI*2);ctx.arc(43,-65,7,0,Math.PI*2);ctx.fill();
-        // neck and head
-        ctx.fillStyle=skin;ctx.fillRect(-7,-124,14,14);ctx.beginPath();ctx.arc(0,-139,16,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle=hero?'#241a14':'#171622';ctx.beginPath();ctx.arc(0,-145,16,Math.PI,Math.PI*2);ctx.fill();
-        // readable weapon on the enemy; shield detail for David
-        if(hero){ctx.strokeStyle='#d9dfe8';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-48,-111);ctx.lineTo(-53,-73);ctx.stroke();ctx.fillStyle='#d7b45d';ctx.beginPath();ctx.ellipse(-54,-93,14,19,-.2,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff0b3';ctx.lineWidth=2;ctx.stroke();}
-        else{ctx.strokeStyle='#c6ccd8';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(49,-119);ctx.lineTo(57,-44);ctx.stroke();ctx.fillStyle='#e3c27b';ctx.beginPath();ctx.moveTo(43,-119);ctx.lineTo(55,-145);ctx.lineTo(63,-119);ctx.closePath();ctx.fill();}
-        ctx.restore();
-      }
-      fighter(300,475,1.45,true);fighter(675,475,1.45,false);
-      ctx.fillStyle='#f4d58f';ctx.font='bold 18px Georgia';ctx.textAlign='center';ctx.fillText('DAVID  •  THE FAITHFUL',300,505);
-      ctx.fillStyle='#f0a3a0';ctx.fillText('SPIRIT OF FEAR',675,505);
-      const status=document.getElementById('status');
-      if(status) status.textContent='Visual recovery active: the fighters are shown, but the battle engine needs repair. Reload after the game update.';
-    } catch(e) {}
-  },1800);
-})();
-</script>
+
 </body></html>
