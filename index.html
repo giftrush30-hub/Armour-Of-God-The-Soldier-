@@ -112,7 +112,7 @@ button{touch-action:manipulation}
 </main>
 <script>
 (()=>{
-const c=document.getElementById('game'),x=c.getContext('2d'),W=960,H=540;const reduceMotion=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const c=document.getElementById('game'),x=c.getContext('2d'),W=960,H=540;const reducedMotionQuery=window.matchMedia?window.matchMedia('(prefers-reduced-motion: reduce)'):null;let reduceMotion=!!(reducedMotionQuery&&reducedMotionQuery.matches);if(reducedMotionQuery){const syncReducedMotion=ev=>{reduceMotion=ev.matches;if(reduceMotion)shake=0;};if(reducedMotionQuery.addEventListener)reducedMotionQuery.addEventListener('change',syncReducedMotion);else if(reducedMotionQuery.addListener)reducedMotionQuery.addListener(syncReducedMotion);}
 const $=id=>document.getElementById(id);
 function safeGet(key,fallback=""){try{const value=localStorage.getItem(key);return value===null?fallback:value;}catch(_){return fallback;}}
 let running=false,ended=false,frame=0,shake=0,flash=0,hitStop=0,specialFX=0,swordChain=0,swordChainUntil=0,coins=Number(safeGet('aogs-coins')||0),held={},cool={},last=0,particles=[],comboCount=0,comboUntil=0,spiritIndex=Number(safeGet('aogs-spirit')||0);
