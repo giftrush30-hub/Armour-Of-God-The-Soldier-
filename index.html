@@ -160,8 +160,10 @@ for(let n=0;n<4;n++){let gy=432+n*n*7;x.beginPath();x.moveTo(35,gy);x.lineTo(925
 x.restore();
 // wind streaks, drifting sparks, and impact motes add depth to the ridge
 for(let i=0;i<20;i++){let xx=(i*83-frame*(.7+(i%3)*.35))%980;if(xx<0)xx+=980;let yy=285+(i*37)%145;x.strokeStyle=i%4===0?'#f4d28b35':'#d7c6aa18';x.lineWidth=i%4===0?2:1;x.beginPath();x.moveTo(xx,yy);x.lineTo(xx+12+(i%5)*4,yy-2);x.stroke()}
-// luminous ground marks between the combatants
-x.save();x.globalAlpha=.2+.08*Math.sin(frame*.04);x.strokeStyle='#e7c77f';x.lineWidth=1.5;x.beginPath();x.ellipse(480,426,105,8,0,0,Math.PI*2);x.stroke();for(let q=0;q<7;q++){let qx=420+q*20;x.beginPath();x.moveTo(qx,421);x.lineTo(qx+4,415);x.lineTo(qx+8,421);x.stroke()}x.restore();
+// fractured mineral seams follow the narrow mountain path; no arena markings
+x.save();x.globalAlpha=.22;x.strokeStyle='#c8a778';x.lineWidth=1;
+for(let q=0;q<7;q++){let qx=350+q*43, bend=Math.sin(q*1.7)*9;x.beginPath();x.moveTo(qx,424);x.lineTo(qx+8+bend,430);x.lineTo(qx+3+bend,437);x.lineTo(qx+18+bend,445);x.stroke()}
+x.restore();
 fighter(p,true);fighter(e,false);
 // Radiant Burst telegraph: layered runes bloom under the hero, then collapse into light.
 if(specialFX>0){
@@ -182,13 +184,21 @@ if(specialFX>0){
   x.globalAlpha=fade*(.18+.24*Math.sin(frame*.7));x.fillStyle='#c6f8ff';x.shadowColor='#8deeff';x.shadowBlur=22;
   x.beginPath();x.ellipse(0,0,Math.max(3,radius*.48),Math.max(2,radius*.11),0,0,Math.PI*2);x.fill();x.restore();
 }
-// Original cinematic telegraph: the enemy's crimson warning ring grows before its strike.
+// Attack-specific warning marks make each spirit strike readable without arena-style ground rings.
 if(running&&!ended&&e.kind==='windup'){
-  x.save();let progress=1-clamp(e.attack/(e.windupTotal||36),0,1),rad=34+progress*38,heavy=e.attackType==='heavy';
-  x.globalAlpha=.3+progress*.55;x.strokeStyle=heavy?'#ffd36b':'#ff615c';x.lineWidth=2+progress*2;
-  x.shadowColor=heavy?'#ffc34d':'#f33b42';x.shadowBlur=10+progress*12;
-  x.beginPath();x.ellipse(p.x,425+p.y+3,rad,7+progress*3,0,0,Math.PI*2);x.stroke();
-  x.globalAlpha=.85;x.font='900 12px system-ui';x.textAlign='center';x.fillStyle=heavy?'#ffe5a0':'#ffaaa2';x.fillText(heavy?'HEAVY!':'GUARD!',p.x,385+p.y);x.restore();
+  x.save();
+  let progress=1-clamp(e.attack/(e.windupTotal||36),0,1),heavy=e.attackType==='heavy',kick=e.attackType==='kick';
+  let cue=heavy?'HEAVY STRIKE!':(kick?'LOW KICK!':'SWORD SLASH!');
+  let cueColor=heavy?'#ffd36b':(kick?'#ff9b68':'#ff615c');
+  let reach=heavy?112:(kick?72:92), baseY=425+p.y+3;
+  x.globalAlpha=.24+progress*.55;x.strokeStyle=cueColor;x.lineWidth=2+progress*2;
+  x.shadowColor=cueColor;x.shadowBlur=8+progress*12;
+  // A directional ground slash points from the attacker toward the threatened approach.
+  let dir=e.x<p.x?1:-1, startX=e.x+dir*18, endX=startX+dir*(reach+progress*20);
+  x.beginPath();x.moveTo(startX,baseY);x.lineTo(endX,baseY-5);x.lineTo(endX-dir*10,baseY+5);x.stroke();
+  x.globalAlpha=.92;x.font='900 12px system-ui';x.textAlign='center';x.lineWidth=3;x.strokeStyle='#170f12';
+  x.strokeText(cue,e.x,385+e.y);x.fillStyle=cueColor;x.fillText(cue,e.x,385+e.y);
+  x.restore();
 }
 // Distinct contact cue: keep the danger signal visible at phone scale during the active frames.
 if(running&&!ended&&(e.kind==='sword'||e.kind==='kick')&&e.attack<=11&&e.attack>=8){
@@ -201,11 +211,11 @@ if(comboCount>=2&&frame<comboUntil){x.save();x.textAlign='center';let pulse=1+Ma
 if(p.hp<=30){x.save();x.globalAlpha=.08+.06*Math.sin(frame*.25);x.fillStyle='#ff263b';x.fillRect(0,0,W,H);x.restore()}
 for(let i=particles.length-1;i>=0;i--){let q=particles[i];q.x+=q.vx;q.y+=q.vy;q.vy+=.12;q.life--;x.save();x.globalAlpha=Math.max(0,q.life/q.max);if(q.text){x.font='900 22px system-ui';x.textAlign='center';x.lineWidth=4;x.strokeStyle='#080b12';x.strokeText(q.text,q.x,q.y);x.fillStyle=q.color;x.fillText(q.text,q.x,q.y)}else{x.fillStyle=q.color;x.shadowColor=q.color;x.shadowBlur=12;x.beginPath();x.arc(q.x,q.y,q.size*Math.max(.2,q.life/q.max),0,Math.PI*2);x.fill()}x.restore();if(q.life<=0)particles.splice(i,1)}
 if(flash>0){let gr=x.createRadialGradient(p.x,360,4,p.x,360,190);gr.addColorStop(0,'#fff1b7aa');gr.addColorStop(1,'#f3c35b00');x.fillStyle=gr;x.fillRect(0,180,W,300);flash--}
-if(p.fall>0||e.fall>0){x.fillStyle='#f5d58e';x.font='bold 24px system-ui';x.textAlign='center';x.fillText('THE RIDGE CLAIMS THE FALLEN',W/2,170)}
+if(p.fall>0||e.fall>0){x.fillStyle='#f5d58e';x.font='bold 24px system-ui';x.textAlign='center';x.fillText('THE ABYSS CLAIMS THE FALLEN',W/2,170)}
 x.restore();
 }
 function hit(a,b,damage,force){if(b.inv>0||b.fall>0)return;b.hp=Math.max(0,b.hp-damage);b.inv=19;b.vx=a.face*force;b.stagger=a.kind==='special'?16:(damage>=20?14:11);b.hitDir=a.face;b.hitFlash=a.kind==='special'?11:(damage>=20?9:7);shake=a.kind==='special'?12:(damage>=20?10:7);flash=a.kind==='special'?15:(damage>=20?11:7);hitStop=Math.max(hitStop,a.kind==='special'?6:(damage>=20?4:3));if(a===p){comboCount=frame<comboUntil?comboCount+1:1;comboUntil=frame+95;if(comboCount>=2){$('status').innerHTML='<strong>'+comboCount+' HIT COMBO!</strong> Keep the pressure on the Spirit.'}}let hx=b.x,hy=425+b.y-62;
- // Ring-shaped impact flash: readable at phone size without expensive post-processing.
+ // Compact impact flash: readable at phone size without expensive post-processing.
  particles.push({x:hx,y:hy,vx:0,vy:0,life:9,max:9,size:24,text:'✦',color:a.kind==='special'?'#a8f4ff':(a===p?'#ffe39a':'#ff8178')});
  for(let i=0;i<13;i++){let ang=(Math.PI*2*i/13)+Math.random()*.22,spd=1.5+Math.random()*4;particles.push({x:hx,y:hy,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-1,life:12+Math.random()*10,max:22,size:1.8+Math.random()*3,color:a.kind==='special'?'#a8f4ff':(a===p?'#ffd875':'#ff7770')})}particles.push({x:hx,y:hy-25,vx:(Math.random()-.5)*1.5,vy:-2.2,life:34,max:34,size:0,text:'-'+damage,color:a.kind==='special'?'#a8f4ff':'#fff0bd'});$('status').innerHTML=damage>14?' <strong>IMPACT!</strong> The strike breaks through.':'<strong>HIT CONFIRMED.</strong> Keep pressing forward.';if(b.hp<=0){b.fall=1;b.vx=a.face*7;b.hitDir=a.face;b.vy=-2;for(let i=0;i<16;i++){let ang=Math.random()*Math.PI*2,spd=1+Math.random()*4;particles.push({x:b.x,y:425+b.y-34,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-2,life:16+Math.random()*12,max:28,size:2+Math.random()*3,color:i%3===0?'#a8f4ff':(a.kind==='special'?'#ffe39a':'#c6b99e')})}}}
 function act(k){if(!running||ended||p.fall>0||p.hp<=0||p.stagger>0)return;if(k==='guard'){p.kind='guard';p.attack=12;return}if(p.attack>0&&p.kind!=='guard')return;if((cool[k]||0)>frame)return;cool[k]=frame+(k==='special'?100:20);p.kind=k;if(k==='sword'){swordChain=frame<swordChainUntil?(swordChain%3)+1:1;swordChainUntil=frame+38;p.attack=[16,18,20][swordChain-1];p.attackDamage=[16,19,23][swordChain-1];p.attackReach=[175,188,202][swordChain-1];p.attackTotal=p.attack}else{p.attack=k==='special'?28:16;p.attackTotal=p.attack;p.attackDamage=k==='kick'?12:30;p.attackReach=k==='kick'?132:205}p.hitDone=false;
@@ -260,7 +270,7 @@ else if(e.attack===0&&e.inv===0&&e.recovery===0&&e.kind!=='windup'&&Math.abs(p.x
 if(p.x<95||p.x>865){p.vx+=(p.x<95?1:-1)*.6}
 if(p.fall===0&&((p.x<=55&&p.vx< -1.4)||(p.x>=905&&p.vx>1.4))){p.fall=1;p.hitDir=p.x<=55?-1:1;p.vy=-1.5;$('status').innerHTML='<strong>CLIFF EDGE!</strong> Recover your footing before the next strike.';}
 // A living opponent can also be knocked off the ridge by sustained pressure.
-if(e.fall===0&&e.hp>0&&((e.x<=95&&e.vx< -1.4)||(e.x>=865&&e.vx>1.4))){e.fall=1;e.hitDir=e.x<=95?-1:1;e.vy=-1.5;$('status').innerHTML='<strong>RING OUT!</strong> The Spirit tumbles from the ridge.';}
+if(e.fall===0&&e.hp>0&&((e.x<=95&&e.vx< -1.4)||(e.x>=865&&e.vx>1.4))){e.fall=1;e.hitDir=e.x<=95?-1:1;e.vy=-1.5;$('status').innerHTML='<strong>CAST FROM THE RIDGE!</strong> The Spirit tumbles into the abyss.';}
 if(p.fall>0){p.x+=p.vx;p.vx*=.96;p.vy+=.42;p.y+=p.vy;p.fall++;if(p.fall>25)finish(false)}
 if(e.fall>0){e.x+=e.vx;e.vx*=.96;e.vy+=.42;e.y+=e.vy;e.fall++;if(e.fall>25)finish(true)}
 if(p.hp<=0&&p.fall===0)finish(false);ui();draw();requestAnimationFrame(update)
