@@ -66,12 +66,19 @@ limb(-25,-68,-31+cape*.5,-43,2,isPlayer?'#d7a84d':'#9aa5b5');limb(-20,-65,-23+ca
 let kickPose=a.kind==='kick'&&a.attack>7; limb(-8,-39,-14+walk,-18,13,'#11151c');limb(-14+walk,-18,-24+walk,-5,14,isPlayer?'#bd8b36':'#7d8795');
 if(kickPose){limb(8,-39,22,-48,13,'#11151c');limb(22,-48,48,-43,14,isPlayer?'#bd8b36':'#7d8795');poly([[39,-49],[54,-47],[58,-40],[42,-38]],'#0b0e14','#d7b15e')}else{limb(8,-39,14-walk,-18,13,'#11151c');limb(14-walk,-18,25-walk,-5,14,isPlayer?'#bd8b36':'#7d8795');}
 poly([[-34,-7],[-12,-10],[-5,-3],[-7,1],[-34,1]],'#0b0e14','#d7b15e');poly([[9,-7],[31,-9],[36,-3],[34,1],[10,1]],'#0b0e14','#d7b15e');
-// long tunic and plated torso
-poly([[-17,-83],[15,-83],[22,-48],[15,-34],[-15,-34],[-23,-49]],isPlayer?'#773126':'#303846','#070a10');
-poly([[-17,-79],[-5,-85],[0,-77],[8,-85],[17,-79],[12,-52],[0,-45],[-13,-53]],isPlayer?'#d3a344':'#8793a4','#fff0b0');
-poly([[-12,-73],[0,-65],[12,-73],[9,-55],[0,-49],[-9,-56]],isPlayer?'#8b652c':'#4a5261','#f8d981');
-poly([[-15,-53],[15,-53],[12,-37],[-12,-37]],isPlayer?'#8e3829':'#242a35','#e4c273');
+// layered leather under-tunic, sculpted cuirass and bevelled metal plates
+poly([[-18,-84],[15,-84],[22,-49],[15,-33],[-15,-33],[-23,-49]],isPlayer?'#48221e':'#1a202a','#080b11');
+let chest=x.createLinearGradient(-20,-84,20,-43);chest.addColorStop(0,isPlayer?'#f8d978':'#c4ced8');chest.addColorStop(.34,isPlayer?'#bd8730':'#697687');chest.addColorStop(.7,isPlayer?'#f0c45e':'#a6b0be');chest.addColorStop(1,isPlayer?'#6f4b21':'#394352');
+poly([[-17,-80],[-7,-87],[0,-81],[7,-87],[17,-80],[13,-55],[0,-46],[-13,-55]],chest,isPlayer?'#ffe6a0':'#d3dce7');
+poly([[-13,-77],[-4,-80],[0,-73],[4,-80],[13,-77],[8,-63],[0,-59],[-8,-63]],isPlayer?'#6b4521':'#333d4c',isPlayer?'#e8bd58':'#9aa9bb');
+poly([[-11,-70],[0,-65],[11,-70],[8,-57],[0,-52],[-8,-57]],isPlayer?'#9c6a28':'#4d5969',isPlayer?'#f8d77c':'#c3ccd7');
+poly([[-15,-53],[15,-53],[12,-37],[-12,-37]],isPlayer?'#783126':'#202631','#090c12');
 poly([[-18,-57],[18,-57],[15,-50],[-15,-50]],'#f3d58b','#fff3c8');
+// raised shoulder pauldrons and segmented abdominal plates
+poly([[-19,-82],[-10,-88],[-5,-81],[-8,-72],[-19,-73]],isPlayer?'#e7bb56':'#9ba8ba',isPlayer?'#fff0ad':'#e2e8f0');
+poly([[19,-82],[10,-88],[5,-81],[8,-72],[19,-73]],isPlayer?'#b88732':'#6c7889',isPlayer?'#fff0ad':'#d1dbe8');
+for(let j=0;j<3;j++){poly([[-10,-51+j*4],[10,-51+j*4],[8,-48+j*4],[-8,-48+j*4]],isPlayer?'#c39136':'#697586',isPlayer?'#f3d47e':'#aab6c5')}
+for(let side of [-1,1]){x.fillStyle=isPlayer?'#fff0b0':'#e3e9f0';for(let j=0;j<2;j++){x.beginPath();x.arc(side*(15+j),-75+j*7,1.3,0,Math.PI*2);x.fill()}}
 // belt emblem
 x.fillStyle='#fff0b0';x.fillRect(-2,-63,4,13);x.beginPath();x.arc(0,-66,4,0,Math.PI*2);x.fill();
 // left arm and large shield
