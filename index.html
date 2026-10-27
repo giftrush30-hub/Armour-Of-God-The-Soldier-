@@ -9,7 +9,7 @@
 <div class="modal" id="intro"><div class="panel"><div class="eyebrow gold">Chapter I · The mountain pass</div><h1>STAND FIRM.<br><span class="gold">FEAR NOTHING.</span></h1><p>The wind is rising. The ridge is narrow. A shadow blocks your path. Use your sword, hold your shield, and drive the adversary from the edge.</p><p><b>Move</b> with the arrows · <b>Strike</b> with sword or kick · <b>Guard</b> to defend · <b>Special</b> to unleash a radiant burst.</p><button class="primary" id="start">ENTER THE BATTLE →</button></div></div>
 <div class="modal hidden" id="result"><div class="panel"><div class="eyebrow gold" id="resulttag">TRIAL COMPLETE</div><h1 id="resulttitle">VICTORY</h1><p id="resulttext">You stood firm.</p><button class="primary" id="again">FIGHT AGAIN →</button></div></div></section>
 <div class="below"><div class="status" id="status">The ridge awaits. <strong>Stay within the light.</strong></div><div class="pill">✦ <span id="reward">FIRST TRIAL</span></div></div>
-<div class="controls"><div class="cluster"><button class="ctrl" data-hold="left">◀<small>LEFT</small></button><button class="ctrl" data-hold="right">▶<small>RIGHT</small></button><button class="ctrl" data-hold="jump">▲<small>JUMP</small></button></div><div class="cluster"><button class="ctrl" data-act="guard">◈<small>GUARD</small></button><button class="ctrl attack" data-act="sword">⚔<small>SWORD</small></button><button class="ctrl attack" data-act="kick">➤<small>KICK</small></button><button class="ctrl special" data-act="special">✦<small>SPECIAL</small></button></div></div>
+<div class="controls"><div class="cluster"><button class="ctrl" data-hold="left">◀<small>LEFT</small></button><button class="ctrl" data-hold="right">▶<small>RIGHT</small></button><button class="ctrl" data-hold="jump">▲<small>JUMP</small></button></div><div class="cluster"><button class="ctrl" data-act="guard">◈<small>GUARD</small></button><button class="ctrl attack" data-act="sword">⚔<small>SWORD</small></button><button class="ctrl attack" data-act="kick">➤<small>KICK</small></button><button class="ctrl special" data-act="special">✦<small id="specialstate">SPECIAL · READY</small></button></div></div>
 <div class="foot">A work in progress · Combat prototype · Scripture and campaign systems are being built separately.</div>
 </main>
 <script>
@@ -21,7 +21,7 @@ const p={x:300,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fa
 const e={x:650,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0,ai:0};
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 function reset(){particles=[];comboCount=0;comboUntil=0;held={};Object.assign(p,{x:300,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0,hitDone:false,attackDamage:0,attackReach:0});Object.assign(e,{x:650,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0});ended=false;running=true;frame=0;shake=0;flash=0;particles=[];$('result').classList.add('hidden');$('intro').classList.add('hidden');$('status').innerHTML='The ridge awaits. <strong>Stay within the light.</strong>';ui()}
-function ui(){$('hp').style.width=clamp(p.hp,0,100)+'%';$('ehp').style.width=clamp(e.hp,0,100)+'%';$('hpnum').textContent=Math.ceil(clamp(p.hp,0,100))+' / 100';$('ehpnum').textContent=Math.ceil(clamp(e.hp,0,100))+' / 100';$('coins').textContent='◈ '+coins}
+function ui(){$('hp').style.width=clamp(p.hp,0,100)+'%';$('ehp').style.width=clamp(e.hp,0,100)+'%';$('hpnum').textContent=Math.ceil(clamp(p.hp,0,100))+' / 100';$('ehpnum').textContent=Math.ceil(clamp(e.hp,0,100))+' / 100';$('coins').textContent='◈ '+coins;let wait=Math.max(0,(cool.special||0)-frame);$('specialstate').textContent=wait>0?'CHARGING '+Math.ceil(wait/60)+'s':'SPECIAL · READY';$('specialstate').style.color=wait>0?'#c5a978':'#ffe39b'}
 function poly(points,fill,stroke){x.beginPath();points.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.closePath();x.fillStyle=fill;x.fill();if(stroke){x.strokeStyle=stroke;x.lineWidth=2;x.stroke()}}
 function mountain(points,fill){poly(points,fill)}
 function background(){
@@ -44,6 +44,9 @@ poly([[bx,by],[bx+12,by-7],[bx+28,by-4],[bx+18,by+2]],'#55504a','#95816a');
  // ridge breaks into abyss at both ends
 poly([[0,415],[120,405],[220,423],[330,412],[460,418],[590,408],[720,423],[830,405],[960,414],[960,540],[0,540]],'#191d23');
 for(let i=0;i<32;i++){let xx=(i*47-frame*.7)%980;let yy=424+(i%4)*20;x.strokeStyle='#b8a28a18';x.beginPath();x.moveTo(xx,yy);x.lineTo(xx+20,yy-3);x.stroke()}
+// foreground shards and ember-glass crystals give the cliff edge another depth layer
+for(let i=0;i<9;i++){let bx=35+i*111,by=451+(i%3)*18,h=9+(i%4)*5;poly([[bx,by],[bx+5,by-h],[bx+10,by],[bx+6,by+3]],i%2?'#284b58':'#5d3d2b',i%2?'#76d8df66':'#d7a35b55')}
+for(let i=0;i<10;i++){let bx=(i*97+frame*.45)%960,by=350+(i*31)%100;x.save();x.globalAlpha=.25+.25*Math.sin(frame*.08+i);x.fillStyle=i%3===0?'#f4d17d':'#d68a68';x.shadowColor=x.fillStyle;x.shadowBlur=8;x.beginPath();x.arc(bx,by,1.5+(i%2),0,Math.PI*2);x.fill();x.restore()}
 poly([[0,420],[110,410],[180,425],[180,540],[0,540]],'#050910');poly([[820,418],[880,405],[960,414],[960,540],[820,540]],'#050910');
 x.strokeStyle='#d8b16c55';x.lineWidth=2;x.beginPath();x.moveTo(190,425);x.lineTo(800,425);x.stroke();
 }
