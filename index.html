@@ -515,6 +515,42 @@ x.fillStyle=isPlayer?'#fff0ae':'#ffb6a9';x.fillRect(-7,-101,5,2);x.fillRect(3,-1
 poly([[-4,-113],[0,-129],[4,-113]],isPlayer?'#f8e3a0':'#c9d5e6','#fff');
 poly([[-2,-115],[0,-125],[2,-115]],isPlayer?'#9a6d27':'#596678');
 poly([[-8,-85],[0,-79],[8,-85],[5,-72],[0,-68],[-5,-72]],isPlayer?'#f0ce75':'#a9b7c8','#fff0ae');
+// Character identity pass: replace the generic full helmet with a readable human face for the playable heroes.
+if(isPlayer){
+  const isDeborah=selectedCharacter==='deborah';
+  const skin=isDeborah?'#c98260':'#b9784d';
+  const skinLight=isDeborah?'#f0b18b':'#e0a16d';
+  const hair=isDeborah?'#38221b':'#30221b';
+  // Face, jaw and ears remain visible at the game's side-view scale.
+  x.fillStyle=skin;x.beginPath();x.ellipse(0,-99,9.2,12.2,0,0,Math.PI*2);x.fill();
+  x.fillStyle=skinLight;x.beginPath();x.ellipse(2,-100,4.5,8.5,-.12,0,Math.PI*2);x.fill();
+  x.fillStyle=skin;x.beginPath();x.ellipse(-9,-98,2.1,3.1,0,0,Math.PI*2);x.ellipse(9,-98,2.1,3.1,0,0,Math.PI*2);x.fill();
+  // Hairline and swept-back hair give David and Deborah distinct silhouettes.
+  x.fillStyle=hair;
+  if(isDeborah){
+    poly([[-10,-101],[-11,-110],[-5,-116],[3,-115],[10,-109],[10,-101],[5,-106],[0,-108],[-5,-105]],hair,'#6b4731');
+    poly([[5,-109],[13,-106],[15,-97],[12,-88],[8,-91],[10,-101]],hair,'#6b4731');
+    x.strokeStyle='#9b6746';x.lineWidth=1.3;x.beginPath();x.moveTo(9,-91);x.lineTo(12,-86);x.stroke();
+  }else{
+    poly([[-10,-100],[-12,-109],[-6,-117],[3,-117],[10,-111],[11,-103],[5,-107],[0,-109],[-5,-106]],hair,'#725039');
+    poly([[-8,-107],[-5,-115],[2,-117],[7,-112],[1,-110]],'#493023');
+    x.strokeStyle='#e5bd8b';x.lineWidth=1.1;x.beginPath();x.moveTo(-4,-103);x.lineTo(-1,-102);x.moveTo(4,-103);x.lineTo(7,-102);x.stroke();
+  }
+  // Brow, eye, nose and mouth marks keep the face legible without oversized features.
+  x.strokeStyle=hair;x.lineWidth=1.2;x.beginPath();x.moveTo(-6,-103);x.lineTo(-2,-104);x.moveTo(3,-104);x.lineTo(7,-103);x.stroke();
+  x.fillStyle='#201a18';x.fillRect(-4,-101,2.4,1.5);x.fillRect(4,-101,2.4,1.5);
+  x.strokeStyle=isDeborah?'#8f453b':'#744234';x.lineWidth=1;x.beginPath();x.moveTo(1,-99);x.lineTo(0,-96);x.lineTo(2,-95);x.moveTo(-2,-91);x.quadraticCurveTo(1,-90,4,-92);x.stroke();
+  if(!isDeborah){x.strokeStyle='#493026';x.lineWidth=1.5;x.beginPath();x.moveTo(-6,-94);x.lineTo(-2,-91);x.moveTo(2,-91);x.lineTo(6,-94);x.stroke()}
+  // The neck joins the visible head to the cuirass; shoulder plates stay layered over the torso.
+  x.fillStyle=skin;x.fillRect(-4,-88,8,7);
+  poly([[-17,-81],[-9,-86],[-4,-81],[0,-77],[5,-81],[10,-86],[18,-81],[12,-73],[0,-70],[-12,-73]],isDeborah?'#6f3028':'#24465e',isDeborah?'#d8a65e':'#d9b46b');
+  if(isDeborah){
+    // Separate red mantle and fitted waist silhouette identify the female hero without exaggeration.
+    poly([[-15,-56],[-9,-52],[0,-49],[9,-52],[15,-56],[13,-39],[7,-35],[0,-38],[-7,-35],[-13,-39]],'#762e2b','#d6a15b');
+    poly([[-12,-39],[0,-36],[12,-39],[10,-32],[0,-30],[-10,-32]],'#422522','#d6a15b');
+    x.strokeStyle='#e5c078';x.lineWidth=1.2;x.beginPath();x.moveTo(-7,-49);x.lineTo(-5,-40);x.moveTo(7,-49);x.lineTo(5,-40);x.stroke();
+  }
+}
 // articulated knee and elbow accents improve the limb silhouette
 x.strokeStyle=isPlayer?'#f5d47b':'#aab6c8';x.lineWidth=2.2;x.beginPath();x.arc(-20,-24,4.2,0,Math.PI*2);x.arc(20,-24,4.2,0,Math.PI*2);x.stroke();
 x.fillStyle=isPlayer?'#f4d17a':'#aeb9c9';x.beginPath();x.arc(-20,-24,1.5,0,Math.PI*2);x.arc(20,-24,1.5,0,Math.PI*2);x.fill();
