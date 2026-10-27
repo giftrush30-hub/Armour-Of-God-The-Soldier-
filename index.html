@@ -45,11 +45,13 @@ x.save();x.translate(xx,yy);x.scale(face,1);x.scale(1.12,1);
 x.globalAlpha=a.inv>0&&frame%4<2?.55:1;
 // strong ground shadow
 x.fillStyle='#000b';x.beginPath();x.ellipse(0,3,38,10,0,0,Math.PI*2);x.fill();
-// cape moves behind the body
-poly([[-10,-87],[-25,-79],[-38+walk*.35,-45],[-31+walk*.35,-25],[-13,-50],[-3,-70]],isPlayer?'#7b2922':'#281c2b','#0a0c12');
-// legs with visible joints and heavy boots
-limb(-8,-39,-14+walk,-18,13,'#11151c');limb(-14+walk,-18,-24+walk,-5,14,isPlayer?'#bd8b36':'#7d8795');
-limb(8,-39,14-walk,-18,13,'#11151c');limb(14-walk,-18,25-walk,-5,14,isPlayer?'#bd8b36':'#7d8795');
+// animated cape, split folds and gold hem catch the ridge light
+let cape=walk*.55+Math.sin(frame*.09+(isPlayer?0:1))*4;
+poly([[-10,-87],[-25,-79],[-38+cape,-45],[-31+cape,-25],[-13,-50],[-3,-70]],isPlayer?'#7b2922':'#281c2b','#0a0c12');
+limb(-25,-68,-31+cape*.5,-43,2,isPlayer?'#d7a84d':'#9aa5b5');limb(-20,-65,-23+cape*.6,-39,2,isPlayer?'#d7a84d':'#9aa5b5');
+// legs with visible joints, readable movement poses, and heavy boots
+let kickPose=a.kind==='kick'&&a.attack>7; limb(-8,-39,-14+walk,-18,13,'#11151c');limb(-14+walk,-18,-24+walk,-5,14,isPlayer?'#bd8b36':'#7d8795');
+if(kickPose){limb(8,-39,22,-48,13,'#11151c');limb(22,-48,48,-43,14,isPlayer?'#bd8b36':'#7d8795');poly([[39,-49],[54,-47],[58,-40],[42,-38]],'#0b0e14','#d7b15e')}else{limb(8,-39,14-walk,-18,13,'#11151c');limb(14-walk,-18,25-walk,-5,14,isPlayer?'#bd8b36':'#7d8795');}
 poly([[-34,-7],[-12,-10],[-5,-3],[-7,1],[-34,1]],'#0b0e14','#d7b15e');poly([[9,-7],[31,-9],[36,-3],[34,1],[10,1]],'#0b0e14','#d7b15e');
 // long tunic and plated torso
 poly([[-17,-83],[15,-83],[22,-48],[15,-34],[-15,-34],[-23,-49]],isPlayer?'#773126':'#303846','#070a10');
@@ -66,7 +68,8 @@ else{x.save();x.translate(-29,-58);poly([[-10,-15],[8,-13],[12,0],[0,13],[-12,0]
 // right arm swings while walking; sword lifts during attack
 let sx=atk?23:14,sy=atk?-60:-54,ex=atk?50:24,ey=atk?-76:-42;
 limb(13,-75,sx,sy,12,isPlayer?'#d9ad50':'#7c8798');limb(sx,sy,ex,ey,9,'#222936');
-if(atk){x.save();x.shadowColor='#fff0a5';x.shadowBlur=25;limb(ex,ey,ex+14,ey-28,6,'#fff0b0');limb(ex+14,ey-28,ex+18,ey-39,3,'#ffffff');x.restore();x.strokeStyle='#ffd86a';x.lineWidth=5;x.globalAlpha=.8;x.beginPath();x.arc(2,-57,61,-1.1,.52);x.stroke();x.globalAlpha=1}
+if(atk){x.save();x.shadowColor=a.kind==='special'?'#b9f8ff':'#fff0a5';x.shadowBlur=a.kind==='special'?34:25;limb(ex,ey,ex+14,ey-28,6,a.kind==='special'?'#d7fbff':'#fff0b0');limb(ex+14,ey-28,ex+18,ey-39,3,'#ffffff');x.restore();x.strokeStyle=a.kind==='special'?'#9cf4ff':'#ffd86a';x.lineWidth=a.kind==='special'?8:5;x.globalAlpha=.8;x.beginPath();x.arc(2,-57,61,-1.1,.52);x.stroke();x.globalAlpha=1}
+if(a.kind==='special'&&atk){x.save();x.globalAlpha=.8;x.strokeStyle='#a9f5ff';x.lineWidth=2;x.beginPath();x.ellipse(0,-44,49+Math.sin(frame*.7)*5,13,0,0,Math.PI*2);x.stroke();x.beginPath();x.ellipse(0,-44,35,8,frame*.04,0,Math.PI*2);x.stroke();x.restore()}
 else{limb(ex,ey,ex+7,ey-36,6,'#dce8f5');limb(ex+2,ey-15,ex+13,ey-19,4,'#8f6427')}
 // face, helmet, brow and crest
 x.fillStyle=isPlayer?'#a96e45':'#8d929c';x.beginPath();x.arc(0,-94,13,0,Math.PI*2);x.fill();
@@ -80,8 +83,10 @@ x.restore();
 function draw(){
 x.save();if(shake>0){x.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake*=.85}
 background();
-// dust and wind streaks
-for(let i=0;i<15;i++){let xx=(i*83-frame*1.4)%980;if(xx<0)xx+=980;let yy=300+(i*37)%130;x.strokeStyle='#d7c6aa18';x.beginPath();x.moveTo(xx,yy);x.lineTo(xx+20,yy-2);x.stroke()}
+// wind streaks, drifting sparks, and impact motes add depth to the ridge
+for(let i=0;i<20;i++){let xx=(i*83-frame*(.7+(i%3)*.35))%980;if(xx<0)xx+=980;let yy=285+(i*37)%145;x.strokeStyle=i%4===0?'#f4d28b35':'#d7c6aa18';x.lineWidth=i%4===0?2:1;x.beginPath();x.moveTo(xx,yy);x.lineTo(xx+12+(i%5)*4,yy-2);x.stroke()}
+// luminous ground marks between the combatants
+x.save();x.globalAlpha=.2+.08*Math.sin(frame*.04);x.strokeStyle='#e7c77f';x.lineWidth=1.5;x.beginPath();x.ellipse(480,426,105,8,0,0,Math.PI*2);x.stroke();for(let q=0;q<7;q++){let qx=420+q*20;x.beginPath();x.moveTo(qx,421);x.lineTo(qx+4,415);x.lineTo(qx+8,421);x.stroke()}x.restore();
 fighter(p,true);fighter(e,false);
 if(flash>0){let gr=x.createRadialGradient(p.x,360,4,p.x,360,190);gr.addColorStop(0,'#fff1b7aa');gr.addColorStop(1,'#f3c35b00');x.fillStyle=gr;x.fillRect(0,180,W,300);flash--}
 if(p.fall>0||e.fall>0){x.fillStyle='#f5d58e';x.font='bold 24px system-ui';x.textAlign='center';x.fillText('THE RIDGE CLAIMS THE FALLEN',W/2,170)}
@@ -89,7 +94,7 @@ x.restore();
 }
 function hit(a,b,damage,force){if(b.inv>0||b.fall>0)return;b.hp=Math.max(0,b.hp-damage);b.inv=16;b.vx=a.face*force;shake=8;flash=8;$('status').innerHTML=damage>14?' <strong>IMPACT!</strong> The strike breaks through.':'<strong>HIT CONFIRMED.</strong> Keep pressing forward.';if(b.hp<=0){b.fall=1;b.vx=a.face*7;finish(a===p)}}
 function act(k){if(!running||ended)return;if(k==='guard'){p.kind='guard';p.attack=12;return}if((cool[k]||0)>frame)return;cool[k]=frame+(k==='special'?100:20);p.kind=k;p.attack=k==='special'?28:16;
-if(k==='special'){flash=24;shake=3}
+if(k==='special'){flash=24;shake=3;$('status').innerHTML='<strong>RADIANT BURST!</strong> The special strike is unleashed.'}
 let d=Math.abs(p.x-e.x);if(d<105&&Math.abs(p.y-e.y)<55){if(k==='sword')hit(p,e,13,8);if(k==='kick')hit(p,e,10,11);if(k==='special')hit(p,e,27,15)}
 }
 function finish(win){if(ended)return;ended=true;running=false;if(win){coins+=25;localStorage.setItem('aogs-coins',coins);$('resulttag').textContent='TRIAL COMPLETE · +25 COINS';$('resulttitle').textContent='VICTORY';$('resulttext').textContent='You stood firm on the ridge. Your reward has been saved on this device.';$('reward').textContent='+25 COINS'}else{$('resulttag').textContent='THE TRIAL CONTINUES';$('resulttitle').textContent='RISE AGAIN';$('resulttext').textContent='The warrior has fallen. Every defeat is a lesson. Return to the ridge and try a new strategy.';$('reward').textContent='TRY AGAIN'}ui();$('result').classList.remove('hidden')}
@@ -100,7 +105,7 @@ if(held.left){p.vx-=.65;p.face=-1}if(held.right){p.vx+=.65;p.face=1}
 if(held.jump&&p.ground){p.vy=-11;p.ground=false;held.jump=false}
 p.vx*=.82;p.x+=p.vx;p.y+=p.vy;p.vy+=.55;if(p.y>=0){p.y=0;p.vy=0;p.ground=true}
 p.x=clamp(p.x,65,895);e.face=p.x<e.x?-1:1;
-if(Math.abs(p.x-e.x)>78&&e.fall===0){e.vx+=(p.x<e.x?-1:1)*.22;e.x+=e.vx;e.vx*=.88}else if(frame%72===0&&e.attack===0&&e.inv===0){e.kind='sword';e.attack=20;if(Math.abs(p.x-e.x)<110){if(p.kind==='guard'){p.hp=Math.max(0,p.hp-3);$('status').innerHTML='<strong>GUARD HELD.</strong> Damage reduced.'}else hit(e,p,10,7)}}
+if(Math.abs(p.x-e.x)>78&&e.fall===0){e.vx+=(p.x<e.x?-1:1)*.22;e.x+=e.vx;e.vx*=.88}else if(frame%52===0&&e.attack===0&&e.inv===0){e.kind='sword';e.attack=20;if(Math.abs(p.x-e.x)<110){if(p.kind==='guard'){p.hp=Math.max(0,p.hp-3);$('status').innerHTML='<strong>GUARD HELD.</strong> Damage reduced.'}else hit(e,p,10,7)}}
 if(p.x<95||p.x>865){p.vx+=(p.x<95?1:-1)*.6}
 if(p.inv>0&&p.x<45||p.inv>0&&p.x>915)p.fall=1;
 if(p.fall>0){p.x+=p.vx;p.y+=4;p.fall++;if(p.fall>25)finish(false)}
