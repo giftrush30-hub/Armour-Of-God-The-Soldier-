@@ -630,6 +630,31 @@ if(isPlayer){
 // Small knuckle highlights stay subtle so the sword grip remains readable.
   for(let k=0;k<3;k++){x.beginPath();x.arc(28+k*2,-49+(k%2),.8,0,Math.PI*2);x.fill()}
 }
+// Motion-following footwear pass: ankle, heel and toe shapes stay readable as the legs move.
+if(isPlayer){
+  const female=selectedCharacter==='deborah';
+  const bootLeather=female?'#542a25':'#273b4b';
+  const bootEdge=female?'#e7b978':'#e2c47b';
+  const step=reduceMotion?0:walk;
+  const attackLean=atk&&a.kind!=='guard'?Math.sin((1-clamp(a.attack/(a.attackTotal||16),0,1))*Math.PI)*2:0;
+  for(const side of [-1,1]){
+    const swing=side===-1?step:-step;
+    const lift=Math.max(0,swing)*.16;
+    const bx=side*19+swing*.34+(side===1?attackLean*.3:-attackLean*.15);
+    x.save();
+    x.translate(bx,-7-lift);
+    // Heel and toe are separate shapes, rather than a flat line across the foot.
+    poly([[-5,-4],[3,-4],[5,-1],[11,0],[10,3],[-6,3],[-8,1]],bootLeather,bootEdge);
+    x.strokeStyle=bootEdge;x.lineWidth=1.1;x.beginPath();
+    x.moveTo(-4,-2);x.lineTo(3,-2);x.moveTo(5,1);x.lineTo(9,1);
+    x.stroke();
+    x.fillStyle=bootEdge;x.beginPath();x.arc(0,-2,1,0,Math.PI*2);x.fill();
+    x.restore();
+  }
+  // Wrist cuffs frame the hands so the fingers read as attached to the forearms.
+  x.lineCap='round';x.strokeStyle=bootEdge;x.lineWidth=2;
+  x.beginPath();x.moveTo(-32,-53);x.lineTo(-24,-50);x.moveTo(23,-50);x.lineTo(32,-53);x.stroke();
+}
 // articulated knee and elbow accents improve the limb silhouette
 x.strokeStyle=isPlayer?'#f5d47b':'#aab6c8';x.lineWidth=2.2;x.beginPath();x.arc(-20,-24,4.2,0,Math.PI*2);x.arc(20,-24,4.2,0,Math.PI*2);x.stroke();
 x.fillStyle=isPlayer?'#f4d17a':'#aeb9c9';x.beginPath();x.arc(-20,-24,1.5,0,Math.PI*2);x.arc(20,-24,1.5,0,Math.PI*2);x.fill();
