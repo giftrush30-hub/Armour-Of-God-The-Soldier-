@@ -53,8 +53,8 @@ x.strokeStyle='#d8b16c55';x.lineWidth=2;x.beginPath();x.moveTo(190,425);x.lineTo
 function limb(ax,ay,bx,by,width,color){x.strokeStyle=color;x.lineWidth=width;x.lineCap='round';x.beginPath();x.moveTo(ax,ay);x.lineTo(bx,by);x.stroke()}
 function fighter(a,isPlayer){
 let xx=a.x,breath=Math.sin(frame*.09+(isPlayer?0:1.4))*1.2,yy=425+a.y+(a.ground?breath:0),face=a.face,walk=Math.sin(frame*.24+(isPlayer?0:1))*Math.min(8,Math.abs(a.vx)*1.4),atk=a.attack>0,swordAtk=a.attack>0&&(a.kind==='sword'||a.kind==='special'),guard=a.kind==='guard'&&a.attack>0;
-x.save();x.translate(xx,yy);if(a.stagger>0){x.rotate((a.stagger/12)*.11*(a.hitDir||1));a.stagger--}x.scale(face,1);x.scale(1.78,1);
-x.globalAlpha=a.inv>0&&frame%4<2?.55:1;if(a.hitFlash>0){x.shadowColor=isPlayer?'#fff0b0':'#ff665f';x.shadowBlur=16;a.hitFlash--}
+x.save();x.translate(xx,yy);if(a.stagger>0){x.rotate((a.stagger/12)*.11*(a.hitDir||1));a.stagger--}x.scale(face,1);x.scale(1.82,1.2);
+x.globalAlpha=a.inv>0&&frame%4<2?.55:1;if(a.hitFlash>0){x.shadowColor=isPlayer?'#fff0b0':'#ff665f';x.shadowBlur=16;x.globalAlpha=.82+.18*Math.sin(frame*1.8);a.hitFlash--}
 // strong ground shadow
 x.fillStyle='#000b';x.beginPath();x.ellipse(0,3,38,10,0,0,Math.PI*2);x.fill();
 if(!isPlayer){x.save();x.scale(face,1);x.fillStyle='#ffb6a9';x.font='900 13px system-ui';x.textAlign='center';x.shadowColor='#000';x.shadowBlur=8;x.fillText('SPIRIT OF FEAR',0,-145);x.restore()}
@@ -86,8 +86,8 @@ for(let side of [-1,1]){x.fillStyle=isPlayer?'#fff0b0':'#e3e9f0';for(let j=0;j<2
 // belt emblem
 x.fillStyle='#fff0b0';x.fillRect(-2,-63,4,13);x.beginPath();x.arc(0,-66,4,0,Math.PI*2);x.fill();
 // left arm and large shield
-limb(-13,-75,-25+Math.sin(frame*.14)*Math.min(1,Math.abs(a.vx)/4)*4,-60,12,isPlayer?'#d9ad50':'#7c8798');limb(-25+Math.sin(frame*.14)*Math.min(1,Math.abs(a.vx)/4)*4,-60,-26,-49,10,'#202631');
-if(guard){x.save();x.translate(-31,-59);poly([[-12,-18],[8,-16],[14,-2],[1,17],[-14,2]],'#e0b14a','#fff0ae');poly([[-6,-11],[3,-10],[7,-1],[0,8],[-7,0]],'#67451c','#f7d88a');x.restore()}
+let shieldLift=guard?10:0;limb(-13,-75,-25+Math.sin(frame*.14)*Math.min(1,Math.abs(a.vx)/4)*4,-60-shieldLift,12,isPlayer?'#d9ad50':'#7c8798');limb(-25+Math.sin(frame*.14)*Math.min(1,Math.abs(a.vx)/4)*4,-60-shieldLift,-26,-49-shieldLift,10,'#202631');
+if(guard){x.save();x.translate(-33,-65);x.rotate(-.12);poly([[-12,-20],[8,-18],[14,-2],[1,17],[-14,2]],'#e0b14a','#fff0ae');poly([[-6,-13],[3,-12],[7,-1],[0,8],[-7,0]],'#67451c','#f7d88a');x.strokeStyle='#fff0ae';x.lineWidth=2;x.beginPath();x.moveTo(-8,-15);x.lineTo(0,-8);x.lineTo(8,-15);x.moveTo(-8,4);x.lineTo(0,11);x.lineTo(8,4);x.stroke();x.restore()}
 else{x.save();x.translate(-29,-58);let shield=x.createLinearGradient(-12,-14,12,13);shield.addColorStop(0,isPlayer?'#f2cc67':'#a8b5c8');shield.addColorStop(.45,isPlayer?'#8f6727':'#414c5e');shield.addColorStop(1,isPlayer?'#4e371e':'#202733');poly([[-11,-16],[8,-14],[13,-1],[2,15],[-13,2]],shield,isPlayer?'#f4d889':'#bdc9d8');poly([[-7,-11],[5,-10],[8,-1],[1,9],[-8,1]],isPlayer?'#a67b31':'#5c697b',isPlayer?'#f4d889':'#d5deeb');x.fillStyle=isPlayer?'#ffe6a0':'#e1e8f1';x.beginPath();x.arc(0,-1,4,0,Math.PI*2);x.fill();x.strokeStyle=isPlayer?'#fce7a5':'#d4deeb';x.lineWidth=1.5;x.beginPath();x.moveTo(-7,-12);x.lineTo(0,-6);x.lineTo(7,-12);x.moveTo(-8,4);x.lineTo(0,10);x.lineTo(8,4);x.stroke();x.restore()}
 // right arm swings while walking; sword lifts during attack
 let swing=swordAtk?Math.sin((1-a.attack/16)*Math.PI):0;let sx=swordAtk?18+22*swing:14,sy=swordAtk?-54-10*swing:-54,ex=swordAtk?30+38*swing:24,ey=swordAtk?-55-25*swing:-42;
