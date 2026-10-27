@@ -18,9 +18,9 @@ const c=document.getElementById('game'),x=c.getContext('2d'),W=960,H=540;
 const $=id=>document.getElementById(id);
 let running=false,ended=false,frame=0,shake=0,flash=0,hitStop=0,specialFX=0,swordChain=0,swordChainUntil=0,coins=Number(localStorage.getItem('aogs-coins')||0),held={},cool={},last=0,particles=[],comboCount=0,comboUntil=0;
 const p={x:300,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0,hitDone:false,attackDamage:0,attackReach:0,stagger:0,hitFlash:0};
-const e={x:650,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0,ai:0,stagger:0,hitFlash:0,hitDone:false,recovery:0,attackType:''};
+const e={x:650,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0,ai:0,stagger:0,hitFlash:0,hitDone:false,recovery:0,attackType:'',windupTotal:36};
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-function reset(){particles=[];comboCount=0;comboUntil=0;held={};Object.assign(p,{x:300,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0,hitDone:false,attackDamage:0,attackReach:0,stagger:0,hitFlash:0});Object.assign(e,{x:650,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0,stagger:0,hitFlash:0,hitDone:false,recovery:0,attackType:''});ended=false;running=true;frame=0;shake=0;flash=0;hitStop=0;specialFX=0;swordChain=0;swordChainUntil=0;particles=[];$('result').classList.add('hidden');$('intro').classList.add('hidden');$('status').innerHTML='The ridge awaits. <strong>Stay within the light.</strong>';ui()}
+function reset(){particles=[];comboCount=0;comboUntil=0;held={};Object.assign(p,{x:300,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0,hitDone:false,attackDamage:0,attackReach:0,stagger:0,hitFlash:0});Object.assign(e,{x:650,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0,stagger:0,hitFlash:0,hitDone:false,recovery:0,attackType:'',windupTotal:36});ended=false;running=true;frame=0;shake=0;flash=0;hitStop=0;specialFX=0;swordChain=0;swordChainUntil=0;particles=[];$('result').classList.add('hidden');$('intro').classList.add('hidden');$('status').innerHTML='The ridge awaits. <strong>Stay within the light.</strong>';ui()}
 function ui(){$('hp').style.width=clamp(p.hp,0,100)+'%';$('ehp').style.width=clamp(e.hp,0,100)+'%';$('hpnum').textContent=Math.ceil(clamp(p.hp,0,100))+' / 100';$('ehpnum').textContent=Math.ceil(clamp(e.hp,0,100))+' / 100';$('coins').textContent='◈ '+coins;let wait=Math.max(0,(cool.special||0)-frame);$('specialstate').textContent=wait>0?'CHARGING '+Math.ceil(wait/60)+'s':'SPECIAL · READY';$('specialstate').style.color=wait>0?'#c5a978':'#ffe39b'}
 function poly(points,fill,stroke){x.beginPath();points.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.closePath();x.fillStyle=fill;x.fill();if(stroke){x.strokeStyle=stroke;x.lineWidth=2;x.stroke()}}
 function mountain(points,fill){poly(points,fill)}
@@ -184,11 +184,11 @@ if(specialFX>0){
 }
 // Original cinematic telegraph: the enemy's crimson warning ring grows before its strike.
 if(running&&!ended&&e.kind==='windup'){
-  x.save();let progress=1-clamp(e.attack/36,0,1),rad=34+progress*38;
-  x.globalAlpha=.3+progress*.55;x.strokeStyle='#ff615c';x.lineWidth=2+progress*2;
-  x.shadowColor='#f33b42';x.shadowBlur=10+progress*12;
+  x.save();let progress=1-clamp(e.attack/(e.windupTotal||36),0,1),rad=34+progress*38,heavy=e.attackType==='heavy';
+  x.globalAlpha=.3+progress*.55;x.strokeStyle=heavy?'#ffd36b':'#ff615c';x.lineWidth=2+progress*2;
+  x.shadowColor=heavy?'#ffc34d':'#f33b42';x.shadowBlur=10+progress*12;
   x.beginPath();x.ellipse(p.x,425+p.y+3,rad,7+progress*3,0,0,Math.PI*2);x.stroke();
-  x.globalAlpha=.75;x.font='900 12px system-ui';x.textAlign='center';x.fillStyle='#ffaaa2';x.fillText('GUARD!',p.x,385+p.y);x.restore();
+  x.globalAlpha=.85;x.font='900 12px system-ui';x.textAlign='center';x.fillStyle=heavy?'#ffe5a0':'#ffaaa2';x.fillText(heavy?'HEAVY!':'GUARD!',p.x,385+p.y);x.restore();
 }
 // Distinct contact cue: keep the danger signal visible at phone scale during the active frames.
 if(running&&!ended&&(e.kind==='sword'||e.kind==='kick')&&e.attack<=11&&e.attack>=8){
@@ -224,13 +224,13 @@ const activeFrame=p.kind==='special'?p.attack<=13&&p.attack>=9:(p.kind==='sword'
 if(activeFrame&&!p.hitDone){p.hitDone=true;let distance=Math.abs(p.x-e.x);if(distance<p.attackReach&&Math.abs(p.y-e.y)<75){hit(p,e,p.attackDamage,p.kind==='sword'?10:(p.kind==='kick'?12:17));if(p.kind==='special'){flash=18;shake=7}}else{$('status').innerHTML='<strong>MISS!</strong> Move closer and time your strike.'}}
 if(p.attack===0)p.kind=''}
 if(e.stagger>0){if(e.kind==='windup'||e.kind==='sword'||e.kind==='kick'){e.attack=0;e.kind='';e.aiState='interrupted';e.hitDone=false;e.recovery=Math.max(e.recovery,16)}}
-if(e.kind==='windup'){e.attack--;if(e.attack<=0){e.attackType=e.ai%2===0?'kick':'sword';e.kind=e.attackType;e.attack=17;e.hitDone=false;e.aiState='strike';}}
+if(e.kind==='windup'){e.attack--;if(e.attack<=0){e.kind=e.attackType==='kick'?'kick':'sword';e.attack=e.attackType==='heavy'?22:17;e.hitDone=false;e.aiState='strike';}}
 else if(e.attack>0){
   e.attack--;
   // Resolve enemy contact only during the visible strike window, once per attack.
   if(!e.hitDone&&e.attack<=11&&e.attack>=8){e.hitDone=true;if(Math.abs(p.x-e.x)<190&&Math.abs(p.y-e.y)<75){
     if(held.guard||p.kind==='guard'){p.hp=Math.max(0,p.hp-2);p.vx+=(e.x<p.x?1:-1)*2;p.hitFlash=5;p.stagger=3;shake=4;flash=4;$('status').innerHTML='<strong>SHIELD BLOCK!</strong> Your shield absorbs most of the strike.';for(let z=0;z<9;z++)particles.push({x:p.x-12,y:365+Math.random()*35,vx:(Math.random()-.5)*4,vy:-Math.random()*3,life:12,max:12,size:2+Math.random()*2,color:'#9cecff'})}
-    else hit(e,p,e.kind==='kick'?12:10,e.kind==='kick'?9:7);
+    else hit(e,p,e.attackType==='heavy'?16:(e.kind==='kick'?12:10),e.attackType==='heavy'?11:(e.kind==='kick'?9:7));
   }}
   if(e.attack===0){e.kind='';e.aiState='recovery';e.recovery=24;e.hitDone=false;}
 }
@@ -239,7 +239,7 @@ if(held.jump&&p.ground){p.vy=-11;p.ground=false;held.jump=false}
 p.vx*=.82;p.x+=p.vx;p.y+=p.vy;p.vy+=.55;if(p.y>=0){p.y=0;p.vy=0;p.ground=true}
 p.x=clamp(p.x,55,905);if(Math.abs(p.x-e.x)<48&&p.y===0){p.x+=p.x<e.x?-1.5:1.5}e.face=p.x<e.x?-1:1;
 if(Math.abs(p.x-e.x)>132&&e.fall===0&&e.stagger===0){e.vx+=(p.x<e.x?-1:1)*.32;e.x+=e.vx;e.vx*=.86}
-else if(e.attack===0&&e.inv===0&&e.recovery===0&&e.kind!=='windup'&&frame%52===0){e.kind='windup';e.attack=36;e.hitDone=false;e.ai=(e.ai||0)+1;e.aiState='windup';$('status').innerHTML='<strong>WATCH OUT!</strong> The Spirit is winding up an attack. Guard now.'}
+else if(e.attack===0&&e.inv===0&&e.recovery===0&&e.kind!=='windup'&&frame%52===0){e.ai=(e.ai||0)+1;e.attackType=e.ai%3===0?'heavy':(e.ai%2===0?'kick':'sword');e.windupTotal=e.attackType==='heavy'?48:(e.attackType==='kick'?30:36);e.kind='windup';e.attack=e.windupTotal;e.hitDone=false;e.aiState='windup';$('status').innerHTML=e.attackType==='heavy'?'<strong>HEAVY STRIKE!</strong> A slower, stronger blow is coming. Guard or create distance.':'<strong>WATCH OUT!</strong> The Spirit is winding up an attack. Guard or move away.'}
 if(p.x<95||p.x>865){p.vx+=(p.x<95?1:-1)*.6}
 if(p.inv>0&&p.x<45||p.inv>0&&p.x>915)p.fall=1;
 if(p.fall>0){p.x+=p.vx;p.vx*=.96;p.vy+=.42;p.y+=p.vy;p.fall++;if(p.fall>25)finish(false)}
