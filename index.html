@@ -332,7 +332,13 @@ if(running&&!ended&&e.kind==='windup'){
   else if(storm){x.lineWidth=3+progress*3;x.beginPath();x.moveTo(startX,baseY-12);x.lineTo(endX,baseY);x.lineTo(startX,baseY+12);x.stroke();x.beginPath();x.moveTo(startX+dir*8,baseY-20);x.lineTo(endX-dir*8,baseY);x.lineTo(startX+dir*8,baseY+20);x.stroke();}
   else{x.beginPath();x.moveTo(startX,baseY);x.lineTo(endX,baseY-5);x.lineTo(endX-dir*10,baseY+5);x.stroke();}
   x.globalAlpha=.92;x.font='900 12px system-ui';x.textAlign='center';x.lineWidth=3;x.strokeStyle='#170f12';
-  x.strokeText(cue,e.x,385+e.y);x.fillStyle=cueColor;x.fillText(cue,e.x,385+e.y);
+  const defenseHint=storm?'DODGE THE RUSH':(judgment?'DODGE OR TIME YOUR GUARD':(heavy?'GUARD — PERFECT TIMING HELPS':(kick?'DODGE OR GUARD LOW':'GUARD — WATCH THE STRIKE')));
+  const cueMark=storm?'⚡':(judgment?'✦':(heavy?'◆':(kick?'↘':'⚔')));
+  x.strokeText(cueMark+'  '+cue,e.x,385+e.y);x.fillStyle=cueColor;x.fillText(cueMark+'  '+cue,e.x,385+e.y);
+  // Pair the colour and attack shape with a plain-language response prompt.
+  // This keeps the cue readable without requiring players to identify colour alone.
+  x.globalAlpha=.96;x.font='800 9px system-ui';x.lineWidth=2;x.strokeStyle='#170f12';
+  x.strokeText(defenseHint,e.x,400+e.y);x.fillStyle='#fff3d0';x.fillText(defenseHint,e.x,400+e.y);
   x.restore();
 }
 // Boss signature effects only appear during the committed strike, matching the wind-up cue without hiding the fighters.
