@@ -583,7 +583,17 @@ if(isPlayer){
   // Boot straps and toe caps clarify the ankles and feet in the side-on view.
   x.strokeStyle=edge;x.lineWidth=1.4;x.beginPath();x.moveTo(-31,-10);x.lineTo(-13,-10);x.moveTo(12,-10);x.lineTo(33,-10);x.stroke();
   x.fillStyle=skinHi;
-  // Small knuckle highlights stay subtle so the sword grip remains readable.
+  // Hand anatomy pass: articulated fingers, thumb pads and glove seams on both visible hands.
+  x.save();x.lineCap='round';x.lineJoin='round';x.strokeStyle=female?'#f0b18b':'#e0a16d';x.lineWidth=1.25;
+  // Off-hand hangs beside the hip when not shielding; draw short, separated fingers.
+  x.beginPath();x.moveTo(-28,-48);x.quadraticCurveTo(-31,-46,-30,-43);x.moveTo(-26,-48);x.lineTo(-27,-42);x.moveTo(-24,-47);x.lineTo(-24,-42);x.moveTo(-22,-46);x.lineTo(-21,-42);x.stroke();
+  // Visible thumb and palm creases keep the gripping hand from reading as a mitten.
+  x.beginPath();x.moveTo(25,-51);x.quadraticCurveTo(22,-49,24,-47);x.moveTo(26,-48);x.lineTo(29,-46);x.moveTo(28,-49);x.lineTo(31,-47);x.stroke();
+  x.strokeStyle=female?'#6c3a2b':'#70482c';x.lineWidth=1;x.beginPath();x.moveTo(-29,-46);x.lineTo(-26,-45);x.moveTo(25,-49);x.lineTo(28,-48);x.stroke();x.restore();
+  // Collar and neck tendons visually join the head to the armored chest.
+  poly([[-6,-87],[0,-83],[6,-87],[4,-80],[0,-78],[-4,-80]],female?'#6f3028':'#24465e',edge);
+  x.strokeStyle=female?'#9a5b40':'#875b3c';x.lineWidth=1;x.beginPath();x.moveTo(-2,-87);x.lineTo(-1,-82);x.moveTo(2,-87);x.lineTo(1,-82);x.stroke();
+// Small knuckle highlights stay subtle so the sword grip remains readable.
   for(let k=0;k<3;k++){x.beginPath();x.arc(28+k*2,-49+(k%2),.8,0,Math.PI*2);x.fill()}
 }
 // articulated knee and elbow accents improve the limb silhouette
