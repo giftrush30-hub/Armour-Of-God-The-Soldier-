@@ -52,14 +52,14 @@ x.strokeStyle='#d8b16c55';x.lineWidth=2;x.beginPath();x.moveTo(190,425);x.lineTo
 }
 function limb(ax,ay,bx,by,width,color){x.strokeStyle=color;x.lineWidth=width;x.lineCap='round';x.beginPath();x.moveTo(ax,ay);x.lineTo(bx,by);x.stroke()}
 function fighter(a,isPlayer){
-let xx=a.x,yy=425+a.y,face=a.face,walk=Math.sin(frame*.24+(isPlayer?0:1))*Math.min(8,Math.abs(a.vx)*1.4),atk=a.attack>0,guard=a.kind==='guard'&&a.attack>0;
+let xx=a.x,breath=Math.sin(frame*.09+(isPlayer?0:1.4))*1.2,yy=425+a.y+(a.ground?breath:0),face=a.face,walk=Math.sin(frame*.24+(isPlayer?0:1))*Math.min(8,Math.abs(a.vx)*1.4),atk=a.attack>0,guard=a.kind==='guard'&&a.attack>0;
 x.save();x.translate(xx,yy);if(a.stagger>0){x.rotate((a.stagger/12)*.11*(a.hitDir||1));a.stagger--}x.scale(face,1);x.scale(1.78,1);
 x.globalAlpha=a.inv>0&&frame%4<2?.55:1;if(a.hitFlash>0){x.shadowColor=isPlayer?'#fff0b0':'#ff665f';x.shadowBlur=16;a.hitFlash--}
 // strong ground shadow
 x.fillStyle='#000b';x.beginPath();x.ellipse(0,3,38,10,0,0,Math.PI*2);x.fill();
 if(!isPlayer){x.save();x.scale(face,1);x.fillStyle='#ffb6a9';x.font='900 13px system-ui';x.textAlign='center';x.shadowColor='#000';x.shadowBlur=8;x.fillText('SPIRIT OF FEAR',0,-145);x.restore()}
 // animated cape, split folds and gold hem catch the ridge light
-let cape=walk*.55+Math.sin(frame*.09+(isPlayer?0:1))*4;
+let cape=walk*.8+Math.sin(frame*.09+(isPlayer?0:1))*5+(a.kind==='special'?Math.sin(frame*.5)*3:0);
 poly([[-10,-87],[-25,-79],[-38+cape,-45],[-31+cape,-25],[-13,-50],[-3,-70]],isPlayer?'#7b2922':'#281c2b','#0a0c12');
 limb(-25,-68,-31+cape*.5,-43,2,isPlayer?'#d7a84d':'#9aa5b5');limb(-20,-65,-23+cape*.6,-39,2,isPlayer?'#d7a84d':'#9aa5b5');
 // legs with visible joints, readable movement poses, and heavy boots
@@ -82,7 +82,7 @@ for(let side of [-1,1]){x.fillStyle=isPlayer?'#fff0b0':'#e3e9f0';for(let j=0;j<2
 // belt emblem
 x.fillStyle='#fff0b0';x.fillRect(-2,-63,4,13);x.beginPath();x.arc(0,-66,4,0,Math.PI*2);x.fill();
 // left arm and large shield
-limb(-13,-75,-25,-60,12,isPlayer?'#d9ad50':'#7c8798');limb(-25,-60,-26,-49,10,'#202631');
+limb(-13,-75,-25+Math.sin(frame*.14)*Math.min(1,Math.abs(a.vx)/4)*4,-60,12,isPlayer?'#d9ad50':'#7c8798');limb(-25+Math.sin(frame*.14)*Math.min(1,Math.abs(a.vx)/4)*4,-60,-26,-49,10,'#202631');
 if(guard){x.save();x.translate(-31,-59);poly([[-12,-18],[8,-16],[14,-2],[1,17],[-14,2]],'#e0b14a','#fff0ae');poly([[-6,-11],[3,-10],[7,-1],[0,8],[-7,0]],'#67451c','#f7d88a');x.restore()}
 else{x.save();x.translate(-29,-58);poly([[-10,-15],[8,-13],[12,0],[0,13],[-12,0]],isPlayer?'#9c742e':'#535f72','#e9cc7a');x.beginPath();x.moveTo(-5,-8);x.lineTo(4,6);x.moveTo(5,-8);x.lineTo(-4,6);x.strokeStyle='#f8df94';x.lineWidth=2;x.stroke();x.restore()}
 // right arm swings while walking; sword lifts during attack
