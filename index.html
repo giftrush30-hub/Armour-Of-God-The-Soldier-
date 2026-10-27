@@ -420,17 +420,19 @@ else if(e.attack>0){
   if(!e.hitDone&&e.attack<=11&&e.attack>=8){e.hitDone=true;const signatureReach=e.attackType==='judgment'?spiritStyle().reach+48:(e.attackType==='storm'?spiritStyle().reach+24:spiritStyle().reach);if(Math.abs(p.x-e.x)<signatureReach&&Math.abs(p.y-e.y)<75){
     if(p.inv>0&&p.kind==='dodge'){e.attackConnected=false;$('status').innerHTML='<strong>PERFECT DODGE!</strong> The strike passes by. Counter while the spirit is exposed.';particles.push({x:p.x,y:340+p.y,vx:0,vy:-1.2,life:34,max:34,size:0,text:'PERFECT DODGE',color:'#9deaff'});for(let z=0;z<7;z++)particles.push({x:p.x+(Math.random()-.5)*38,y:390+p.y,vx:(Math.random()-.5)*3,vy:-Math.random()*2,life:16,max:16,size:2+Math.random()*2,color:'#9deaff'})}
     else {e.attackConnected=true;
-    if(held.guard&&p.fall===0&&p.hp>0&&p.stagger===0||p.kind==='guard'&&p.fall===0&&p.hp>0&&p.stagger===0){
+    if((held.guard||p.kind==='guard')&&p.fall===0&&p.hp>0&&p.stagger===0){
       const heavyBlock=e.attackType==='heavy'||e.attackType==='judgment'||e.attackType==='storm';
-      wearArmour('shield',heavyBlock?11:5,'blocked impact');
-      p.hp=Math.max(0,p.hp-(armourState.shield===0?(heavyBlock?18:12):(heavyBlock?5:1)));
-      p.vx+=(e.x<p.x?1:-1)*(heavyBlock?3:1.4);
-      p.hitFlash=heavyBlock?7:4;p.blockFlash=heavyBlock?12:8;p.stagger=heavyBlock?5:1;
-      shake=heavyBlock?7:3;flash=heavyBlock?7:3;hitStop=Math.max(hitStop,heavyBlock?4:2);
-      $('status').innerHTML=heavyBlock?'<strong>HEAVY BLOCK!</strong> Your shield holds, but the force pushes you back.':'<strong>SHIELD BLOCK!</strong> The blow glances off your shield.';
-      const impactX=p.x+(e.x<p.x?-1:1)*28,impactY=358+(heavyBlock?-5:0);particles.push({x:impactX,y:impactY-7,vx:0,vy:-1,life:18,max:18,size:0,text:heavyBlock?'HEAVY BLOCK':'BLOCKED',color:heavyBlock?'#ffd36b':'#9cecff'});particles.push({x:p.x+12,y:impactY-25,vx:0,vy:-1.1,life:26,max:26,size:0,text:'-'+(heavyBlock?5:1),color:heavyBlock?'#ffbf70':'#9cecff'});
-      particles.push({x:impactX,y:impactY,vx:0,vy:0,life:8,max:8,size:heavyBlock?25:19,text:'✦',color:heavyBlock?'#ffd36b':'#9cecff'});
-      for(let z=0;z<(heavyBlock?14:9);z++)particles.push({x:impactX,y:impactY+Math.random()*20,vx:(e.x<p.x?1:-1)*(1+Math.random()*(heavyBlock?5:3)),vy:(Math.random()-.5)*(heavyBlock?5:3),life:12,max:12,size:2+Math.random()*2,color:heavyBlock?'#ffd36b':'#9cecff'});
+      const perfectGuard=e.attack>=10&&armourState.shield>0;
+      wearArmour('shield',perfectGuard?3:(heavyBlock?11:5),'blocked impact');
+      p.hp=Math.max(0,p.hp-(perfectGuard?0:(armourState.shield===0?(heavyBlock?18:12):(heavyBlock?5:1))));
+      p.vx+=(e.x<p.x?1:-1)*(perfectGuard?.65:(heavyBlock?3:1.4));
+      p.hitFlash=perfectGuard?3:(heavyBlock?7:4);p.blockFlash=perfectGuard?16:(heavyBlock?12:8);p.stagger=perfectGuard?0:(heavyBlock?5:1);
+      shake=perfectGuard?5:(heavyBlock?7:3);flash=perfectGuard?5:(heavyBlock?7:3);hitStop=Math.max(hitStop,perfectGuard?5:(heavyBlock?4:2));
+      if(perfectGuard){e.stagger=Math.max(e.stagger,9);e.opening=Math.max(e.opening,30);e.recovery=Math.max(e.recovery,20);$('status').innerHTML='<strong>PERFECT GUARD!</strong> Your shield turns the strike aside. Counterattack now!';}
+      else $('status').innerHTML=heavyBlock?'<strong>HEAVY BLOCK!</strong> Your shield holds, but the force pushes you back.':'<strong>SHIELD BLOCK!</strong> The blow glances off your shield.';
+      const impactX=p.x+(e.x<p.x?-1:1)*28,impactY=358+(heavyBlock?-5:0);particles.push({x:impactX,y:impactY-7,vx:0,vy:-1,life:perfectGuard?24:18,max:perfectGuard?24:18,size:0,text:perfectGuard?'PERFECT GUARD':(heavyBlock?'HEAVY BLOCK':'BLOCKED'),color:perfectGuard?'#ffe58a':(heavyBlock?'#ffd36b':'#9cecff')});if(!perfectGuard)particles.push({x:p.x+12,y:impactY-25,vx:0,vy:-1.1,life:26,max:26,size:0,text:'-'+(heavyBlock?5:1),color:heavyBlock?'#ffbf70':'#9cecff'});
+      particles.push({x:impactX,y:impactY,vx:0,vy:0,life:perfectGuard?12:8,max:perfectGuard?12:8,size:perfectGuard?30:(heavyBlock?25:19),text:'✦',color:perfectGuard?'#fff1a8':(heavyBlock?'#ffd36b':'#9cecff')});
+      for(let z=0;z<(perfectGuard?18:(heavyBlock?14:9));z++)particles.push({x:impactX,y:impactY+Math.random()*20,vx:(e.x<p.x?1:-1)*(1+Math.random()*(perfectGuard?5:(heavyBlock?5:3))),vy:(Math.random()-.5)*(perfectGuard?5:(heavyBlock?5:3)),life:perfectGuard?18:12,max:perfectGuard?18:12,size:2+Math.random()*2,color:perfectGuard?'#fff0a3':(heavyBlock?'#ffd36b':'#9cecff')});
     }
     else hit(e,p,e.attackType==='judgment'?spiritStyle().damage+6:(e.attackType==='storm'?spiritStyle().damage+3:(e.attackType==='heavy'?spiritStyle().damage+4:(e.kind==='kick'?spiritStyle().damage+1:spiritStyle().damage))),e.attackType==='storm'?15:(e.attackType==='judgment'?10:(e.attackType==='heavy'?11:(e.kind==='kick'?9:7))));
     }
