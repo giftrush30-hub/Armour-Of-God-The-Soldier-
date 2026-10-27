@@ -82,6 +82,38 @@ button{touch-action:manipulation}
  .controls>.cluster{gap:4px}
  .controls .ctrl{flex-basis:44px;min-width:44px;padding-left:2px;padding-right:2px}
 }
+/* Premium typography pass: cinematic display type, calm interface type, and legibility over mountain scenery. */
+:root{--gold-bright:#ffe7a0;--gold-soft:#d8bd7a;--text-main:#f5f0e5;--text-muted:#b5bfcd}
+html,body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.brand{font-family:Georgia,"Times New Roman",serif;font-weight:700;letter-spacing:.105em;text-shadow:0 1px 0 #fff2,0 3px 18px #e4b95a22}
+.brand span{color:var(--gold-bright);text-shadow:0 0 18px #f5c96b33}
+.eyebrow,.verse-kicker,.companion-label,.armour-head,.centerhud{font-weight:800;text-shadow:0 1px 7px #0008}
+.panel h1,.forge-title h2,.vault-heading h2{font-family:Georgia,"Times New Roman",serif;font-weight:700;letter-spacing:.015em;text-wrap:balance;text-shadow:0 2px 0 #000,0 8px 24px #0008}
+.panel h1{color:#fff0c9}
+.panel p{font-size:13px;line-height:1.58;letter-spacing:.005em;color:#c5ced9}
+.primary{font-size:11px;letter-spacing:.14em;text-shadow:0 1px #fff3;box-shadow:inset 0 1px #fff5,0 5px 18px #0005}
+.status{font-size:12px;line-height:1.55;letter-spacing:.01em;color:#e0e4eb;text-shadow:0 1px 5px #0008}
+.name{font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;text-shadow:0 2px 0 #000,0 3px 12px #000}
+.centerhud{font-size:10px;letter-spacing:.2em;color:#fff0c5}
+.scripture-banner{border-color:#d9b96f99;background:linear-gradient(105deg,#090c13ed,#15130fe8);box-shadow:0 8px 24px #0006,inset 0 1px #fff1}
+.scripture-banner strong{font-size:9px;letter-spacing:.19em;color:var(--gold-bright)}
+.scripture-banner span{font-family:Georgia,"Times New Roman",serif;font-size:12px;line-height:1.45;letter-spacing:.01em;color:#fff3d5}
+.verse-card #daily-verse{font-family:Georgia,"Times New Roman",serif;font-weight:500;letter-spacing:.005em;text-shadow:0 1px 10px #0005}
+.companion-line{font-family:Georgia,"Times New Roman",serif;font-weight:600;line-height:1.55;letter-spacing:.005em}
+.power-chip,.hero-choice strong,.ctrl{letter-spacing:.045em}
+.hero-choice strong{font-size:12px}
+.hero-choice span{font-size:10px;line-height:1.4}
+.armour-piece b{font-size:9px}
+.armour-piece small{font-size:8px;line-height:1.35}
+.subhud{font-variant-numeric:tabular-nums}
+@media(max-width:520px){
+ .panel p{font-size:12px;line-height:1.5}
+ .scripture-banner span{font-size:10px}
+ .armour-piece b{font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){
+ .primary,.fill,.armour-track i{transition:none!important}
+}
 </style></head><body><main class="app">
 <header class="top"><div><div class="eyebrow">A 2.5D biblical combat experience</div><div class="brand">ARMOUR OF GOD <span>: THE SOLDIER</span></div></div><div class="pill">✦ DIVINE GOLD <span id="coins">◈ 0</span></div></header>
 <section class="stage"><canvas id="game" width="960" height="540" aria-label="Playable mountain-edge battle"></canvas>
@@ -267,7 +299,7 @@ if(spiritIndex===11){poly([[-11,-110],[-17,-101],[-13,-88],[-5,-91]],'#252b34',a
 if(spiritIndex===12){x.strokeStyle=accent;x.lineWidth=2;x.beginPath();x.arc(0,-116,15,Math.PI,Math.PI*2);x.stroke()}
 if(spiritIndex===14){x.strokeStyle=accent;x.lineWidth=2;x.beginPath();x.moveTo(-7,-109);x.lineTo(1,-101);x.lineTo(-3,-94);x.lineTo(6,-86);x.stroke()}
 x.restore()}
-if(!isPlayer){x.save();x.scale(face,1);x.fillStyle='#ffb6a9';x.font='900 13px system-ui';x.textAlign='center';x.shadowColor='#000';x.shadowBlur=8;x.fillText(currentSpirit().name,0,-145);x.shadowBlur=0;x.strokeStyle=currentSpirit().cue+'88';x.lineWidth=1;x.beginPath();x.moveTo(-44,-137);x.lineTo(44,-137);x.stroke();x.restore()}
+if(!isPlayer){x.save();x.scale(face,1);x.fillStyle='#ffb6a9';x.font='700 13px Georgia,serif';x.textAlign='center';x.shadowColor='#000';x.shadowBlur=8;x.fillText(currentSpirit().name,0,-145);x.shadowBlur=0;x.strokeStyle=currentSpirit().cue+'88';x.lineWidth=1;x.beginPath();x.moveTo(-44,-137);x.lineTo(44,-137);x.stroke();x.restore()}
 // animated cape, split folds and gold hem catch the ridge light
 let cape=walk*.8+Math.sin(frame*.09+(isPlayer?0:1))*5+(a.kind==='special'?Math.sin(frame*.5)*3:0);
 poly([[-10,-87],[-25,-79],[-38+cape,-45],[-31+cape,-25],[-13,-50],[-3,-70]],isPlayer?(selectedCharacter==='deborah'?'#235f55':'#7b2922'):'#281c2b','#0a0c12');
@@ -338,7 +370,7 @@ if(swordAtk){let swingProgress=1-clamp(a.attack/Math.max(1,a.attackTotal||16),0,
 if(a.kind==='special'&&atk){x.save();x.globalAlpha=.8;x.strokeStyle='#a9f5ff';x.lineWidth=2;x.beginPath();x.ellipse(0,-44,49+Math.sin(frame*.7)*5,13,0,0,Math.PI*2);x.stroke();x.beginPath();x.ellipse(0,-44,35,8,frame*.04,0,Math.PI*2);x.stroke();x.restore()}
 
 // enemy telegraph: a warning rune appears before the Spirit attacks
-if(!isPlayer&&a.kind==='windup'){x.save();let boss=spiritIndex===0||spiritIndex===15||spiritIndex===17,heavy=a.attackType==='heavy',warnColor=spiritIndex===0?'#ff615c':(spiritIndex===15?'#ff9dbb':(spiritIndex===17?'#ffb070':(heavy?'#ffd36b':'#ff6e61')));x.globalAlpha=.78+.22*Math.sin(frame*(boss?.95:.7));x.strokeStyle=warnColor;x.lineWidth=boss?4:3;x.beginPath();x.arc(0,-91,(boss?34:29)+Math.sin(frame*.5)*3,0,Math.PI*2);x.stroke();if(boss){x.beginPath();x.arc(0,-91,43+Math.sin(frame*.35)*2,0,Math.PI*2);x.stroke()}x.fillStyle=warnColor;x.font='900 '+(boss?'11':'10')+'px system-ui';x.textAlign='center';x.fillText(spiritIndex===0?'FEAR':(spiritIndex===15?'JUDGE':(spiritIndex===17?'WRATH':(heavy?'HEAVY':'!'))),0,-129);x.restore()}
+if(!isPlayer&&a.kind==='windup'){x.save();let boss=spiritIndex===0||spiritIndex===15||spiritIndex===17,heavy=a.attackType==='heavy',warnColor=spiritIndex===0?'#ff615c':(spiritIndex===15?'#ff9dbb':(spiritIndex===17?'#ffb070':(heavy?'#ffd36b':'#ff6e61')));x.globalAlpha=.78+.22*Math.sin(frame*(boss?.95:.7));x.strokeStyle=warnColor;x.lineWidth=boss?4:3;x.beginPath();x.arc(0,-91,(boss?34:29)+Math.sin(frame*.5)*3,0,Math.PI*2);x.stroke();if(boss){x.beginPath();x.arc(0,-91,43+Math.sin(frame*.35)*2,0,Math.PI*2);x.stroke()}x.fillStyle=warnColor;x.font='700 '+(boss?'12':'10')+'px Georgia,serif';x.textAlign='center';x.fillText(spiritIndex===0?'FEAR':(spiritIndex===15?'JUDGE':(spiritIndex===17?'WRATH':(heavy?'HEAVY':'!'))),0,-129);x.restore()}
 if(a.kind==='sword'&&atk){x.save();x.strokeStyle='#fff0a5';x.lineWidth=3;x.globalAlpha=.75;x.beginPath();x.arc(4,-58,83,-1.18,.45);x.stroke();x.restore()}
 if(a.kind==='guard'){x.save();x.strokeStyle='#8de7ff';x.lineWidth=3;x.globalAlpha=.8;x.beginPath();x.arc(-17,-61,23,-1.3,1.3);x.stroke();x.restore()}
 // layered helmet silhouette with brow ridge, cheek guards and glowing visor
@@ -457,7 +489,7 @@ if(running&&!ended&&e.kind==='windup'){
   }
   else if(storm){x.lineWidth=3+progress*3;x.beginPath();x.moveTo(startX,baseY-12);x.lineTo(endX,baseY);x.lineTo(startX,baseY+12);x.stroke();x.beginPath();x.moveTo(startX+dir*8,baseY-20);x.lineTo(endX-dir*8,baseY);x.lineTo(startX+dir*8,baseY+20);x.stroke();}
   else{x.beginPath();x.moveTo(startX,baseY);x.lineTo(endX,baseY-5);x.lineTo(endX-dir*10,baseY+5);x.stroke();}
-  x.globalAlpha=.92;x.font='900 12px system-ui';x.textAlign='center';x.lineWidth=3;x.strokeStyle='#170f12';
+  x.globalAlpha=.92;x.font='700 12px Georgia,serif';x.textAlign='center';x.lineWidth=3;x.strokeStyle='#170f12';
   const defenseHint=feint?'DON’T SWING — WAIT IT OUT':(storm?'DODGE THE RUSH':(judgment?'DODGE OR TIME YOUR GUARD':(heavy?'GUARD — PERFECT TIMING HELPS':(kick?'DODGE OR GUARD LOW':'GUARD — WATCH THE STRIKE'))));
   const cueMark=feint?'…':(storm?'⚡':(judgment?'✦':(heavy?'◆':(kick?'↘':'⚔'))));
   x.strokeText(cueMark+'  '+cue,e.x,385+e.y);x.fillStyle=cueColor;x.fillText(cueMark+'  '+cue,e.x,385+e.y);
@@ -489,9 +521,9 @@ if(running&&!ended&&(e.kind==='sword'||e.kind==='kick')&&e.attack<=11&&e.attack>
   x.beginPath();x.moveTo(p.x-34*pulse,385+p.y-12);x.lineTo(p.x+34*pulse,385+p.y+7);x.stroke();
   x.textAlign='center';x.font='900 12px system-ui';x.lineWidth=4;x.strokeStyle='#251015';x.strokeText('STRIKE!',p.x,365+p.y);x.fillStyle='#ffd1c7';x.fillText('STRIKE!',p.x,365+p.y);x.restore();
 }
-if(e.opening>0&&e.hp>0&&e.fall===0){x.save();let pulse=1+Math.sin(frame*.45)*.08,bossOpen=spiritIndex===15&&e.attackType==='judgment'||spiritIndex===17&&e.attackType==='storm',openColor=bossOpen?'#8deeff':'#ffe29a';x.globalAlpha=.55+.3*Math.sin(frame*.38);x.strokeStyle=openColor;x.lineWidth=bossOpen?4:3;x.shadowColor=openColor;x.shadowBlur=bossOpen?12:8;const gy=428;x.beginPath();x.moveTo(e.x-34*pulse,gy+4);x.lineTo(e.x-15*pulse,gy-2);x.moveTo(e.x-7*pulse,gy+3);x.lineTo(e.x+12*pulse,gy-4);x.moveTo(e.x+20*pulse,gy+2);x.lineTo(e.x+37*pulse,gy-3);x.stroke();if(bossOpen){x.globalAlpha=.8;x.beginPath();x.moveTo(e.x-46,gy-7);x.lineTo(e.x-28,gy-12);x.moveTo(e.x+29,gy+8);x.lineTo(e.x+49,gy+3);x.stroke()}x.globalAlpha=1;x.font='900 11px system-ui';x.textAlign='center';x.lineWidth=3;x.strokeStyle='#17120b';const openLabel=bossOpen?'BOSS EXPOSED':'COUNTER WINDOW';x.strokeText(openLabel,e.x,303+e.y);x.fillStyle=openColor;x.fillText(openLabel,e.x,303+e.y);x.restore()}
-if((spiritIndex===0||spiritIndex===15||spiritIndex===17)&&e.hp>0&&e.fall===0){x.save();x.textAlign='center';x.font='900 11px system-ui';x.lineWidth=3;x.strokeStyle='#120d14';x.strokeText(e.phase===2?'PHASE II · ENRAGED':'BOSS · PHASE I',e.x,286+e.y);x.fillStyle=e.phase===2?(spiritIndex===15?'#ff9dbb':'#ff9866'):'#f4d7a0';x.fillText(e.phase===2?'PHASE II · ENRAGED':'BOSS · PHASE I',e.x,286+e.y);x.restore()}
-if(comboCount>=2&&frame<comboUntil){x.save();x.textAlign='center';let pulse=1+Math.sin(frame*.32)*.035;x.translate(480,205);x.scale(pulse,pulse);x.font='900 21px system-ui';x.lineWidth=5;x.strokeStyle='#10141c';x.strokeText(comboCount+' HIT COMBO',0,0);x.fillStyle='#ffe29a';x.shadowColor='#ffcf66';x.shadowBlur=12;x.fillText(comboCount+' HIT COMBO',0,0);x.restore()}
+if(e.opening>0&&e.hp>0&&e.fall===0){x.save();let pulse=1+Math.sin(frame*.45)*.08,bossOpen=spiritIndex===15&&e.attackType==='judgment'||spiritIndex===17&&e.attackType==='storm',openColor=bossOpen?'#8deeff':'#ffe29a';x.globalAlpha=.55+.3*Math.sin(frame*.38);x.strokeStyle=openColor;x.lineWidth=bossOpen?4:3;x.shadowColor=openColor;x.shadowBlur=bossOpen?12:8;const gy=428;x.beginPath();x.moveTo(e.x-34*pulse,gy+4);x.lineTo(e.x-15*pulse,gy-2);x.moveTo(e.x-7*pulse,gy+3);x.lineTo(e.x+12*pulse,gy-4);x.moveTo(e.x+20*pulse,gy+2);x.lineTo(e.x+37*pulse,gy-3);x.stroke();if(bossOpen){x.globalAlpha=.8;x.beginPath();x.moveTo(e.x-46,gy-7);x.lineTo(e.x-28,gy-12);x.moveTo(e.x+29,gy+8);x.lineTo(e.x+49,gy+3);x.stroke()}x.globalAlpha=1;x.font='700 11px Georgia,serif';x.textAlign='center';x.lineWidth=3;x.strokeStyle='#17120b';const openLabel=bossOpen?'BOSS EXPOSED':'COUNTER WINDOW';x.strokeText(openLabel,e.x,303+e.y);x.fillStyle=openColor;x.fillText(openLabel,e.x,303+e.y);x.restore()}
+if((spiritIndex===0||spiritIndex===15||spiritIndex===17)&&e.hp>0&&e.fall===0){x.save();x.textAlign='center';x.font='700 11px Georgia,serif';x.lineWidth=3;x.strokeStyle='#120d14';x.strokeText(e.phase===2?'PHASE II · ENRAGED':'BOSS · PHASE I',e.x,286+e.y);x.fillStyle=e.phase===2?(spiritIndex===15?'#ff9dbb':'#ff9866'):'#f4d7a0';x.fillText(e.phase===2?'PHASE II · ENRAGED':'BOSS · PHASE I',e.x,286+e.y);x.restore()}
+if(comboCount>=2&&frame<comboUntil){x.save();x.textAlign='center';let pulse=1+Math.sin(frame*.32)*.035;x.translate(480,205);x.scale(pulse,pulse);x.font='700 21px Georgia,serif';x.lineWidth=5;x.strokeStyle='#10141c';x.strokeText(comboCount+' HIT COMBO',0,0);x.fillStyle='#ffe29a';x.shadowColor='#ffcf66';x.shadowBlur=12;x.fillText(comboCount+' HIT COMBO',0,0);x.restore()}
 if(p.hp<=30){x.save();x.globalAlpha=.08+.06*Math.sin(frame*.25);x.fillStyle='#ff263b';x.fillRect(0,0,W,H);x.restore()}
 // Keep burst effects bounded on lower-powered phones; retain the newest, most relevant combat cues.
 if(particles.length>180)particles.splice(0,particles.length-180);
