@@ -17,15 +17,46 @@
 const c=document.getElementById('game'),x=c.getContext('2d'),W=960,H=540;
 const $=id=>document.getElementById(id);
 let running=false,ended=false,frame=0,shake=0,flash=0,hitStop=0,specialFX=0,swordChain=0,swordChainUntil=0,coins=Number(localStorage.getItem('aogs-coins')||0),held={},cool={},last=0,particles=[],comboCount=0,comboUntil=0,spiritIndex=Number(localStorage.getItem('aogs-spirit')||0);
-const spirits=[{name:'SPIRIT OF FEAR',color:'#d52d3a',cue:'#ff615c',trial:'THE RIDGE'},{name:'SPIRIT OF TEMPTATION',color:'#9b4acb',cue:'#e1a0ff',trial:'THE VEILED PASS'},{name:'SPIRIT OF DOUBT',color:'#3976bf',cue:'#8bc7ff',trial:'THE BROKEN SUMMIT'},{name:'SPIRIT OF SORROW',color:'#2d8d91',cue:'#8ce7df',trial:'THE WEEPING CLIFF'},{name:'SPIRIT OF STAGNATION',color:'#6b7a42',cue:'#d4e88b',trial:'THE STONE ASCENT'},{name:'SPIRIT OF DELAY',color:'#b06b31',cue:'#ffd08a',trial:'THE LAST PASS'}];
+const spirits=[
+{name:'SPIRIT OF FEAR',color:'#d52d3a',cue:'#ff615c',trial:'THE RIDGE'},
+{name:'SPIRIT OF DOUBT',color:'#3976bf',cue:'#8bc7ff',trial:'THE BROKEN SUMMIT'},
+{name:'SPIRIT OF LUST',color:'#a52f70',cue:'#ff8ac5',trial:'THE VEILED GARDEN'},
+{name:'SPIRIT OF ANGER',color:'#c4432e',cue:'#ff9a5c',trial:'THE ASHEN SLOPE'},
+{name:'SPIRIT OF SORROW',color:'#2d8d91',cue:'#8ce7df',trial:'THE WEEPING CLIFF'},
+{name:'SPIRIT OF STAGNATION',color:'#6b7a42',cue:'#d4e88b',trial:'THE STONE ASCENT'},
+{name:'SPIRIT OF DECEPTION',color:'#6950ad',cue:'#c4a9ff',trial:'THE SHATTERED MIRROR'},
+{name:'SPIRIT OF PRIDE',color:'#b58a2e',cue:'#ffe18b',trial:'THE HIGH THRONE'},
+{name:'SPIRIT OF GREED',color:'#8c6827',cue:'#f2c75b',trial:'THE HOARDER’S PASS'},
+{name:'SPIRIT OF ENVY',color:'#318052',cue:'#8ff0a8',trial:'THE GREEN ABYSS'},
+{name:'SPIRIT OF BITTERNESS',color:'#74513d',cue:'#d7a58b',trial:'THE THORNED PATH'},
+{name:'SPIRIT OF HOPELESSNESS',color:'#45556b',cue:'#a8bfdc',trial:'THE GREY DESCENT'},
+{name:'SPIRIT OF DESPAIR',color:'#30364f',cue:'#a6a9ff',trial:'THE SUNLESS CLIFF'},
+{name:'SPIRIT OF DELAY',color:'#b06b31',cue:'#ffd08a',trial:'THE LAST PASS'},
+{name:'SPIRIT OF SIN',color:'#6c283d',cue:'#ed789b',trial:'THE BROKEN GATE'},
+{name:'THE ACCUSER',color:'#632d4b',cue:'#ff9dbb',trial:'THE JUDGMENT RIDGE'},
+{name:'SPIRIT OF TEMPTATION',color:'#9b4acb',cue:'#e1a0ff',trial:'THE VEILED PASS'},
+{name:'WRATH THE UNCONTROLLED',color:'#d14b25',cue:'#ffb070',trial:'THE STORM ASCENT'}
+];
 const currentSpirit=()=>spirits[spiritIndex%spirits.length];
 const spiritStyles=[
  {health:100,damage:10,reach:190,range:160,windup:36,recovery:24,speed:.34,attack:'sword'},
- {health:88,damage:11,reach:205,range:174,windup:31,recovery:19,speed:.42,attack:'feint'},
  {health:112,damage:9,reach:180,range:148,windup:43,recovery:27,speed:.25,attack:'feint'},
+ {health:88,damage:11,reach:205,range:174,windup:31,recovery:19,speed:.42,attack:'feint'},
+ {health:118,damage:14,reach:185,range:145,windup:32,recovery:28,speed:.38,attack:'heavy'},
  {health:118,damage:12,reach:185,range:145,windup:32,recovery:28,speed:.3,attack:'heavy'},
  {health:145,damage:13,reach:190,range:137,windup:50,recovery:31,speed:.2,attack:'heavy'},
- {health:92,damage:10,reach:195,range:168,windup:28,recovery:17,speed:.46,attack:'kick'}
+ {health:96,damage:10,reach:202,range:169,windup:30,recovery:20,speed:.39,attack:'feint'},
+ {health:132,damage:13,reach:194,range:150,windup:42,recovery:30,speed:.28,attack:'heavy'},
+ {health:140,damage:12,reach:188,range:142,windup:46,recovery:30,speed:.24,attack:'heavy'},
+ {health:98,damage:11,reach:196,range:167,windup:29,recovery:20,speed:.41,attack:'kick'},
+ {health:122,damage:12,reach:187,range:144,windup:40,recovery:29,speed:.27,attack:'heavy'},
+ {health:115,damage:10,reach:181,range:149,windup:47,recovery:27,speed:.23,attack:'feint'},
+ {health:138,damage:14,reach:195,range:139,windup:48,recovery:32,speed:.22,attack:'heavy'},
+ {health:92,damage:10,reach:195,range:168,windup:28,recovery:17,speed:.46,attack:'kick'},
+ {health:150,damage:14,reach:200,range:140,windup:45,recovery:32,speed:.26,attack:'heavy'},
+ {health:170,damage:15,reach:210,range:155,windup:52,recovery:34,speed:.24,attack:'heavy'},
+ {health:88,damage:11,reach:205,range:174,windup:31,recovery:19,speed:.42,attack:'feint'},
+ {health:160,damage:15,reach:205,range:146,windup:47,recovery:33,speed:.31,attack:'heavy'}
 ];
 const spiritStyle=()=>spiritStyles[spiritIndex%spiritStyles.length];
 const p={x:300,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0,hitDone:false,attackDamage:0,attackReach:0,stagger:0,hitFlash:0};
