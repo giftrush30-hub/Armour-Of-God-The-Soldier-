@@ -297,7 +297,24 @@ armourSheen.addColorStop(0,'#ffffff00');armourSheen.addColorStop(.42,'#fff6d966'
 x.globalAlpha=isPlayer?.34:.22;x.fillStyle=armourSheen;x.fillRect(-32,-91,64,54);x.restore();
 for(let side of [-1,1]){x.fillStyle=isPlayer?'#fff0b0':'#e3e9f0';for(let j=0;j<2;j++){x.beginPath();x.arc(side*(15+j),-75+j*7,1.3,0,Math.PI*2);x.fill()}}
 // belt emblem
-x.fillStyle='#fff0b0';x.fillRect(-2,-63,4,13);x.beginPath();x.arc(0,-66,4,0,Math.PI*2);x.fill();
+x.fillStyle='#fff0b0';x.fillRect(-2,-63,4,13);x.beginPath();x.arc(0,-66,4,0,Math.PI*2);x.fill();// Signature insignia: each available hero has a distinct readable chest mark.
+if(isPlayer){
+  x.save();x.translate(0,-70);
+  if(selectedCharacter==='deborah'){
+    // Deborah's olive branch: paired leaves around a central stem.
+    x.strokeStyle='#b7efc9';x.lineWidth=1.7;x.lineCap='round';
+    x.beginPath();x.moveTo(-8,7);x.quadraticCurveTo(0,0,7,-8);x.stroke();
+    [[-6,4,-9,0],[-3,2,-2,-3],[1,-2,5,-5],[4,-5,9,-4]].forEach(v=>{x.beginPath();x.moveTo(v[0],v[1]);x.quadraticCurveTo((v[0]+v[2])/2-2,(v[1]+v[3])/2-3,v[2],v[3]);x.stroke()});
+    x.fillStyle='#d5f5ce';x.beginPath();x.arc(0,0,1.7,0,Math.PI*2);x.fill();
+  }else{
+    // David's royal star: a small double triangle with a bright central point.
+    x.strokeStyle='#fff0ae';x.lineWidth=1.6;x.lineJoin='round';
+    x.beginPath();x.moveTo(0,-8);x.lineTo(7,5);x.lineTo(-7,5);x.closePath();x.stroke();
+    x.beginPath();x.moveTo(0,8);x.lineTo(7,-5);x.lineTo(-7,-5);x.closePath();x.stroke();
+    x.fillStyle='#fff8d7';x.shadowColor='#ffd76b';x.shadowBlur=5;x.beginPath();x.arc(0,0,1.7,0,Math.PI*2);x.fill();
+  }
+  x.restore();
+}
 // left arm and large shield
 let shieldLift=guard?10:0,shieldImpact=isPlayer&&a.blockFlash>0?Math.sin((a.blockFlash/12)*Math.PI):0,shieldRecoil=shieldImpact*5;limb(-13,-75,-25+Math.sin(frame*.14)*Math.min(1,Math.abs(a.vx)/4)*4+shieldRecoil,-60-shieldLift+shieldImpact*3,12,isPlayer?'#d9ad50':'#7c8798');limb(-25+Math.sin(frame*.14)*Math.min(1,Math.abs(a.vx)/4)*4+shieldRecoil,-60-shieldLift+shieldImpact*3,-26+shieldRecoil,-49-shieldLift+shieldImpact*3,10,'#202631');
 if(guard){x.save();x.translate(-33+shieldRecoil,-65+shieldImpact*3);x.rotate(-.12+shieldImpact*.09);poly([[-12,-20],[8,-18],[14,-2],[1,17],[-14,2]],'#e0b14a','#fff0ae');poly([[-6,-13],[3,-12],[7,-1],[0,8],[-7,0]],'#67451c','#f7d88a');x.strokeStyle='#fff0ae';x.lineWidth=2;x.beginPath();x.moveTo(-8,-15);x.lineTo(0,-8);x.lineTo(8,-15);x.moveTo(-8,4);x.lineTo(0,11);x.lineTo(8,4);x.stroke();x.restore()}
