@@ -40,37 +40,40 @@ x.strokeStyle='#d8b16c55';x.lineWidth=2;x.beginPath();x.moveTo(190,425);x.lineTo
 }
 function limb(ax,ay,bx,by,width,color){x.strokeStyle=color;x.lineWidth=width;x.lineCap='round';x.beginPath();x.moveTo(ax,ay);x.lineTo(bx,by);x.stroke()}
 function fighter(a,isPlayer){
-let xx=a.x,yy=425+a.y,face=a.face,move=Math.sin(frame*.22+(isPlayer?0:1))*Math.min(4,Math.abs(a.vx)*.9),atk=a.attack>0,guard=a.kind==='guard'&&a.attack>0;
-x.save();x.translate(xx,yy);x.scale(face,1);
-x.globalAlpha=a.inv>0&&frame%4<2?.45:1;
-x.fillStyle='#0009';x.beginPath();x.ellipse(0,2,32,8,0,0,Math.PI*2);x.fill();
-// trailing cape
-poly([[-9,-82],[-27,-72],[-39,-35],[-23,-22],[-7,-55]],isPlayer?'#5b251d':'#1e202d');
-let metal=isPlayer?'#c99a43':'#6c7483',light=isPlayer?'#ffe6a0':'#d5d8e0',dark=isPlayer?'#67471f':'#292e39',cloth=isPlayer?'#713329':'#3b1824';
-// legs
-limb(-7,-35,-15+move,-12,10,dark);limb(-15+move,-12,-22+move,-2,11,metal);limb(7,-35,13-move,-13,10,dark);limb(13-move,-13,22-move,-3,11,metal);
-poly([[-27,-5],[-7,-8],[-3,-1],[-25,1]],'#171b22');poly([[8,-5],[29,-6],[32,0],[9,1]],'#171b22');
-// torso silhouette and tunic
-poly([[-14,-79],[11,-79],[19,-48],[12,-33],[-13,-33],[-21,-49]],dark,'#e3bd6a');
-poly([[-14,-75],[0,-69],[12,-76],[14,-51],[0,-43],[-13,-52]],metal);
-poly([[-12,-51],[13,-51],[10,-34],[-10,-34]],cloth);
-x.strokeStyle=light;x.lineWidth=2;x.beginPath();x.moveTo(-8,-74);x.lineTo(0,-62);x.lineTo(8,-74);x.stroke();
-poly([[-15,-54],[15,-54],[12,-48],[-13,-48]],light);poly([[-4,-55],[4,-55],[3,-44],[-3,-44]],dark);
-// shield arm
-if(guard){limb(-11,-70,-23,-59,9,metal);x.save();x.translate(-28,-59);x.scale(.8,1);poly([[-10,-14],[9,-12],[12,0],[0,13],[-12,0]],isPlayer?'#b58432':'#596477',light);x.restore()}
-else{limb(-12,-70,-22,-54,9,metal);limb(-22,-54,-18,-45,7,dark)}
-// sword arm and blade
-let sx=atk?23:13,sy=atk?-58:-52,ex=atk?51:25,ey=atk?-74:-39;
-limb(11,-70,sx,sy,10,metal);limb(sx,sy,ex,ey,7,metal);
-if(atk){x.save();x.shadowColor='#ffe6a0';x.shadowBlur=18;limb(ex,ey,ex+12,ey-23,4,light);limb(ex+12,ey-23,ex+15,ey-32,2,'#fff8d9');x.restore();
-x.strokeStyle='#ffe9a2';x.lineWidth=3;x.beginPath();x.arc(2,-55,52,-1.05,.55);x.stroke()}
-else{limb(ex,ey,ex+5,ey-32,4,light);limb(ex+1,ey-14,ex+10,ey-17,3,'#a77a36')}
-// helmet/head
-x.fillStyle='#c18b56';x.beginPath();x.arc(0,-91,12,0,Math.PI*2);x.fill();
-poly([[-14,-91],[-12,-105],[-4,-112],[7,-109],[14,-99],[12,-91],[5,-96],[-7,-96]],metal,light);
-poly([[-13,-94],[12,-94],[9,-89],[-11,-89]],dark);x.fillStyle=light;x.fillRect(-5,-104,10,2);
-poly([[-2,-111],[2,-111],[0,-125]],light);
-if(isPlayer){poly([[-8,-83],[0,-77],[8,-83],[5,-70],[0,-66],[-5,-70]],'#e7c16a')}
+let xx=a.x,yy=425+a.y,face=a.face,walk=Math.sin(frame*.24+(isPlayer?0:1))*Math.min(8,Math.abs(a.vx)*1.4),atk=a.attack>0,guard=a.kind==='guard'&&a.attack>0;
+x.save();x.translate(xx,yy);x.scale(face,1);x.scale(1.12,1);
+x.globalAlpha=a.inv>0&&frame%4<2?.55:1;
+// strong ground shadow
+x.fillStyle='#000b';x.beginPath();x.ellipse(0,3,38,10,0,0,Math.PI*2);x.fill();
+// cape moves behind the body
+poly([[-10,-87],[-25,-79],[-38+walk*.35,-45],[-31+walk*.35,-25],[-13,-50],[-3,-70]],isPlayer?'#7b2922':'#281c2b','#0a0c12');
+// legs with visible joints and heavy boots
+limb(-8,-39,-14+walk,-18,13,'#11151c');limb(-14+walk,-18,-24+walk,-5,14,isPlayer?'#bd8b36':'#7d8795');
+limb(8,-39,14-walk,-18,13,'#11151c');limb(14-walk,-18,25-walk,-5,14,isPlayer?'#bd8b36':'#7d8795');
+poly([[-34,-7],[-12,-10],[-5,-3],[-7,1],[-34,1]],'#0b0e14','#d7b15e');poly([[9,-7],[31,-9],[36,-3],[34,1],[10,1]],'#0b0e14','#d7b15e');
+// long tunic and plated torso
+poly([[-17,-83],[15,-83],[22,-48],[15,-34],[-15,-34],[-23,-49]],isPlayer?'#773126':'#303846','#070a10');
+poly([[-17,-79],[-5,-85],[0,-77],[8,-85],[17,-79],[12,-52],[0,-45],[-13,-53]],isPlayer?'#d3a344':'#8793a4','#fff0b0');
+poly([[-12,-73],[0,-65],[12,-73],[9,-55],[0,-49],[-9,-56]],isPlayer?'#8b652c':'#4a5261','#f8d981');
+poly([[-15,-53],[15,-53],[12,-37],[-12,-37]],isPlayer?'#8e3829':'#242a35','#e4c273');
+poly([[-18,-57],[18,-57],[15,-50],[-15,-50]],'#f3d58b','#fff3c8');
+// belt emblem
+x.fillStyle='#fff0b0';x.fillRect(-2,-63,4,13);x.beginPath();x.arc(0,-66,4,0,Math.PI*2);x.fill();
+// left arm and large shield
+limb(-13,-75,-25,-60,12,isPlayer?'#d9ad50':'#7c8798');limb(-25,-60,-26,-49,10,'#202631');
+if(guard){x.save();x.translate(-31,-59);poly([[-12,-18],[8,-16],[14,-2],[1,17],[-14,2]],'#e0b14a','#fff0ae');poly([[-6,-11],[3,-10],[7,-1],[0,8],[-7,0]],'#67451c','#f7d88a');x.restore()}
+else{x.save();x.translate(-29,-58);poly([[-10,-15],[8,-13],[12,0],[0,13],[-12,0]],isPlayer?'#9c742e':'#535f72','#e9cc7a');x.beginPath();x.moveTo(-5,-8);x.lineTo(4,6);x.moveTo(5,-8);x.lineTo(-4,6);x.strokeStyle='#f8df94';x.lineWidth=2;x.stroke();x.restore()}
+// right arm swings while walking; sword lifts during attack
+let sx=atk?23:14,sy=atk?-60:-54,ex=atk?50:24,ey=atk?-76:-42;
+limb(13,-75,sx,sy,12,isPlayer?'#d9ad50':'#7c8798');limb(sx,sy,ex,ey,9,'#222936');
+if(atk){x.save();x.shadowColor='#fff0a5';x.shadowBlur=25;limb(ex,ey,ex+14,ey-28,6,'#fff0b0');limb(ex+14,ey-28,ex+18,ey-39,3,'#ffffff');x.restore();x.strokeStyle='#ffd86a';x.lineWidth=5;x.globalAlpha=.8;x.beginPath();x.arc(2,-57,61,-1.1,.52);x.stroke();x.globalAlpha=1}
+else{limb(ex,ey,ex+7,ey-36,6,'#dce8f5');limb(ex+2,ey-15,ex+13,ey-19,4,'#8f6427')}
+// face, helmet, brow and crest
+x.fillStyle=isPlayer?'#a96e45':'#8d929c';x.beginPath();x.arc(0,-94,13,0,Math.PI*2);x.fill();
+poly([[-16,-94],[-14,-108],[-6,-116],[7,-113],[15,-102],[14,-93],[6,-98],[-8,-98]],isPlayer?'#d8a943':'#788394','#fff0ad');
+poly([[-14,-96],[14,-96],[11,-90],[-12,-90]],'#151a23','#f3d58b');
+x.fillStyle='#fff0ae';x.fillRect(-7,-104,14,3);poly([[-4,-113],[0,-129],[4,-113]],isPlayer?'#f8e3a0':'#c9d5e6','#fff');
+poly([[-8,-85],[0,-79],[8,-85],[5,-72],[0,-68],[-5,-72]],isPlayer?'#f0ce75':'#a9b7c8','#fff0ae');
 if(a.fall>0){x.rotate(Math.min(1.2,a.fall*.05))}
 x.restore();
 }
