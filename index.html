@@ -19,6 +19,7 @@
     <div class="armour-piece" data-armour-card="shoes"><div><b>➤ SHOES OF PEACE</b><span id="armour-shoes-num">100%</span></div><div class="armour-track"><i id="armour-shoes"></i></div><small id="armour-shoes-state">GROUNDED</small></div>
   </div>
 </div>
+<div class="scripture-powers" id="scripture-powers" aria-live="polite" aria-label="Active Scripture powers"><span class="power-empty">NO SCRIPTURE POWERS ACTIVE</span></div>
 <div class="modal" id="intro"><div class="panel"><div class="eyebrow gold">Chapter I · The mountain pass</div><h1>STAND FIRM.<br><span class="gold">FEAR NOTHING.</span></h1><p>The wind is rising. The ridge is narrow. Choose your warrior, then face the spirit guarding the pass.</p><div class="eyebrow gold">YOUR WARFARE PROFILE</div><div class="profile-field"><label for="warrior-name">YOUR NAME OR WARRIOR NAME</label><input id="warrior-name" type="text" maxlength="24" autocomplete="nickname" placeholder="Enter your name (optional)"></div><div class="profile-field"><label for="warrior-scriptures">FAVOURITE SCRIPTURES</label><input id="warrior-scriptures" type="text" maxlength="120" placeholder="e.g. Ephesians 6:10–18; Psalm 23:4"></div><p>These will appear during your battles. Your entries are saved on this device.</p><div class="eyebrow gold">CHOOSE YOUR WARRIOR</div><div class="roster"><button class="hero-choice selected" data-hero="david"><strong>DAVID</strong><span>Free · The Faithful</span></button><button class="hero-choice" data-hero="deborah"><strong>DEBORAH</strong><span>Free · The Judge</span></button><button class="hero-choice locked" data-hero="golden" aria-label="Golden Sentinel premium character, not yet available"><strong>GOLDEN SENTINEL</strong><span>Premium · Coming later</span></button><button class="hero-choice locked" data-hero="dawn" aria-label="Dawn Guardian premium character, not yet available"><strong>DAWN GUARDIAN</strong><span>Premium · Coming later</span></button></div><div class="progressline"><span id="campaign-progress">TRIAL 1 OF 18</span><span id="campaign-trial">MOUNT FEARSPIRE</span></div><p class="mountain-lore" id="mountain-lore">Mount Fearspire — A narrow crimson ridge where fear tries to drive every step toward the abyss.</p><p><b>Move</b> with arrows · <b>Sword/Kick</b> to strike · <b>Guard</b> to defend · <b>Special</b> for a radiant burst.</p><button class="primary" id="start">ENTER THE BATTLE →</button></div></div>
 <div class="modal hidden" id="result"><div class="panel"><div class="eyebrow gold" id="resulttag">TRIAL COMPLETE</div><h1 id="resulttitle">VICTORY</h1><p id="resulttext">You stood firm.</p><section class="verse-card" id="verse-card" aria-live="polite"><div class="verse-kicker">✦ SCRIPTURE FOR THE JOURNEY</div><p id="daily-verse">Be strong in the Lord.</p><strong id="daily-reference">Ephesians 6:10</strong><p class="verse-note" id="verse-note">Carry this truth into your next trial.</p><button type="button" class="verse-favourite" id="show-favourite">SHOW MY FAVOURITE SCRIPTURE</button></section><button class="primary" id="again">FIGHT AGAIN →</button></div></div></section>
 <div class="below"><div class="status" id="status">The ridge awaits. <strong>Stay within the light.</strong></div><div class="pill">✦ <span id="reward">FIRST TRIAL</span></div></div>
@@ -279,6 +280,24 @@ x.save();x.globalAlpha=.22;x.strokeStyle='#c8a778';x.lineWidth=1;
 for(let q=0;q<7;q++){let qx=350+q*43, bend=Math.sin(q*1.7)*9;x.beginPath();x.moveTo(qx,424);x.lineTo(qx+8+bend,430);x.lineTo(qx+3+bend,437);x.lineTo(qx+18+bend,445);x.stroke()}
 x.restore();
 fighter(p,true);fighter(e,false);
+// Active Scripture effects use distinct shapes as well as colour, so each power reads clearly.
+const activePowers=Object.keys(scripturePowerUntil).filter(k=>scripturePowerUntil[k]>frame);
+if(activePowers.length&&running&&!ended){
+  x.save();x.translate(p.x,350+p.y);
+  activePowers.forEach((key,index)=>{
+    const remain=(scripturePowerUntil[key]-frame)/180,pulse=1+Math.sin(frame*.16+index)*.045;
+    const alpha=Math.min(.72,remain*1.4),colors={shield:'#80dfff',sword:'#ffe08a',helmet:'#fff1b8',breastplate:'#77e6b2',belt:'#d4b0ff',shoes:'#a8e6ff'};
+    x.save();x.globalAlpha=alpha;x.strokeStyle=colors[key];x.fillStyle=colors[key];x.lineWidth=key==='shield'?2.6:1.7;x.shadowColor=colors[key];x.shadowBlur=key==='sword'?12:7;
+    if(key==='shield'){x.beginPath();x.moveTo(-31,-27);x.quadraticCurveTo(-44,0,-25,26);x.lineTo(0,38);x.lineTo(25,26);x.quadraticCurveTo(44,0,31,-27);x.closePath();x.stroke();}
+    else if(key==='sword'){x.beginPath();x.ellipse(0,0,30*pulse,47*pulse,0,0,Math.PI*2);x.stroke();x.beginPath();x.moveTo(-18,-30);x.lineTo(18,30);x.moveTo(18,-30);x.lineTo(-18,30);x.stroke();}
+    else if(key==='helmet'){x.beginPath();x.arc(0,-28,21*pulse,Math.PI,Math.PI*2);x.lineTo(19,-12);x.lineTo(-19,-12);x.closePath();x.stroke();x.beginPath();x.moveTo(-24,-10);x.lineTo(24,-10);x.stroke();}
+    else if(key==='breastplate'){x.beginPath();x.moveTo(-27,-20);x.lineTo(-13,-28);x.lineTo(0,-19);x.lineTo(13,-28);x.lineTo(27,-20);x.lineTo(22,15);x.lineTo(0,31);x.lineTo(-22,15);x.closePath();x.stroke();}
+    else if(key==='belt'){x.beginPath();x.ellipse(0,8,36*pulse,12*pulse,0,0,Math.PI*2);x.stroke();x.strokeRect(-5,1,10,14);}
+    else{x.beginPath();x.moveTo(-25,19);x.lineTo(-8,29);x.lineTo(-25,38);x.moveTo(5,19);x.lineTo(22,29);x.lineTo(5,38);x.stroke();}
+    x.restore();
+  });
+  x.restore();
+}
 // Radiant Burst telegraph: layered runes bloom under the hero, then collapse into light.
 if(specialFX>0){
   let progress=1-specialFX/34, radius=18+progress*112, fade=Math.min(1,specialFX/8);
