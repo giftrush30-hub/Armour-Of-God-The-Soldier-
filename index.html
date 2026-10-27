@@ -444,7 +444,12 @@ if(running&&!ended&&e.kind==='windup'){
   x.shadowColor=cueColor;x.shadowBlur=8+progress*12;
   // A directional ground slash points from the attacker toward the threatened approach.
   let dir=e.x<p.x?1:-1, startX=e.x+dir*18, endX=startX+dir*(reach+progress*20);
-  if(judgment){x.beginPath();x.ellipse(e.x+dir*68,baseY,reach*.56,18+progress*7,0,Math.PI,Math.PI*2);x.stroke();x.beginPath();x.moveTo(startX,baseY);x.lineTo(endX,baseY-5);x.lineTo(endX-dir*10,baseY+5);x.stroke();}
+  if(judgment){
+    // A broken, directional shale-sweep warning reads as a strike across the ridge, never an arena ring.
+    x.beginPath();x.moveTo(startX,baseY);x.lineTo(endX,baseY-5);x.lineTo(endX-dir*10,baseY+5);x.stroke();
+    x.lineWidth=1.5+progress;x.beginPath();x.moveTo(startX+dir*18,baseY+8);x.lineTo(startX+dir*(reach*.56),baseY+5);x.moveTo(startX+dir*42,baseY-9);x.lineTo(startX+dir*(reach*.78),baseY-12);x.stroke();
+    x.globalAlpha*=.72;x.beginPath();x.moveTo(startX+dir*28,baseY+13);x.lineTo(startX+dir*38,baseY+10);x.moveTo(endX-dir*25,baseY-15);x.lineTo(endX-dir*15,baseY-17);x.stroke();
+  }
   else if(storm){x.lineWidth=3+progress*3;x.beginPath();x.moveTo(startX,baseY-12);x.lineTo(endX,baseY);x.lineTo(startX,baseY+12);x.stroke();x.beginPath();x.moveTo(startX+dir*8,baseY-20);x.lineTo(endX-dir*8,baseY);x.lineTo(startX+dir*8,baseY+20);x.stroke();}
   else{x.beginPath();x.moveTo(startX,baseY);x.lineTo(endX,baseY-5);x.lineTo(endX-dir*10,baseY+5);x.stroke();}
   x.globalAlpha=.92;x.font='900 12px system-ui';x.textAlign='center';x.lineWidth=3;x.strokeStyle='#170f12';
