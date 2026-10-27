@@ -185,12 +185,13 @@ function ui(){renderArmour();$('hp').style.width=clamp(p.hp,0,100)+'%';$('ehp').
 function poly(points,fill,stroke){x.beginPath();points.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.closePath();x.fillStyle=fill;x.fill();if(stroke){x.strokeStyle=stroke;x.lineWidth=2;x.stroke()}}
 function mountain(points,fill){poly(points,fill)}
 function background(){
+const sceneFrame=reduceMotion?0:frame;
 const mountainPalettes=[['#260f20','#71333b','#d18a64'],['#0c2036','#355777','#9bb7cf'],['#27132d','#653858','#d28ca8'],['#24151b','#65372f','#d88950'],['#10282f','#35666a','#91c3bd'],['#20251c','#505944','#b4a878'],['#1a1730','#44345f','#a58ac7'],['#241d13','#67512a','#e2ba68'],['#241d15','#554027','#c6a05a'],['#10261d','#285b43','#a0c67e'],['#211a18','#554038','#ba8a6c'],['#17202d','#3a485c','#91a4b8'],['#0c1024','#262b49','#777da6'],['#2b1c16','#71452b','#d3a16b'],['#24121d','#54263b','#b65d72'],['#1c1222','#4a2946','#c17b9b'],['#20152b','#54366d','#b69bd7'],['#1e1115','#592c2a','#f0a05e']];const palette=mountainPalettes[spiritIndex%mountainPalettes.length];let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,palette[0]);g.addColorStop(.48,palette[1]);g.addColorStop(1,palette[2]);x.fillStyle=g;x.fillRect(0,0,W,H);
 let sun=x.createRadialGradient(710,130,8,710,130,210);sun.addColorStop(0,palette[2]+'aa');sun.addColorStop(1,palette[2]+'00');x.fillStyle=sun;x.fillRect(470,0,470,360);
 mountain([[0,310],[100,190],[175,260],[300,135],[425,275],[520,205],[645,300],[760,175],[960,305],[960,430],[0,430]],palette[1]);
 mountain([[0,355],[145,270],[240,330],[390,225],[520,335],[675,250],[790,330],[900,240],[960,280],[960,460],[0,460]],palette[0]);
 mountain([[0,410],[150,365],[270,398],[420,350],[555,400],[700,352],[825,390],[960,340],[960,500],[0,500]],'#101925');
-for(let i=0;i<8;i++){let bx=((i*147-frame*.18)%1100+1100)%1100-80;poly([[bx,310],[bx+30,250],[bx+42,310]],'#65718422')}
+for(let i=0;i<8;i++){let bx=((i*147-sceneFrame*.18)%1100+1100)%1100-80;poly([[bx,310],[bx+30,250],[bx+42,310]],'#65718422')}
 x.save();x.globalAlpha=.76;const mark=spiritIndex;if(mark===0){for(let k=0;k<5;k++)poly([[90+k*170,330],[104+k*170,286-(k%2)*15],[117+k*170,330]],'#111722','#c26b6b66');}else if(mark===1){for(let k=0;k<6;k++){x.strokeStyle=palette[2]+'66';x.lineWidth=2;x.beginPath();x.moveTo(70+k*155,180+(k%3)*36);x.lineTo(95+k*155,230+(k%3)*36);x.stroke();}}else if(mark===2){for(let k=0;k<4;k++){let bx=130+k*205;poly([[bx,330],[bx+15,300],[bx+30,330]],'#21152b',palette[2]+'77');x.beginPath();x.arc(bx+15,290,5,0,Math.PI*2);x.fillStyle=palette[2]+'88';x.fill();}}else if(mark===3||mark===17){for(let k=0;k<5;k++){let bx=65+k*205;x.strokeStyle='#ffc27a88';x.lineWidth=2;x.beginPath();x.moveTo(bx,150);x.lineTo(bx+18,178);x.lineTo(bx+4,198);x.stroke();}}else if(mark===4||mark===11){for(let k=0;k<5;k++){let bx=100+k*180;x.strokeStyle=palette[2]+'55';x.lineWidth=1;x.beginPath();x.moveTo(bx,235);x.quadraticCurveTo(bx+24,218,bx+45,238);x.stroke();}}else if(mark===5||mark===8){for(let k=0;k<4;k++)poly([[150+k*220,330],[163+k*220,286],[176+k*220,330]],'#373a30',palette[2]+'55');}else if(mark===6||mark===14){for(let k=0;k<5;k++){let bx=70+k*190;poly([[bx,330],[bx+12,294],[bx+25,330],[bx+15,318]],'#181528',palette[2]+'88');}}else if(mark===7||mark===15){for(let k=0;k<3;k++){let bx=180+k*280;poly([[bx-18,330],[bx-14,270],[bx+14,270],[bx+18,330]],'#25212a',palette[2]+'88');poly([[bx-24,270],[bx,250],[bx+24,270]],'#342a25',palette[2]+'aa');}}else if(mark===9||mark===10){for(let k=0;k<6;k++){let bx=40+k*170;x.strokeStyle=palette[2]+'88';x.lineWidth=2;x.beginPath();x.moveTo(bx,330);x.lineTo(bx+18,296);x.lineTo(bx+10,278);x.stroke();}}else if(mark===12){x.globalAlpha=.45;x.fillStyle='#080b20';x.beginPath();x.arc(735,115,52,0,Math.PI*2);x.fill();x.strokeStyle=palette[2]+'99';x.lineWidth=3;x.beginPath();x.arc(735,115,61,0,Math.PI*2);x.stroke();}else if(mark===13){for(let k=0;k<5;k++){let bx=85+k*190;poly([[bx,340],[bx,310],[bx+5,310],[bx+5,340]],'#3a2a22',palette[2]+'88');x.fillStyle=palette[2]+'99';x.fillRect(bx-3,305,11,3);}}else if(mark===16){for(let k=0;k<4;k++){let bx=180+k*190;x.strokeStyle=palette[2]+'99';x.lineWidth=2;x.beginPath();x.arc(bx,305,20,Math.PI,Math.PI*2);x.stroke();}}x.restore();let ground=x.createLinearGradient(0,390,0,540);ground.addColorStop(0,'#514b45');ground.addColorStop(.4,'#272a2c');ground.addColorStop(1,'#10151d');x.fillStyle=ground;x.fillRect(0,410,W,130);
 // ruined watch pillars and torn standards make the pass feel inhabited
 for(let j=0;j<3;j++){let bx=115+j*365,by=365+(j%2)*13;
@@ -203,10 +204,10 @@ poly([[bx,by],[bx+12,by-7],[bx+28,by-4],[bx+18,by+2]],'#55504a','#95816a');
 }
  // ridge breaks into abyss at both ends
 poly([[0,415],[120,405],[220,423],[330,412],[460,418],[590,408],[720,423],[830,405],[960,414],[960,540],[0,540]],'#191d23');
-for(let i=0;i<32;i++){let xx=(i*47-frame*.7)%980;let yy=424+(i%4)*20;x.strokeStyle='#b8a28a18';x.beginPath();x.moveTo(xx,yy);x.lineTo(xx+20,yy-3);x.stroke()}
+for(let i=0;i<32;i++){let xx=(i*47-sceneFrame*.7)%980;let yy=424+(i%4)*20;x.strokeStyle='#b8a28a18';x.beginPath();x.moveTo(xx,yy);x.lineTo(xx+20,yy-3);x.stroke()}
 // foreground shards and ember-glass crystals give the cliff edge another depth layer
 for(let i=0;i<9;i++){let bx=35+i*111,by=451+(i%3)*18,h=9+(i%4)*5;poly([[bx,by],[bx+5,by-h],[bx+10,by],[bx+6,by+3]],i%2?'#284b58':'#5d3d2b',i%2?'#76d8df66':'#d7a35b55')}
-for(let i=0;i<10;i++){let bx=(i*97+frame*.45)%960,by=350+(i*31)%100;x.save();x.globalAlpha=.25+.25*Math.sin(frame*.08+i);x.fillStyle=i%3===0?'#f4d17d':'#d68a68';x.shadowColor=x.fillStyle;x.shadowBlur=8;x.beginPath();x.arc(bx,by,1.5+(i%2),0,Math.PI*2);x.fill();x.restore()}
+for(let i=0;i<10;i++){let bx=(i*97+sceneFrame*.45)%960,by=350+(i*31)%100;x.save();x.globalAlpha=.25+.25*Math.sin(sceneFrame*.08+i);x.fillStyle=i%3===0?'#f4d17d':'#d68a68';x.shadowColor=x.fillStyle;x.shadowBlur=8;x.beginPath();x.arc(bx,by,1.5+(i%2),0,Math.PI*2);x.fill();x.restore()}
 poly([[0,420],[110,410],[180,425],[180,540],[0,540]],'#050910');poly([[820,418],[880,405],[960,414],[960,540],[820,540]],'#050910');
 x.strokeStyle='#d8b16c55';x.lineWidth=2;x.beginPath();x.moveTo(190,425);x.lineTo(800,425);x.stroke();
 }
@@ -327,18 +328,18 @@ x.fillStyle=isPlayer?'#f4d17a':'#aeb9c9';x.beginPath();x.arc(-20,-24,1.5,0,Math.
 if(guard){x.save();x.globalAlpha=.6+.35*Math.sin(frame*.7);x.strokeStyle='#a8f3ff';x.lineWidth=2;x.shadowColor='#75e7ff';x.shadowBlur=13;x.beginPath();x.arc(-33,-65,20,-1.1,.9);x.stroke();x.restore()}
 x.restore();
 }
-function drawDivinePresence(){const activeMood=frame<divineMoodUntil?divineMood:'calm';const moodPower=activeMood==='rescue'?1.8:activeMood==='warning'?1.48:activeMood==='hit'?.55:activeMood==='guard'?1.28:activeMood==='dodge'?1.35:activeMood==='strike'?1.22:1;const px=clamp(p.x-(p.face||1)*76,42,W-42),py=352+p.y+Math.sin(frame*(activeMood==='rescue'?.13:.075))*5,breath=1+Math.sin(frame*.16)*.09*moodPower; x.save();x.globalCompositeOperation='lighter';let halo=x.createRadialGradient(px,py,2,px,py,43*moodPower);halo.addColorStop(0,activeMood==='hit'?'#fff0e8cc':activeMood==='warning'?'#ffb06acc':'#fff6c9bb');halo.addColorStop(.28,activeMood==='hit'?'#ff8b6977':activeMood==='warning'?'#ff6d4d88':'#ffd56b77');halo.addColorStop(1,'#ffad3200');x.fillStyle=halo;x.beginPath();x.arc(px,py,43,0,Math.PI*2);x.fill();x.globalAlpha=.62+.2*Math.sin(frame*.13);x.strokeStyle='#ffe7a0';x.lineWidth=1.5;x.beginPath();x.ellipse(px,py+8,24*breath,31/breath,Math.sin(frame*.025)*.15,0,Math.PI*2);x.stroke();for(let i=0;i<5;i++){const a=frame*.045+i*Math.PI*2/5,rx=13+Math.sin(frame*.08+i)*3,ry=20+Math.cos(frame*.06+i)*4;const sx=px+Math.cos(a)*rx,sy=py+Math.sin(a)*ry;x.globalAlpha=.72;x.fillStyle=i%2?'#fff4c0':'#ffbd50';x.beginPath();x.ellipse(sx,sy,2.4,4.8,a,0,Math.PI*2);x.fill()}x.globalAlpha=.95;x.fillStyle='#fff8d8';x.shadowColor='#ffd56b';x.shadowBlur=18;x.beginPath();x.ellipse(px,py,7*breath,13/breath,0,0,Math.PI*2);x.fill();x.shadowBlur=0;x.globalAlpha=.8;x.fillStyle='#fff0b0';x.beginPath();x.arc(px,py+16,2,0,Math.PI*2);x.fill();if(activeMood==='rescue'){x.globalAlpha=.85;x.strokeStyle='#b8f5ff';x.lineWidth=2;x.beginPath();x.arc(px,py,33+Math.sin(frame*.22)*5,0,Math.PI*2);x.stroke()}x.restore();}function draw(){
+function drawDivinePresence(){const visualFrame=reduceMotion?0:frame;const activeMood=visualFrame<divineMoodUntil?divineMood:'calm';const moodPower=activeMood==='rescue'?1.8:activeMood==='warning'?1.48:activeMood==='hit'?.55:activeMood==='guard'?1.28:activeMood==='dodge'?1.35:activeMood==='strike'?1.22:1;const px=clamp(p.x-(p.face||1)*76,42,W-42),py=352+p.y+Math.sin(visualFrame*(activeMood==='rescue'?.13:.075))*5,breath=1+Math.sin(visualFrame*.16)*.09*moodPower; x.save();x.globalCompositeOperation='lighter';let halo=x.createRadialGradient(px,py,2,px,py,43*moodPower);halo.addColorStop(0,activeMood==='hit'?'#fff0e8cc':activeMood==='warning'?'#ffb06acc':'#fff6c9bb');halo.addColorStop(.28,activeMood==='hit'?'#ff8b6977':activeMood==='warning'?'#ff6d4d88':'#ffd56b77');halo.addColorStop(1,'#ffad3200');x.fillStyle=halo;x.beginPath();x.arc(px,py,43,0,Math.PI*2);x.fill();x.globalAlpha=.62+.2*Math.sin(visualFrame*.13);x.strokeStyle='#ffe7a0';x.lineWidth=1.5;x.beginPath();x.ellipse(px,py+8,24*breath,31/breath,Math.sin(visualFrame*.025)*.15,0,Math.PI*2);x.stroke();for(let i=0;i<5;i++){const a=visualFrame*.045+i*Math.PI*2/5,rx=13+Math.sin(visualFrame*.08+i)*3,ry=20+Math.cos(visualFrame*.06+i)*4;const sx=px+Math.cos(a)*rx,sy=py+Math.sin(a)*ry;x.globalAlpha=.72;x.fillStyle=i%2?'#fff4c0':'#ffbd50';x.beginPath();x.ellipse(sx,sy,2.4,4.8,a,0,Math.PI*2);x.fill()}x.globalAlpha=.95;x.fillStyle='#fff8d8';x.shadowColor='#ffd56b';x.shadowBlur=18;x.beginPath();x.ellipse(px,py,7*breath,13/breath,0,0,Math.PI*2);x.fill();x.shadowBlur=0;x.globalAlpha=.8;x.fillStyle='#fff0b0';x.beginPath();x.arc(px,py+16,2,0,Math.PI*2);x.fill();if(activeMood==='rescue'){x.globalAlpha=.85;x.strokeStyle='#b8f5ff';x.lineWidth=2;x.beginPath();x.arc(px,py,33+Math.sin(visualFrame*.22)*5,0,Math.PI*2);x.stroke()}x.restore();}function draw(){
 x.save();if(reduceMotion){shake=0}else if(shake>0){x.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake*=.85}
 background();
 // Cinematic edge falloff keeps the fighters and gold effects as the visual focus.
 let vignette=x.createRadialGradient(W*.5,H*.48,H*.18,W*.5,H*.5,H*.72);vignette.addColorStop(0,'#05081200');vignette.addColorStop(.72,'#05081222');vignette.addColorStop(1,'#03050bd9');x.fillStyle=vignette;x.fillRect(0,0,W,H);
 // 2.5D depth pass: drifting fog bands at different speeds, layered by distance
 for(let layer=0;layer<3;layer++){
-  let speed=[.18,.42,.78][layer], ybase=[302,352,395][layer], alpha=[.055,.075,.06][layer];
+  let speed=reduceMotion?0:[.18,.42,.78][layer], ybase=[302,352,395][layer], alpha=[.055,.075,.06][layer];
   x.save();x.globalAlpha=alpha;
   for(let n=0;n<4;n++){
-    let fx=((n*287+frame*speed)%(W+360))-180;
-    let fy=ybase+n*9+Math.sin(frame*.018+n+layer)*5;
+    let fx=((n*287+(reduceMotion?0:frame)*speed)%(W+360))-180;
+    let fy=ybase+n*9+Math.sin((reduceMotion?0:frame)*.018+n+layer)*5;
     let fog=x.createRadialGradient(fx,fy,4,fx,fy,120+layer*18);
     fog.addColorStop(0,layer===2?'#e6cba5':'#b6c7d9');fog.addColorStop(1,'#8fa3ba00');
     x.fillStyle=fog;x.beginPath();x.ellipse(fx,fy,130+layer*15,15+layer*3,0,0,Math.PI*2);x.fill();
@@ -348,7 +349,7 @@ for(let layer=0;layer<3;layer++){
 // foreground stones are larger and move faster to reinforce camera depth
 x.save();x.globalAlpha=.72;
 for(let n=0;n<8;n++){
-  let fx=((n*151-frame*1.35)%(W+80)+W+80)%(W+80)-30;
+  let fx=((n*151-(reduceMotion?0:frame)*1.35)%(W+80)+W+80)%(W+80)-30;
   let fy=456+(n%3)*18;
   poly([[fx,fy],[fx+10,fy-8-(n%4)*3],[fx+24,fy-3],[fx+31,fy+5],[fx+5,fy+7]],n%2?'#111923':'#25282c',n%2?'#56616c66':'#9d876455');
 }
@@ -359,7 +360,7 @@ for(let n=0;n<9;n++){x.beginPath();x.moveTo(480,414);x.lineTo(n*125-20,540);x.st
 for(let n=0;n<4;n++){let gy=432+n*n*7;x.beginPath();x.moveTo(35,gy);x.lineTo(925,gy);x.stroke()}
 x.restore();
 // wind streaks, drifting sparks, and impact motes add depth to the ridge
-for(let i=0;i<20;i++){let xx=(i*83-frame*(.7+(i%3)*.35))%980;if(xx<0)xx+=980;let yy=285+(i*37)%145;x.strokeStyle=i%4===0?'#f4d28b35':'#d7c6aa18';x.lineWidth=i%4===0?2:1;x.beginPath();x.moveTo(xx,yy);x.lineTo(xx+12+(i%5)*4,yy-2);x.stroke()}
+for(let i=0;i<20;i++){let xx=(i*83-(reduceMotion?0:frame)*(.7+(i%3)*.35))%980;if(xx<0)xx+=980;let yy=285+(i*37)%145;x.strokeStyle=i%4===0?'#f4d28b35':'#d7c6aa18';x.lineWidth=i%4===0?2:1;x.beginPath();x.moveTo(xx,yy);x.lineTo(xx+12+(i%5)*4,yy-2);x.stroke()}
 // fractured mineral seams follow the narrow mountain path; no arena markings
 x.save();x.globalAlpha=.22;x.strokeStyle='#c8a778';x.lineWidth=1;
 for(let q=0;q<7;q++){let qx=350+q*43, bend=Math.sin(q*1.7)*9;x.beginPath();x.moveTo(qx,424);x.lineTo(qx+8+bend,430);x.lineTo(qx+3+bend,437);x.lineTo(qx+18+bend,445);x.stroke()}
