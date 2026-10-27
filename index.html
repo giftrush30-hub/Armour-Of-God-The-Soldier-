@@ -329,6 +329,25 @@ body{padding-bottom:170px}
  .combat-guide{bottom:calc(88px + env(safe-area-inset-bottom))}
  .controls .ctrl{height:35px;min-height:35px}
 }
+
+/* Final mobile screen-state fix: intro owns the viewport; controls only exist in battle mode. */
+.controls,.combat-guide{display:none}
+body.battle-mode .controls{display:flex}
+body.battle-mode .combat-guide{display:block}
+@media(max-width:700px){
+ body:has(#intro:not(.hidden)){overflow:hidden!important}
+ #intro:not(.hidden){position:fixed!important;inset:0!important;z-index:1000!important;width:100vw;height:100dvh;min-height:100svh;overflow:auto!important;display:flex!important;align-items:center;justify-content:center;padding:max(14px,env(safe-area-inset-top)) 10px max(14px,env(safe-area-inset-bottom))!important;background:#070a10!important;background-image:radial-gradient(ellipse at 50% 0%,#182131 0%,#070a10 68%)!important}
+ #intro:not(.hidden) .panel{width:100%;max-width:560px;max-height:100%;overflow-y:auto;overscroll-behavior:contain;margin:auto;padding:clamp(14px,4vw,22px);background:#0c111b;border-color:#8c6d37}
+ #intro:not(.hidden) .panel h1{font-size:clamp(27px,7.4vw,42px);line-height:1.02;margin:10px 0 14px}
+ #intro:not(.hidden) .panel p{font-size:14px;line-height:1.5}
+ #intro:not(.hidden) .profile-field{margin:12px 0}
+ #intro:not(.hidden) .profile-field input{font-size:16px;padding:12px}
+ #intro:not(.hidden) .primary{font-size:13px;padding:14px;margin-top:10px}
+ #intro:not(.hidden) .roster{gap:8px}
+ body:not(.battle-mode) .controls,body:not(.battle-mode) .combat-guide{display:none!important}
+ body.battle-mode .controls{display:flex!important}
+ body.battle-mode .combat-guide{display:block!important}
+}
 </style></head><body><main class="app">
 <header class="top"><div><div class="eyebrow">A CINEMATIC BIBLICAL COMBAT JOURNEY</div><div class="brand">ARMOUR OF GOD <span>: THE SOLDIER</span></div></div><div class="pill">✦ DIVINE GOLD <span id="coins">◈ 0</span></div></header>
 <section class="stage"><canvas id="game" width="960" height="540" aria-label="Playable mountain-edge battle"></canvas>
@@ -1205,4 +1224,22 @@ ui();draw();requestAnimationFrame(update)
 
 <script id="AOG_COMBAT_DOCK">
 (()=>{const dock=document.querySelector('.controls');if(!dock)return;dock.setAttribute('aria-label','Battle controls');const guide=document.querySelector('.combat-guide');if(guide){guide.addEventListener('click',()=>{});}document.querySelectorAll('.controls button').forEach(b=>{if(!b.getAttribute('type'))b.setAttribute('type','button');});})();
+</script>
+<script id="AOG_SCREEN_STATE_FIX">
+(()=> {
+ const body=document.body;
+ const intro=document.getElementById('intro');
+ const film=document.getElementById('opening-film');
+ const result=document.getElementById('result');
+ if(!body||!intro||!film)return;
+ const sync=()=>{
+   const introOpen=!intro.classList.contains('hidden');
+   const filmOpen=!film.classList.contains('hidden');
+   const resultOpen=!!result&&!result.classList.contains('hidden');
+   body.classList.toggle('battle-mode',!introOpen&&!filmOpen&&!resultOpen);
+ };
+ const observer=new MutationObserver(sync);
+ [intro,film,result].filter(Boolean).forEach(el=>observer.observe(el,{attributes:true,attributeFilter:['class']}));
+ sync();
+})();
 </script></body></html>
