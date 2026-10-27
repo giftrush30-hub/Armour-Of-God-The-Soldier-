@@ -57,7 +57,9 @@ x.save();x.translate(xx,yy);if(a.stagger>0){x.rotate((a.stagger/12)*.11*(a.hitDi
 x.globalAlpha=a.inv>0&&frame%4<2?.55:1;if(a.hitFlash>0){x.shadowColor=isPlayer?'#fff0b0':'#ff665f';x.shadowBlur=16;x.globalAlpha=.82+.18*Math.sin(frame*1.8);a.hitFlash--}
 // strong ground shadow
 x.fillStyle='#000b';x.beginPath();x.ellipse(0,3,38,10,0,0,Math.PI*2);x.fill();
-if(!isPlayer){x.save();x.scale(face,1);x.fillStyle='#ffb6a9';x.font='900 13px system-ui';x.textAlign='center';x.shadowColor='#000';x.shadowBlur=8;x.fillText('SPIRIT OF FEAR',0,-145);x.restore()}
+// the Spirit of Fear carries a restrained crimson haze and drifting ember motes
+if(!isPlayer){x.save();let pulse=.5+.5*Math.sin(frame*.12);let aura=x.createRadialGradient(0,-62,8,0,-62,62);aura.addColorStop(0,'#c12c3b00');aura.addColorStop(.62,'#d52d3a'+Math.floor((.13+.08*pulse)*255).toString(16).padStart(2,'0'));aura.addColorStop(1,'#a20e2600');x.fillStyle=aura;x.beginPath();x.ellipse(0,-62,53,70,0,0,Math.PI*2);x.fill();x.strokeStyle='#ff655b88';x.lineWidth=1.5;x.beginPath();x.arc(0,-65,35+Math.sin(frame*.16)*3,Math.PI*1.05,Math.PI*1.92);x.stroke();for(let k=0;k<4;k++){let py=-28-((frame*1.2+k*31)%86),px=Math.sin(frame*.06+k*2)*22;x.globalAlpha=.35+.25*Math.sin(frame*.15+k);x.fillStyle='#ff6d63';x.shadowColor='#ff5149';x.shadowBlur=8;x.beginPath();x.arc(px,py,1.3+(k%2),0,Math.PI*2);x.fill()}x.restore()}
+if(!isPlayer){x.save();x.scale(face,1);x.fillStyle='#ffb6a9';x.font='900 13px system-ui';x.textAlign='center';x.shadowColor='#000';x.shadowBlur=8;x.fillText('SPIRIT OF FEAR',0,-145);x.shadowBlur=0;x.strokeStyle='#f36b6488';x.lineWidth=1;x.beginPath();x.moveTo(-44,-137);x.lineTo(44,-137);x.stroke();x.restore()}
 // animated cape, split folds and gold hem catch the ridge light
 let cape=walk*.8+Math.sin(frame*.09+(isPlayer?0:1))*5+(a.kind==='special'?Math.sin(frame*.5)*3:0);
 poly([[-10,-87],[-25,-79],[-38+cape,-45],[-31+cape,-25],[-13,-50],[-3,-70]],isPlayer?'#7b2922':'#281c2b','#0a0c12');
