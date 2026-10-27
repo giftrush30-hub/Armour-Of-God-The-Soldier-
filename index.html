@@ -72,6 +72,24 @@ x.save();x.globalAlpha=.48*shadowScale;x.fillStyle='#000';
 x.beginPath();x.ellipse(0,3,38*shadowScale,10*shadowScale,0,0,Math.PI*2);x.fill();x.restore();
 // the Spirit of Fear carries a restrained crimson haze and drifting ember motes
 if(!isPlayer){x.save();let pulse=.5+.5*Math.sin(frame*.12), spiritColor=currentSpirit().color;let aura=x.createRadialGradient(0,-62,8,0,-62,62);aura.addColorStop(0,spiritColor+'00');aura.addColorStop(.62,spiritColor+Math.floor((.13+.08*pulse)*255).toString(16).padStart(2,'0'));aura.addColorStop(1,spiritColor+'00');x.fillStyle=aura;x.beginPath();x.ellipse(0,-62,53,70,0,0,Math.PI*2);x.fill();x.strokeStyle=currentSpirit().cue+'88';x.lineWidth=1.5;x.beginPath();x.arc(0,-65,35+Math.sin(frame*.16)*3,Math.PI*1.05,Math.PI*1.92);x.stroke();for(let k=0;k<4;k++){let py=-28-((frame*1.2+k*31)%86),px=Math.sin(frame*.06+k*2)*22;x.globalAlpha=.35+.25*Math.sin(frame*.15+k);x.fillStyle=currentSpirit().cue;x.shadowColor=currentSpirit().cue;x.shadowBlur=8;x.beginPath();x.arc(px,py,1.3+(k%2),0,Math.PI*2);x.fill()}x.restore()}
+if(!isPlayer){
+// Distinct silhouette accents let each mountain spirit read differently before its attack begins.
+x.save();x.scale(face,1);let si=spiritIndex%6,accent=currentSpirit().cue;
+x.lineJoin='round';x.lineCap='round';x.strokeStyle=accent;x.fillStyle='#111722';x.lineWidth=3;
+if(si===0){ // Fear: jagged, outward-pointing shoulder spurs
+ poly([[-22,-88],[-43,-101],[-37,-82],[-28,-72]],'#351b25',accent);poly([[22,-88],[43,-101],[37,-82],[28,-72]],'#351b25',accent);
+}else if(si===1){ // Doubt: split, asymmetrical crest
+ poly([[-13,-110],[-22,-127],[-5,-119],[2,-105]],'#24223a',accent);poly([[2,-105],[16,-122],[13,-105]],'#24223a',accent);
+}else if(si===2){ // Temptation: curved side fins, a veiled crown
+ poly([[-20,-92],[-36,-111],[-33,-91],[-23,-78]],'#25263a',accent);poly([[20,-92],[36,-111],[33,-91],[23,-78]],'#25263a',accent);
+}else if(si===3){ // Sorrow: long hanging mantle points
+ poly([[-22,-83],[-32,-65],[-26,-42],[-18,-66]],'#17343a',accent);poly([[22,-83],[32,-65],[26,-42],[18,-66]],'#17343a',accent);
+}else if(si===4){ // Stagnation: broad, stone-like shoulder slabs
+ poly([[-18,-91],[-39,-91],[-43,-75],[-25,-70]],'#393a32',accent);poly([[18,-91],[39,-91],[43,-75],[25,-70]],'#393a32',accent);
+}else{ // Delay: narrow swept-back crest and trailing streamers
+ poly([[-5,-105],[-28,-119],[-12,-101]],'#3d3021',accent);poly([[12,-83],[31,-75],[39,-58],[25,-70]],'#3d3021',accent);
+}
+x.restore()}
 if(!isPlayer){x.save();x.scale(face,1);x.fillStyle='#ffb6a9';x.font='900 13px system-ui';x.textAlign='center';x.shadowColor='#000';x.shadowBlur=8;x.fillText(currentSpirit().name,0,-145);x.shadowBlur=0;x.strokeStyle=currentSpirit().cue+'88';x.lineWidth=1;x.beginPath();x.moveTo(-44,-137);x.lineTo(44,-137);x.stroke();x.restore()}
 // animated cape, split folds and gold hem catch the ridge light
 let cape=walk*.8+Math.sin(frame*.09+(isPlayer?0:1))*5+(a.kind==='special'?Math.sin(frame*.5)*3:0);
