@@ -65,7 +65,11 @@ limb(-25,-68,-31+cape*.5,-43,2,isPlayer?'#d7a84d':'#9aa5b5');limb(-20,-65,-23+ca
 // legs with visible joints, readable movement poses, and heavy boots
 let kickPhase=a.kind==='kick'&&a.attack>0?Math.sin((1-a.attack/16)*Math.PI):0;let kickPose=a.kind==='kick'&&a.attack>7; limb(-8,-39,-14+walk,-18,13,'#11151c');limb(-14+walk,-18,-24+walk,-5,14,isPlayer?'#bd8b36':'#7d8795');
 if(kickPose){limb(8,-39,22,-48,13,'#11151c');limb(22,-48,48+kickPhase*10,-43-kickPhase*7,14,isPlayer?'#bd8b36':'#7d8795');poly([[39,-49],[54,-47],[58,-40],[42,-38]],'#0b0e14','#d7b15e')}else{limb(8,-39,14-walk,-18,13,'#11151c');limb(14-walk,-18,25-walk,-5,14,isPlayer?'#bd8b36':'#7d8795');}
+// reinforced greaves, ankle guards and boot soles with metal edge highlights
 poly([[-34,-7],[-12,-10],[-5,-3],[-7,1],[-34,1]],'#0b0e14','#d7b15e');poly([[9,-7],[31,-9],[36,-3],[34,1],[10,1]],'#0b0e14','#d7b15e');
+poly([[-25,-20],[-14,-22],[-9,-9],[-18,-7]],isPlayer?'#d4a13f':'#8794a7',isPlayer?'#ffe6a0':'#d9e1ed');
+poly([[15,-20],[25,-22],[30,-9],[20,-7]],isPlayer?'#bd8732':'#748195',isPlayer?'#ffe6a0':'#d9e1ed');
+x.strokeStyle=isPlayer?'#fff0b0':'#e0e6ef';x.lineWidth=1.6;x.beginPath();x.moveTo(-32,0);x.lineTo(-8,0);x.moveTo(11,0);x.lineTo(35,0);x.stroke();
 // layered leather under-tunic, sculpted cuirass and bevelled metal plates
 poly([[-18,-84],[15,-84],[22,-49],[15,-33],[-15,-33],[-23,-49]],isPlayer?'#48221e':'#1a202a','#080b11');
 let chest=x.createLinearGradient(-20,-84,20,-43);chest.addColorStop(0,isPlayer?'#f8d978':'#c4ced8');chest.addColorStop(.34,isPlayer?'#bd8730':'#697687');chest.addColorStop(.7,isPlayer?'#f0c45e':'#a6b0be');chest.addColorStop(1,isPlayer?'#6f4b21':'#394352');
@@ -84,26 +88,33 @@ x.fillStyle='#fff0b0';x.fillRect(-2,-63,4,13);x.beginPath();x.arc(0,-66,4,0,Math
 // left arm and large shield
 limb(-13,-75,-25+Math.sin(frame*.14)*Math.min(1,Math.abs(a.vx)/4)*4,-60,12,isPlayer?'#d9ad50':'#7c8798');limb(-25+Math.sin(frame*.14)*Math.min(1,Math.abs(a.vx)/4)*4,-60,-26,-49,10,'#202631');
 if(guard){x.save();x.translate(-31,-59);poly([[-12,-18],[8,-16],[14,-2],[1,17],[-14,2]],'#e0b14a','#fff0ae');poly([[-6,-11],[3,-10],[7,-1],[0,8],[-7,0]],'#67451c','#f7d88a');x.restore()}
-else{x.save();x.translate(-29,-58);poly([[-10,-15],[8,-13],[12,0],[0,13],[-12,0]],isPlayer?'#9c742e':'#535f72','#e9cc7a');x.beginPath();x.moveTo(-5,-8);x.lineTo(4,6);x.moveTo(5,-8);x.lineTo(-4,6);x.strokeStyle='#f8df94';x.lineWidth=2;x.stroke();x.restore()}
+else{x.save();x.translate(-29,-58);let shield=x.createLinearGradient(-12,-14,12,13);shield.addColorStop(0,isPlayer?'#f2cc67':'#a8b5c8');shield.addColorStop(.45,isPlayer?'#8f6727':'#414c5e');shield.addColorStop(1,isPlayer?'#4e371e':'#202733');poly([[-11,-16],[8,-14],[13,-1],[2,15],[-13,2]],shield,isPlayer?'#f4d889':'#bdc9d8');poly([[-7,-11],[5,-10],[8,-1],[1,9],[-8,1]],isPlayer?'#a67b31':'#5c697b',isPlayer?'#f4d889':'#d5deeb');x.fillStyle=isPlayer?'#ffe6a0':'#e1e8f1';x.beginPath();x.arc(0,-1,4,0,Math.PI*2);x.fill();x.strokeStyle=isPlayer?'#fce7a5':'#d4deeb';x.lineWidth=1.5;x.beginPath();x.moveTo(-7,-12);x.lineTo(0,-6);x.lineTo(7,-12);x.moveTo(-8,4);x.lineTo(0,10);x.lineTo(8,4);x.stroke();x.restore()}
 // right arm swings while walking; sword lifts during attack
 let swing=atk?Math.sin((1-a.attack/16)*Math.PI):0;let sx=atk?18+22*swing:14,sy=atk?-54-10*swing:-54,ex=atk?30+38*swing:24,ey=atk?-55-25*swing:-42;
 limb(13,-75,sx,sy,12,isPlayer?'#d9ad50':'#7c8798');limb(sx,sy,ex,ey,9,'#222936');
 // visible blade, crossguard and grip remain connected to the weapon hand
 x.save();let bladeGlow=atk?(a.kind==='special'?'#a9f5ff':'#fff0a5'):(isPlayer?'#d9e8f5':'#b8c3d3');x.shadowColor=bladeGlow;x.shadowBlur=atk?18:5;
 limb(ex-4,ey+5,ex+4,ey-3,5,'#45301c');limb(ex-7,ey+1,ex+7,ey-7,3,isPlayer?'#f4d27c':'#aab5c5');
+// gauntlet palm and curled fingers visibly wrap the hilt
+poly([[ex-4,ey-5],[ex+3,ey-9],[ex+8,ey-4],[ex+6,ey+2],[ex-2,ey+2]],isPlayer?'#d8ac4e':'#8996a8',isPlayer?'#fff0b0':'#dbe4ef');
+for(let f=0;f<3;f++){x.strokeStyle=isPlayer?'#5b401d':'#303a49';x.lineWidth=1.3;x.beginPath();x.moveTo(ex-2+f*3,ey-3);x.lineTo(ex+3+f*2,ey-1);x.stroke()}
 poly([[ex+1,ey-5],[ex+7,ey-11],[ex+14,ey-38],[ex+12,ey-43],[ex+5,ey-38],[ex-1,ey-10]],bladeGlow,atk?'#ffffff':'#e4e9ef');x.restore();
 if(atk){x.strokeStyle=a.kind==='special'?'#9cf4ff':'#ffd86a';x.lineWidth=a.kind==='special'?8:5;x.globalAlpha=.8;x.beginPath();x.arc(2,-57,a.kind==='sword'?78:61,-1.1,.52);x.stroke();x.globalAlpha=1}
 if(a.kind==='special'&&atk){x.save();x.globalAlpha=.8;x.strokeStyle='#a9f5ff';x.lineWidth=2;x.beginPath();x.ellipse(0,-44,49+Math.sin(frame*.7)*5,13,0,0,Math.PI*2);x.stroke();x.beginPath();x.ellipse(0,-44,35,8,frame*.04,0,Math.PI*2);x.stroke();x.restore()}
-else{limb(ex,ey,ex+10,ey-43,7,'#dce8f5');limb(ex+3,ey-18,ex+16,ey-22,4,'#8f6427')}
+
 // enemy telegraph: a warning rune appears before the Spirit attacks
 if(!isPlayer&&a.kind==='windup'){x.save();x.globalAlpha=.8+.2*Math.sin(frame*.7);x.strokeStyle='#ff6e61';x.lineWidth=3;x.beginPath();x.arc(0,-91,29+Math.sin(frame*.5)*3,0,Math.PI*2);x.stroke();x.fillStyle='#ffb1a5';x.font='900 10px system-ui';x.textAlign='center';x.fillText('!',0,-129);x.restore()}
 if(a.kind==='sword'&&atk){x.save();x.strokeStyle='#fff0a5';x.lineWidth=3;x.globalAlpha=.75;x.beginPath();x.arc(4,-58,83,-1.18,.45);x.stroke();x.restore()}
 if(a.kind==='guard'){x.save();x.strokeStyle='#8de7ff';x.lineWidth=3;x.globalAlpha=.8;x.beginPath();x.arc(-17,-61,23,-1.3,1.3);x.stroke();x.restore()}
-// face, helmet, brow and crest
-x.fillStyle=isPlayer?'#a96e45':'#8d929c';x.beginPath();x.arc(0,-94,13,0,Math.PI*2);x.fill();
-poly([[-16,-94],[-14,-108],[-6,-116],[7,-113],[15,-102],[14,-93],[6,-98],[-8,-98]],isPlayer?'#d8a943':'#788394','#fff0ad');
-poly([[-14,-96],[14,-96],[11,-90],[-12,-90]],'#151a23','#f3d58b');
-x.fillStyle='#fff0ae';x.fillRect(-7,-104,14,3);poly([[-4,-113],[0,-129],[4,-113]],isPlayer?'#f8e3a0':'#c9d5e6','#fff');
+// layered helmet silhouette with brow ridge, cheek guards and glowing visor
+x.fillStyle=isPlayer?'#a96e45':'#8d929c';x.beginPath();x.ellipse(0,-96,11,14,0,0,Math.PI*2);x.fill();
+poly([[-14,-95],[-13,-106],[-7,-115],[2,-118],[10,-112],[15,-102],[13,-91],[7,-96],[-8,-97]],isPlayer?'#d8a943':'#788394',isPlayer?'#fff0ad':'#d7e0eb');
+poly([[-13,-99],[-6,-104],[0,-102],[7,-104],[13,-99],[9,-95],[-9,-95]],isPlayer?'#8e672c':'#424d5d',isPlayer?'#ffe7a0':'#bfcbd9');
+poly([[-10,-95],[-6,-92],[-4,-84],[-10,-86]],isPlayer?'#c38c32':'#6f7b8d',isPlayer?'#f6d785':'#d0d9e4');
+poly([[10,-95],[6,-92],[4,-84],[10,-86]],isPlayer?'#c38c32':'#6f7b8d',isPlayer?'#f6d785':'#d0d9e4');
+x.fillStyle=isPlayer?'#fff0ae':'#ffb6a9';x.fillRect(-7,-101,5,2);x.fillRect(3,-101,5,2);
+poly([[-4,-113],[0,-129],[4,-113]],isPlayer?'#f8e3a0':'#c9d5e6','#fff');
+poly([[-2,-115],[0,-125],[2,-115]],isPlayer?'#9a6d27':'#596678');
 poly([[-8,-85],[0,-79],[8,-85],[5,-72],[0,-68],[-5,-72]],isPlayer?'#f0ce75':'#a9b7c8','#fff0ae');
 if(a.fall>0){x.rotate(Math.min(1.2,a.fall*.05))}
 x.restore();
