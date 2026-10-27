@@ -17,10 +17,10 @@
 const c=document.getElementById('game'),x=c.getContext('2d'),W=960,H=540;
 const $=id=>document.getElementById(id);
 let running=false,ended=false,frame=0,shake=0,flash=0,coins=Number(localStorage.getItem('aogs-coins')||0),held={},cool={},last=0,particles=[],comboCount=0,comboUntil=0;
-const p={x:300,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0};
+const p={x:300,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0,hitDone:false,attackDamage:0,attackReach:0};
 const e={x:650,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0,ai:0};
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-function reset(){particles=[];comboCount=0;comboUntil=0;held={};Object.assign(p,{x:300,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0});Object.assign(e,{x:650,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0});ended=false;running=true;frame=0;shake=0;flash=0;particles=[];$('result').classList.add('hidden');$('intro').classList.add('hidden');$('status').innerHTML='The ridge awaits. <strong>Stay within the light.</strong>';ui()}
+function reset(){particles=[];comboCount=0;comboUntil=0;held={};Object.assign(p,{x:300,y:0,vx:0,vy:0,hp:100,face:1,ground:true,attack:0,kind:'',inv:0,fall:0,hitDone:false,attackDamage:0,attackReach:0});Object.assign(e,{x:650,y:0,vx:0,vy:0,hp:100,face:-1,ground:true,attack:0,kind:'',inv:0,fall:0});ended=false;running=true;frame=0;shake=0;flash=0;particles=[];$('result').classList.add('hidden');$('intro').classList.add('hidden');$('status').innerHTML='The ridge awaits. <strong>Stay within the light.</strong>';ui()}
 function ui(){$('hp').style.width=clamp(p.hp,0,100)+'%';$('ehp').style.width=clamp(e.hp,0,100)+'%';$('hpnum').textContent=Math.ceil(clamp(p.hp,0,100))+' / 100';$('ehpnum').textContent=Math.ceil(clamp(e.hp,0,100))+' / 100';$('coins').textContent='◈ '+coins}
 function poly(points,fill,stroke){x.beginPath();points.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.closePath();x.fillStyle=fill;x.fill();if(stroke){x.strokeStyle=stroke;x.lineWidth=2;x.stroke()}}
 function mountain(points,fill){poly(points,fill)}
@@ -83,6 +83,7 @@ if(a.kind==='special'&&atk){x.save();x.globalAlpha=.8;x.strokeStyle='#a9f5ff';x.
 else{limb(ex,ey,ex+10,ey-43,7,'#dce8f5');limb(ex+3,ey-18,ex+16,ey-22,4,'#8f6427')}
 // enemy telegraph: a warning rune appears before the Spirit attacks
 if(!isPlayer&&a.kind==='windup'){x.save();x.globalAlpha=.8+.2*Math.sin(frame*.7);x.strokeStyle='#ff6e61';x.lineWidth=3;x.beginPath();x.arc(0,-91,29+Math.sin(frame*.5)*3,0,Math.PI*2);x.stroke();x.fillStyle='#ffb1a5';x.font='900 10px system-ui';x.textAlign='center';x.fillText('!',0,-129);x.restore()}
+if(a.kind==='sword'&&atk){x.save();x.strokeStyle='#fff0a5';x.lineWidth=3;x.globalAlpha=.75;x.beginPath();x.arc(4,-58,83,-1.18,.45);x.stroke();x.restore()}
 if(a.kind==='guard'){x.save();x.strokeStyle='#8de7ff';x.lineWidth=3;x.globalAlpha=.8;x.beginPath();x.arc(-17,-61,23,-1.3,1.3);x.stroke();x.restore()}
 // face, helmet, brow and crest
 x.fillStyle=isPlayer?'#a96e45':'#8d929c';x.beginPath();x.arc(0,-94,13,0,Math.PI*2);x.fill();
@@ -109,15 +110,19 @@ if(p.fall>0||e.fall>0){x.fillStyle='#f5d58e';x.font='bold 24px system-ui';x.text
 x.restore();
 }
 function hit(a,b,damage,force){if(b.inv>0||b.fall>0)return;b.hp=Math.max(0,b.hp-damage);b.inv=19;b.vx=a.face*force;shake=8;flash=8;if(a===p){comboCount=frame<comboUntil?comboCount+1:1;comboUntil=frame+95;if(comboCount>=2){$('status').innerHTML='<strong>'+comboCount+' HIT COMBO!</strong> Keep the pressure on the Spirit.'}}let hx=b.x,hy=425+b.y-62;for(let i=0;i<13;i++){let ang=(Math.PI*2*i/13)+Math.random()*.22,spd=1.5+Math.random()*4;particles.push({x:hx,y:hy,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-1,life:12+Math.random()*10,max:22,size:1.8+Math.random()*3,color:a.kind==='special'?'#a8f4ff':(a===p?'#ffd875':'#ff7770')})}particles.push({x:hx,y:hy-25,vx:(Math.random()-.5)*1.5,vy:-2.2,life:34,max:34,size:0,text:'-'+damage,color:a.kind==='special'?'#a8f4ff':'#fff0bd'});$('status').innerHTML=damage>14?' <strong>IMPACT!</strong> The strike breaks through.':'<strong>HIT CONFIRMED.</strong> Keep pressing forward.';if(b.hp<=0){b.fall=1;b.vx=a.face*7;finish(a===p)}}
-function act(k){if(!running||ended)return;if(k==='guard'){p.kind='guard';p.attack=12;return}if((cool[k]||0)>frame)return;cool[k]=frame+(k==='special'?100:20);p.kind=k;p.attack=k==='special'?28:16;
-if(k==='special'){flash=24;shake=3;$('status').innerHTML='<strong>RADIANT BURST!</strong> The special strike is unleashed.'}
-p.face=p.x<=e.x?1:-1;let d=Math.abs(p.x-e.x);let reach=k==='sword'?165:(k==='kick'?125:190);if(d<reach&&Math.abs(p.y-e.y)<70){if(k==='sword')hit(p,e,16,10);if(k==='kick')hit(p,e,12,12);if(k==='special')hit(p,e,30,17)}else if(k==='sword'){$('status').innerHTML='<strong>SWORD SWING!</strong> Move closer to strike the Spirit.'}
+function act(k){if(!running||ended)return;if(k==='guard'){p.kind='guard';p.attack=12;return}if((cool[k]||0)>frame)return;cool[k]=frame+(k==='special'?100:20);p.kind=k;p.attack=k==='special'?28:16;p.hitDone=false;p.attackDamage=k==='sword'?16:(k==='kick'?12:30);p.attackReach=k==='sword'?175:(k==='kick'?132:205);
+p.face=p.x<=e.x?1:-1;
+if(k==='special'){flash=24;shake=3;$('status').innerHTML='<strong>RADIANT BURST!</strong> Time the strike as the light bursts.'}
+else if(k==='sword'){$('status').innerHTML='<strong>SWORD READY!</strong> The blade will connect at the swing.'}
 }
 function finish(win){if(ended)return;ended=true;running=false;held={};if(win){coins+=25;localStorage.setItem('aogs-coins',coins);$('resulttag').textContent='TRIAL COMPLETE · +25 COINS';$('resulttitle').textContent='VICTORY';$('resulttext').textContent='You stood firm on the ridge. Your reward has been saved on this device.';$('reward').textContent='+25 COINS'}else{$('resulttag').textContent='THE TRIAL CONTINUES';$('resulttitle').textContent='RISE AGAIN';$('resulttext').textContent='The warrior has fallen. Every defeat is a lesson. Return to the ridge and try a new strategy.';$('reward').textContent='TRY AGAIN'}ui();$('result').classList.remove('hidden')}
 function update(){
 frame++;if(!running){draw();requestAnimationFrame(update);return}
 for(let k in cool){};if(p.inv>0)p.inv--;if(e.inv>0)e.inv--;
-if(held.guard){p.kind='guard';p.attack=2}else if(p.attack>0){p.attack--;if(p.attack===0)p.kind=''}
+if(held.guard){p.kind='guard';p.attack=2}else if(p.attack>0){p.attack--;
+const activeFrame=p.kind==='special'?p.attack<=13&&p.attack>=9:p.attack<=8&&p.attack>=5;
+if(activeFrame&&!p.hitDone){p.hitDone=true;let distance=Math.abs(p.x-e.x);if(distance<p.attackReach&&Math.abs(p.y-e.y)<75){hit(p,e,p.attackDamage,p.kind==='sword'?10:(p.kind==='kick'?12:17));if(p.kind==='special'){flash=18;shake=7}}else{$('status').innerHTML='<strong>MISS!</strong> Move closer and time your strike.'}}
+if(p.attack===0)p.kind=''}
 if(e.kind==='windup'){e.attack--;if(e.attack<=0){e.kind=e.ai%2===0?'kick':'sword';e.attack=17;e.aiState='strike';if(Math.abs(p.x-e.x)<190){if(held.guard||p.kind==='guard'){p.hp=Math.max(0,p.hp-2);p.vx+=(e.x<p.x?1:-1)*2;shake=4;flash=4;$('status').innerHTML='<strong>SHIELD BLOCK!</strong> Your shield absorbs most of the strike.';for(let z=0;z<9;z++)particles.push({x:p.x-12,y:365+Math.random()*35,vx:(Math.random()-.5)*4,vy:-Math.random()*3,life:12,max:12,size:2+Math.random()*2,color:'#9cecff'})}else hit(e,p,e.kind==='kick'?12:10,e.kind==='kick'?9:7)}}}
 else if(e.attack>0){e.attack--;if(e.attack===0){e.kind='';e.aiState='';}}
 if(held.left){p.vx-=.72;p.face=-1}if(held.right){p.vx+=.72;p.face=1}
