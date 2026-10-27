@@ -32,7 +32,16 @@ mountain([[0,355],[145,270],[240,330],[390,225],[520,335],[675,250],[790,330],[9
 mountain([[0,410],[150,365],[270,398],[420,350],[555,400],[700,352],[825,390],[960,340],[960,500],[0,500]],'#101925');
 for(let i=0;i<8;i++){let bx=((i*147-frame*.18)%1100+1100)%1100-80;poly([[bx,310],[bx+30,250],[bx+42,310]],'#65718422')}
 let ground=x.createLinearGradient(0,390,0,540);ground.addColorStop(0,'#514b45');ground.addColorStop(.4,'#272a2c');ground.addColorStop(1,'#10151d');x.fillStyle=ground;x.fillRect(0,410,W,130);
-// ridge breaks into abyss at both ends
+// ruined watch pillars and torn standards make the pass feel inhabited
+for(let j=0;j<3;j++){let bx=115+j*365,by=365+(j%2)*13;
+poly([[bx-15,by],[bx-11,by-92],[bx+11,by-92],[bx+17,by]],'#252c35','#66707b');
+poly([[bx-19,by-93],[bx+19,by-93],[bx+14,by-101],[bx-14,by-101]],'#7b6b53','#c4a46a');
+poly([[bx+10,by-89],[bx+54,by-78],[bx+45,by-52],[bx+26,by-65]],j===1?'#6b2727':'#35445a','#9b7a43');
+}
+for(let j=0;j<6;j++){let bx=210+j*108,by=402+(j%2)*7;
+poly([[bx,by],[bx+12,by-7],[bx+28,by-4],[bx+18,by+2]],'#55504a','#95816a');
+}
+ // ridge breaks into abyss at both ends
 poly([[0,415],[120,405],[220,423],[330,412],[460,418],[590,408],[720,423],[830,405],[960,414],[960,540],[0,540]],'#191d23');
 for(let i=0;i<32;i++){let xx=(i*47-frame*.7)%980;let yy=424+(i%4)*20;x.strokeStyle='#b8a28a18';x.beginPath();x.moveTo(xx,yy);x.lineTo(xx+20,yy-3);x.stroke()}
 poly([[0,420],[110,410],[180,425],[180,540],[0,540]],'#050910');poly([[820,418],[880,405],[960,414],[960,540],[820,540]],'#050910');
@@ -72,6 +81,9 @@ limb(13,-75,sx,sy,12,isPlayer?'#d9ad50':'#7c8798');limb(sx,sy,ex,ey,9,'#222936')
 if(atk){x.save();x.shadowColor=a.kind==='special'?'#b9f8ff':'#fff0a5';x.shadowBlur=a.kind==='special'?34:25;limb(ex,ey,ex+14,ey-28,6,a.kind==='special'?'#d7fbff':'#fff0b0');limb(ex+14,ey-28,ex+18,ey-39,3,'#ffffff');x.restore();x.strokeStyle=a.kind==='special'?'#9cf4ff':'#ffd86a';x.lineWidth=a.kind==='special'?8:5;x.globalAlpha=.8;x.beginPath();x.arc(2,-57,a.kind==='sword'?78:61,-1.1,.52);x.stroke();x.globalAlpha=1}
 if(a.kind==='special'&&atk){x.save();x.globalAlpha=.8;x.strokeStyle='#a9f5ff';x.lineWidth=2;x.beginPath();x.ellipse(0,-44,49+Math.sin(frame*.7)*5,13,0,0,Math.PI*2);x.stroke();x.beginPath();x.ellipse(0,-44,35,8,frame*.04,0,Math.PI*2);x.stroke();x.restore()}
 else{limb(ex,ey,ex+7,ey-36,6,'#dce8f5');limb(ex+2,ey-15,ex+13,ey-19,4,'#8f6427')}
+// enemy telegraph: a warning rune appears before the Spirit attacks
+if(!isPlayer&&a.kind==='windup'){x.save();x.globalAlpha=.8+.2*Math.sin(frame*.7);x.strokeStyle='#ff6e61';x.lineWidth=3;x.beginPath();x.arc(0,-91,29+Math.sin(frame*.5)*3,0,Math.PI*2);x.stroke();x.fillStyle='#ffb1a5';x.font='900 10px system-ui';x.textAlign='center';x.fillText('!',0,-129);x.restore()}
+if(a.kind==='guard'){x.save();x.strokeStyle='#8de7ff';x.lineWidth=3;x.globalAlpha=.8;x.beginPath();x.arc(-17,-61,23,-1.3,1.3);x.stroke();x.restore()}
 // face, helmet, brow and crest
 x.fillStyle=isPlayer?'#a96e45':'#8d929c';x.beginPath();x.arc(0,-94,13,0,Math.PI*2);x.fill();
 poly([[-16,-94],[-14,-108],[-6,-116],[7,-113],[15,-102],[14,-93],[6,-98],[-8,-98]],isPlayer?'#d8a943':'#788394','#fff0ad');
@@ -107,7 +119,7 @@ if(held.left){p.vx-=.65;p.face=-1}if(held.right){p.vx+=.65;p.face=1}
 if(held.jump&&p.ground){p.vy=-11;p.ground=false;held.jump=false}
 p.vx*=.82;p.x+=p.vx;p.y+=p.vy;p.vy+=.55;if(p.y>=0){p.y=0;p.vy=0;p.ground=true}
 p.x=clamp(p.x,65,895);e.face=p.x<e.x?-1:1;
-if(Math.abs(p.x-e.x)>105&&e.fall===0){e.vx+=(p.x<e.x?-1:1)*.22;e.x+=e.vx;e.vx*=.88}else if(frame%52===0&&e.attack===0&&e.inv===0){e.kind='sword';e.attack=20;if(Math.abs(p.x-e.x)<155){if(p.kind==='guard'){p.hp=Math.max(0,p.hp-3);$('status').innerHTML='<strong>GUARD HELD.</strong> Damage reduced.'}else hit(e,p,10,7)}}
+if(Math.abs(p.x-e.x)>125&&e.fall===0){e.vx+=(p.x<e.x?-1:1)*.28;e.x+=e.vx;e.vx*=.88}else if(e.attack===0&&e.inv===0&&frame%58===0){e.kind='windup';e.attack=9;e.ai=(e.ai||0)+1;$('status').innerHTML='<strong>WATCH OUT!</strong> The Spirit is preparing an attack.'}else if(e.kind==='windup'&&e.attack===1){e.kind=e.ai%2===0?'kick':'sword';e.attack=17;if(Math.abs(p.x-e.x)<175){if(p.kind==='guard'||held.guard){p.hp=Math.max(0,p.hp-2);p.vx+=(e.x<p.x?1:-1)*2;shake=3;$('status').innerHTML='<strong>SHIELD BLOCK!</strong> The Spirit’s strike is mostly absorbed.';for(let z=0;z<7;z++)particles.push({x:p.x-12,y:365+Math.random()*35,vx:(Math.random()-.5)*4,vy:-Math.random()*3,life:12,max:12,size:2+Math.random()*2,color:'#9cecff'})}else hit(e,p,e.kind==='kick'?12:10,e.kind==='kick'?9:7)}}
 if(p.x<95||p.x>865){p.vx+=(p.x<95?1:-1)*.6}
 if(p.inv>0&&p.x<45||p.inv>0&&p.x>915)p.fall=1;
 if(p.fall>0){p.x+=p.vx;p.y+=4;p.fall++;if(p.fall>25)finish(false)}
