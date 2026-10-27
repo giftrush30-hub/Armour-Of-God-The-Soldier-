@@ -551,6 +551,26 @@ if(isPlayer){
     x.strokeStyle='#e5c078';x.lineWidth=1.2;x.beginPath();x.moveTo(-7,-49);x.lineTo(-5,-40);x.moveTo(7,-49);x.lineTo(5,-40);x.stroke();
   }
 }
+// Character silhouette pass: distinct hair, waist and tunic silhouettes for each playable hero.
+if(isPlayer){
+  const female=selectedCharacter==='deborah';
+  const hairSwing=reduceMotion?0:Math.sin(frame*.12+(a.vx||0)*.08)*Math.min(3,Math.abs(a.vx)*.55);
+  if(female){
+    // Tied-back hair and a short ribbon trail animate independently from the helmet/face layer.
+    poly([[6,-111],[12,-113],[16,-108],[14,-100],[18+hairSwing,-94],[14+hairSwing,-89],[10,-97],[11,-105]],'#38221b','#8b5a3c');
+    x.strokeStyle='#b88656';x.lineWidth=1.1;x.beginPath();x.moveTo(11,-107);x.quadraticCurveTo(15,-101,13+hairSwing,-95);x.stroke();
+    // A split overskirt follows the hips without hiding the legs or knee joints.
+    poly([[-13,-37],[-4,-34],[0,-35],[5,-34],[13,-37],[17,-22],[9,-17],[3,-23],[0,-18],[-4,-23],[-10,-17],[-17,-22]],'#762e2b','#d8a65e');
+    x.strokeStyle='#f0c17c';x.lineWidth=1;x.beginPath();x.moveTo(-9,-34);x.lineTo(-8,-23);x.moveTo(8,-34);x.lineTo(9,-23);x.stroke();
+  }else{
+    // David's short beard and swept hair silhouette reinforce a different identity from Deborah.
+    poly([[-8,-97],[-5,-93],[0,-92],[5,-94],[8,-98],[6,-89],[1,-86],[-4,-88]],'#30221b','#65432f');
+    poly([[-10,-108],[-8,-115],[-1,-119],[6,-115],[10,-109],[4,-112],[0,-110],[-5,-112]],'#30221b','#765239');
+    // Layered blue battle skirt has split panels so both legs remain readable during movement.
+    poly([[-14,-38],[-5,-35],[0,-36],[6,-35],[14,-38],[16,-24],[8,-20],[2,-25],[0,-21],[-5,-25],[-10,-20],[-16,-24]],'#24465e','#d9b46b');
+    x.strokeStyle='#d9b46b';x.lineWidth=1;x.beginPath();x.moveTo(-8,-35);x.lineTo(-7,-25);x.moveTo(8,-35);x.lineTo(7,-25);x.stroke();
+  }
+}
 // Full-body anatomy pass: layered shoulders, articulated arms, waist and boot details.
 if(isPlayer){
   const female=selectedCharacter==='deborah';
