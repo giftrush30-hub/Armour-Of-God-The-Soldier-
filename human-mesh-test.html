@@ -9,6 +9,7 @@
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080d13;color:#f3eee4;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
 #view{position:fixed;inset:0}canvas{display:block;width:100%;height:100%}
 header{position:fixed;z-index:2;top:0;left:0;right:0;padding:14px 16px;background:linear-gradient(#080d13f0,transparent);pointer-events:none}
+@media(max-width:600px){header{padding:10px 12px}.title{font-size:17px;line-height:1.2}.status{font-size:11px;max-width:95%;text-shadow:0 1px 3px #000}#controls{left:6px;right:6px;bottom:42px;gap:6px;padding:6px}#controls button{padding:9px 10px;font-size:12px}#controls label{flex-basis:112px;padding:7px 8px}footer{font-size:10px;padding:7px 8px}}
 .eyebrow{font-size:10px;letter-spacing:.2em;color:#e0bd70;font-weight:900}.title{font-size:21px;font-weight:900}.status{font-size:12px;line-height:1.5;color:#c7d0d9;margin-top:5px;max-width:520px}#controls{position:fixed;z-index:3;left:10px;right:10px;bottom:48px;display:flex;flex-direction:row;align-items:stretch;gap:7px;max-width:none;overflow-x:auto;overflow-y:hidden;padding:8px;background:#0b131edb;border:1px solid #394550;border-radius:12px;backdrop-filter:blur(8px)}#controls button{flex:0 0 auto;background:#1c2933;color:#f3eee4;border:1px solid #9c7d43;border-radius:10px;padding:10px 12px;font-weight:700;text-align:left}#controls button:disabled{opacity:.55}#controls label{flex:0 0 125px;display:block;background:#111a22dd;border:1px solid #394550;border-radius:10px;padding:8px 10px;font-size:12px;color:#e6eaf0}#controls input[type=range]{width:100%;accent-color:#d8b56a;margin-top:6px}
 footer{position:fixed;z-index:2;bottom:0;left:0;right:0;text-align:center;padding:9px 12px;background:linear-gradient(transparent,#080d13ee);font-size:12px;color:#c7d0d9}
 </style>
@@ -43,15 +44,15 @@ loader.load(modelURL,function(gltf){
  const box=new THREE.Box3().setFromObject(model),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());
  if(!isFinite(size.y)||size.y===0){status.textContent='The file loaded, but its body dimensions could not be read.';return}
  model.position.sub(center);model.position.y+=size.y/2;model.scale.setScalar(2.25/size.y);scene.add(model);
- camera.position.set(4.4,1.15,0.08);camera.lookAt(0,1.05,0);
+ camera.position.set(7.0,1.2,0.08);camera.lookAt(0,1.05,0);
  let boneCount=0,skinnedCount=0,boneNames=[],boneMap={};
  model.traverse(o=>{if(o.isSkinnedMesh&&o.skeleton){skinnedCount++;boneCount+=o.skeleton.bones.length;o.skeleton.bones.forEach(b=>{boneMap[b.name.toLowerCase()]=b;if(boneNames.length<12&&!boneNames.includes(b.name))boneNames.push(b.name)})}});
  const clips=gltf.animations||[];
  const findSideBone=(part,side)=>{const entries=Object.entries(boneMap);return (entries.find(([n])=>n.includes(part)&&((side==='l'&&(n.includes('left')||n.endsWith('_l')||n.endsWith('.l')||n.endsWith(' l')))||(side==='r'&&(n.includes('right')||n.endsWith('_r')||n.endsWith('.r')||n.endsWith(' r')))))||[])[1]||null;};
- const upperL=findSideBone('upperarm','l')||findSideBone('upper_arm','l');
- const upperR=findSideBone('upperarm','r')||findSideBone('upper_arm','r');
- const lowerL=findSideBone('lowerarm','l')||findSideBone('forearm','l');
- const lowerR=findSideBone('lowerarm','r')||findSideBone('forearm','r');
+ const upperL=findSideBone('upperarm','l')||findSideBone('upper_arm','l')||findSideBone('arm','l');
+ const upperR=findSideBone('upperarm','r')||findSideBone('upper_arm','r')||findSideBone('arm','r');
+ const lowerL=findSideBone('lowerarm','l')||findSideBone('lower_arm','l')||findSideBone('forearm','l');
+ const lowerR=findSideBone('lowerarm','r')||findSideBone('lower_arm','r')||findSideBone('forearm','r');
  [[upperL,0],[upperR,0],[lowerL,0],[lowerR,0]].forEach(([b])=>{if(b)stanceBones.push({bone:b,original:b.quaternion.clone()})});
  const applyLoweredPose=()=>{const armAngle=Number(armRange.value)*Math.PI/180,elbowAngle=Number(elbowRange.value)*Math.PI/180;stanceBones.forEach(item=>{item.bone.quaternion.copy(item.original);const n=item.bone.name.toLowerCase();const isLeft=n.includes('_l')||n.includes('.l');const sign=isLeft?-1:1;const angle=n.includes('lowerarm')?elbowAngle*sign:armAngle*sign;item.bone.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),angle));});model.updateMatrixWorld(true);armValue.textContent=armRange.value+'°';elbowValue.textContent=elbowRange.value+'°';};
  const resetPose=()=>{stanceBones.forEach(item=>item.bone.quaternion.copy(item.original));model.updateMatrixWorld(true);armRange.value=40;elbowRange.value=10;armValue.textContent='40°';elbowValue.textContent='10°';status.textContent='Original T-pose restored. Adjust the sliders to test a different arm angle.';};
@@ -78,7 +79,8 @@ loader.load(modelURL,function(gltf){
 },function(xhr){status.textContent=xhr.total>0?'Downloading human mesh… '+Math.round(xhr.loaded/xhr.total*100)+'%':'Waiting for the human model file…';},function(err){console.error(err);status.textContent='The character model could not be loaded. This is an isolated test; the main campaign is unchanged.';});
 // Fixed side-view camera for a 2.5D fighting-game presentation; no free rotation.
 document.getElementById('skinSelect').addEventListener('change',e=>{if(!model)return;model.traverse(o=>{if(o.isMesh&&o.material){const mats=Array.isArray(o.material)?o.material:[o.material];mats.forEach(m=>{if(m.color){m.color.set(e.target.value);m.needsUpdate=true}})}});status.textContent='Skin tone updated on the real human mesh.';});
-document.getElementById('zoomRange').addEventListener('input',e=>{const z=Number(e.target.value);camera.position.set(7.0*(85/z),1.2,.08*(85/z));camera.lookAt(0,1.05,0);document.getElementById('zoomValue').textContent=z+'%';});
+document.getElementById('zoomRange').addEventListener('input',e=>{const z=Number(e.target.value);const distance=7.0*(85/z);camera.position.set(distance,1.2,.08*(85/z));camera.lookAt(0,1.05,0);document.getElementById('zoomValue').textContent=z+'%';});
+document.getElementById('zoomRange').dispatchEvent(new Event('input'));
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 function animate(){requestAnimationFrame(animate);const dt=clock.getDelta();if(mixer)mixer.update(dt);renderer.render(scene,camera)}animate();
 })();
