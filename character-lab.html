@@ -30,13 +30,13 @@ ellipsoid(root,-.072,2.17,.15,.027,.024,.016,white);ellipsoid(root,.072,2.17,.15
 const helmet=ellipsoid(root,0,2.31,0,.205,.085,.19,bronze);ellipsoid(root,0,2.38,-.01,.035,.075,.035,gold);ellipsoid(root,0,2.21,.15,.13,.035,.03,bronze);
 ellipsoid(root,0,1.36,.02,.22,.09,.18,leather);ellipsoid(root,0,1.37,.19,.055,.055,.025,gold);
 return root}
-function loadFallback(reason){if(model)return;status.textContent='Human model could not load ('+reason+'). Reload in Chrome with internet access; no toy placeholder will be shown.';}
+function loadFallback(reason){if(model)return;status.textContent='Opening the source model viewer because this phone/browser could not load the model directly ('+reason+').';const frame=document.createElement('iframe');frame.title='Rigged human base mesh 3D viewer';frame.src='https://www.innerscene.com/v/V0ZdMq61oT7IZ8LVA7ACZ';frame.allow='fullscreen';frame.style.cssText='position:fixed;inset:0;width:100%;height:100%;border:0;background:#080d13;z-index:1';document.getElementById('view').replaceChildren(frame);document.querySelector('.top').style.zIndex='3';document.querySelector('.bottom').style.zIndex='3';document.querySelector('.note').style.zIndex='3';}
 if(THREE.GLTFLoader){const loader=new THREE.GLTFLoader();status.textContent='Loading high-detail rigged human mesh (4.3 MB)…';
 loader.load('https://www.innerscene.com/api/library/male-base-mesh-3d-person-rigged-a-pose-380e6d89/download',g=>{
 model=g.scene;scene.add(model);model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});const box=new THREE.Box3().setFromObject(model);const size=box.getSize(new THREE.Vector3());const center=box.getCenter(new THREE.Vector3());model.position.x=-center.x;model.position.z=-center.z;model.position.y=-box.min.y;const h=size.y||1;model.scale.setScalar(2.65/h);model.position.y=0;
 if(g.animations&&g.animations.length){mixer=new THREE.AnimationMixer(model);clips=g.animations;const idle=clips.find(c=>/idle/i.test(c.name))||clips[0];if(idle)mixer.clipAction(idle).play()}
 status.textContent='High-detail human anatomy mesh loaded · '+(clips.length?clips.length+' animation clips':'rigged skeleton present; combat animations not yet added');
-},undefined,e=>{console.error(e);loadFallback('model download failed')});setTimeout(()=>loadFallback('download timed out'),9000);
+},undefined,e=>{console.error(e);loadFallback('model download failed')});setTimeout(()=>loadFallback('download timed out'),5000);
 }else{loadFallback('model loader script did not load')}
 const ground=new THREE.Mesh(new THREE.CircleGeometry(1.1,48),new THREE.MeshStandardMaterial({color:0x171b20,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=.012;scene.add(ground);
 function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05);if(mixer)mixer.update(dt);if(model)model.rotation.y+= (targetYaw-model.rotation.y)*.12;renderer.render(scene,camera)}animate();
