@@ -8,7 +8,6 @@
 (function(){
 const status=document.getElementById('status');
 if(!window.THREE){status.textContent='3D engine did not load. Open in Chrome and reload.';return}
-if(!THREE.GLTFLoader){status.textContent='Model loader did not load. Please reload once.';return}
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x080d13);scene.fog=new THREE.Fog(0x080d13,18,40);
 const camera=new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.1,100);camera.position.set(0,2.5,7.5);
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setSize(innerWidth,innerHeight);renderer.outputEncoding=THREE.sRGBEncoding;renderer.shadowMap.enabled=true;document.getElementById('view').appendChild(renderer.domElement);
@@ -19,12 +18,26 @@ const floor=new THREE.Mesh(new THREE.CylinderGeometry(4.8,4.8,.25,64),new THREE.
 const ring=new THREE.Mesh(new THREE.TorusGeometry(3.6,.035,8,80),new THREE.MeshStandardMaterial({color:0xc5a45d,metalness:.65,roughness:.4}));ring.rotation.x=Math.PI/2;ring.position.y=.005;scene.add(ring);
 const grid=new THREE.GridHelper(9,18,0x55504a,0x353b42);grid.position.y=.005;scene.add(grid);
 let model=null,mixer=null,clips=[],clock=new THREE.Clock(),targetYaw=0,dragging=false,lastX=0;
-const loader=new THREE.GLTFLoader();status.textContent='Loading rigged humanoid model…';
+function ellipsoid(parent,x,y,z,sx,sy,sz,mat){const m=new THREE.Mesh(new THREE.SphereGeometry(1,20,14),mat);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
+function segment(parent,a,b,r1,r2,mat){const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),d=B.clone().sub(A);const m=new THREE.Mesh(new THREE.CylinderGeometry(r2,r1,d.length(),12,1),mat);m.position.copy(A).add(B).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());m.castShadow=true;parent.add(m);ellipsoid(parent,...a,r1,r1,r1,mat);ellipsoid(parent,...b,r2,r2,r2,mat);return m}
+function fallbackHumanoid(){const root=new THREE.Group();scene.add(root);
+const skin=new THREE.MeshStandardMaterial({color:0x98613f,roughness:.82}),darkSkin=new THREE.MeshStandardMaterial({color:0x70452f,roughness:.86}),bronze=new THREE.MeshStandardMaterial({color:0x8c6534,metalness:.68,roughness:.38}),gold=new THREE.MeshStandardMaterial({color:0xe0bd70,metalness:.72,roughness:.3}),cloth=new THREE.MeshStandardMaterial({color:0x263b4b,roughness:.8}),leather=new THREE.MeshStandardMaterial({color:0x3b2920,roughness:.92}),white=new THREE.MeshStandardMaterial({color:0xf0e7d4,roughness:.3}),black=new THREE.MeshStandardMaterial({color:0x161311,roughness:.7});
+ellipsoid(root,0,1.53,0,.29,.39,.19,cloth);ellipsoid(root,0,1.67,.015,.31,.24,.205,bronze);ellipsoid(root,0,1.67,.02,.285,.205,.195,cloth);
+for(const side of [-1,1]){ellipsoid(root,side*.35,1.79,0,.17,.13,.18,bronze);ellipsoid(root,side*.35,1.78,.02,.13,.105,.145,gold);segment(root,[side*.34,1.69,0],[side*.43,1.42,.015],.095,.075,skin);ellipsoid(root,side*.43,1.42,.015,.08,.08,.08,bronze);segment(root,[side*.43,1.42,.015],[side*.46,1.18,.06],.072,.052,skin);ellipsoid(root,side*.46,1.13,.09,.07,.085,.045,skin);ellipsoid(root,side*.46,1.22,.065,.073,.07,.06,bronze);
+segment(root,[side*.14,1.28,0],[side*.15,.87,0],.105,.085,cloth);ellipsoid(root,side*.15,.86,0,.095,.09,.09,bronze);segment(root,[side*.15,.86,0],[side*.16,.38,.025],.078,.055,skin);ellipsoid(root,side*.16,.61,.015,.082,.12,.075,bronze);ellipsoid(root,side*.16,.36,.055,.065,.055,.07,skin);ellipsoid(root,side*.16,.12,.13,.085,.09,.16,leather)}
+ellipsoid(root,0,1.97,0,.105,.13,.105,skin);ellipsoid(root,0,2.15,0,.19,.225,.17,skin);
+ellipsoid(root,-.072,2.17,.15,.027,.024,.016,white);ellipsoid(root,.072,2.17,.15,.027,.024,.016,white);ellipsoid(root,-.072,2.17,.165,.011,.015,.008,black);ellipsoid(root,.072,2.17,.165,.011,.015,.008,black);ellipsoid(root,0,2.12,.17,.035,.05,.035,skin);ellipsoid(root,0,2.055,.15,.075,.027,.025,darkSkin);ellipsoid(root,0,2.025,.145,.08,.038,.025,darkSkin);
+const helmet=ellipsoid(root,0,2.31,0,.205,.085,.19,bronze);ellipsoid(root,0,2.38,-.01,.035,.075,.035,gold);ellipsoid(root,0,2.21,.15,.13,.035,.03,bronze);
+ellipsoid(root,0,1.36,.02,.22,.09,.18,leather);ellipsoid(root,0,1.37,.19,.055,.055,.025,gold);
+return root}
+function loadFallback(reason){if(model)return;model=fallbackHumanoid();status.textContent='Visible character fallback loaded · external rigged model unavailable ('+reason+')';}
+if(THREE.GLTFLoader){const loader=new THREE.GLTFLoader();status.textContent='Loading rigged humanoid model…';
 loader.load('https://threejs.org/examples/models/gltf/Soldier.glb',g=>{
 model=g.scene;scene.add(model);model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});const box=new THREE.Box3().setFromObject(model);const size=box.getSize(new THREE.Vector3());const center=box.getCenter(new THREE.Vector3());model.position.x=-center.x;model.position.z=-center.z;model.position.y=-box.min.y;const h=size.y||1;model.scale.setScalar(2.65/h);model.position.y=0;
 if(g.animations&&g.animations.length){mixer=new THREE.AnimationMixer(model);clips=g.animations;const idle=clips.find(c=>/idle/i.test(c.name))||clips[0];if(idle)mixer.clipAction(idle).play()}
 status.textContent='Rigged humanoid loaded · '+(clips.length?clips.length+' animation clips':'no animation clips')+' · inspect body proportions';
-},undefined,e=>{console.error(e);status.textContent='Model download failed. The page is alive, but the external model could not load on this network.'});
+},undefined,e=>{console.error(e);loadFallback('model download failed')});setTimeout(()=>loadFallback('download timed out'),9000);
+}else{loadFallback('model loader script did not load')}
 const ground=new THREE.Mesh(new THREE.CircleGeometry(1.1,48),new THREE.MeshStandardMaterial({color:0x171b20,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=.012;scene.add(ground);
 function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05);if(mixer)mixer.update(dt);if(model)model.rotation.y+= (targetYaw-model.rotation.y)*.12;renderer.render(scene,camera)}animate();
 function setView(yaw){targetYaw=yaw;camera.position.set(Math.sin(yaw)*7.5,2.35,Math.cos(yaw)*7.5);camera.lookAt(0,1.25,0)}
