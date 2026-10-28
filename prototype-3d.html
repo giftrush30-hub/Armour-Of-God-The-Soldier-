@@ -10,7 +10,7 @@
 </head>
 <body><div id="view"></div>
 <div class="top"><div><div class="brand">ARMOUR OF GOD · DEVELOPMENT BUILD</div><div class="headline">The Soldier — 3D Combat Lab</div><div id="status" class="status">Preparing the 3D scene…</div></div><div class="pill">PROTOTYPE 01</div></div>
-<div id="loading" class="loading"><div><div class="spinner"></div><strong>BUILDING THE 3D BATTLEFIELD</strong><p id="loadtext">Loading the adult humanoid mesh and preparing lighting…</p></div></div>
+<div id="loading" class="loading"><div><div class="spinner"></div><strong>BUILDING THE 3D BATTLEFIELD</strong><p id="loadtext">Loading a rigged 3D soldier with built-in animation clips…</p></div></div>
 <div class="bottom"><div class="hint">Tap an action to test combat response · drag to orbit · pinch to zoom</div><div class="controls"><button data-action="guard">GUARD</button><button data-action="punch">PUNCH</button><button data-action="kick">KICK</button><button class="special" data-action="power">SCRIPTURE POWER</button></div><div class="foot">Prototype sandbox — separate from the live game until tested.</div></div>
 <script type="module">
 import * as THREE from 'three';
@@ -25,7 +25,7 @@ const rim=new THREE.DirectionalLight(0x3d8bff,2.5);rim.position.set(3,3,-4);scen
 const floor=new THREE.Mesh(new THREE.CircleGeometry(8,64),new THREE.MeshStandardMaterial({color:'#151c23',roughness:.94,metalness:.1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.03;scene.add(floor);
 const grid=new THREE.GridHelper(18,36,'#3a4147','#202830');grid.position.y=-.015;scene.add(grid);
 const ring=new THREE.Mesh(new THREE.TorusGeometry(1.2,.018,8,80),new THREE.MeshBasicMaterial({color:'#a98a4e',transparent:true,opacity:.8}));ring.rotation.x=Math.PI/2;ring.position.y=.005;ring.scale.set(1.05,1.5,1);scene.add(ring);
-let fighter=null, bones={}, actionUntil=0, actionName='idle', clock=new THREE.Clock(), yaw=0, drag=null, targetYaw=0, zoom=5.8;
+let fighter=null, bones={}, mixer=null, clips={}, actionUntil=0, actionName='idle', clock=new THREE.Clock(), yaw=0, drag=null, targetYaw=0, zoom=5.8;
 const armorMat=new THREE.MeshStandardMaterial({color:'#303b45',metalness:.78,roughness:.3});
 const goldMat=new THREE.MeshStandardMaterial({color:'#b28b43',metalness:.8,roughness:.25});
 const darkMat=new THREE.MeshStandardMaterial({color:'#111923',metalness:.15,roughness:.75});
@@ -59,31 +59,37 @@ function findBones(root){root.traverse(o=>{if(o.isBone){bones[o.name.toLowerCase
 function boneLike(part){return Object.keys(bones).find(n=>n.includes(part))}
 function applyBodySuit(root){root.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=false;const mats=Array.isArray(o.material)?o.material:[o.material];mats.forEach(m=>{if(m){m.color.set('#18212a');m.roughness=.72;m.metalness=.12}})}})}
 async function loadFighter(){
- status.textContent='Loading adult humanoid 3D mesh…';
- // CC0 adult male base mesh; dark suit material is applied before armor layers cover the torso and joints.
- const url='https://www.innerscene.com/api/library/male-base-mesh-3d-person-rigged-a-pose-380e6d89/download';
+ status.textContent='Loading rigged 3D soldier and motion clips…';
+ // Three.js example Soldier.glb is a public, MIT-licensed rigged character with Idle, Walk and Run clips.
+ const url='https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Soldier.glb';
  try{
-  const gltf=await new GLTFLoader().loadAsync(url);fighter=gltf.scene;applyBodySuit(fighter);
-  const box=new THREE.Box3().setFromObject(fighter), size=box.getSize(new THREE.Vector3());const scale=1.82/Math.max(size.y,.01);fighter.scale.setScalar(scale);
+  const gltf=await new GLTFLoader().loadAsync(url);
+  fighter=gltf.scene;
+  const box=new THREE.Box3().setFromObject(fighter), size=box.getSize(new THREE.Vector3());
+  const scale=1.82/Math.max(size.y,.01);fighter.scale.setScalar(scale);
   const center=box.getCenter(new THREE.Vector3());fighter.position.set(-center.x*scale,-box.min.y*scale,-center.z*scale);
-  scene.add(fighter);findBones(fighter);addArmor(fighter);
-  status.textContent='Humanoid mesh loaded · armor overlay · combat input active';
+  fighter.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=false;o.frustumCulled=false}});
+  scene.add(fighter);findBones(fighter);
+  mixer=new THREE.AnimationMixer(fighter);
+  for(const clip of gltf.animations) clips[clip.name]=mixer.clipAction(clip);
+  if(clips.Idle) clips.Idle.play();
+  status.textContent='Rigged 3D soldier loaded · Idle/Walk/Run clips active · combat tests ready';
  }catch(e){
-  console.warn('External CC0 mesh could not load; displaying local 3D fallback.',e);
-  fighter=buildFallback();status.textContent='3D scene active · fallback model shown (mesh connection unavailable)';
-  loadtext.textContent='The external model host did not respond, so a local 3D fallback is shown. The prototype remains usable.';
+  console.warn('Rigged character could not load; displaying local 3D fallback.',e);
+  fighter=buildFallback();status.textContent='3D scene active · fallback model shown (external mesh unavailable)';
+  loadtext.textContent='The external model could not load on this connection, so a local 3D fallback is shown.';
  }
  loading.classList.add('hide');
 }
 function pulse(power=false){const t=performance.now();actionUntil=t+(power?1400:850);actionName=power?'power':currentAction;status.textContent=power?'Scripture power test · light pulse active':currentAction.toUpperCase()+' response test';if(power){ring.material.color.set('#f3d17c');ring.material.opacity=1;}}
 let currentAction='guard';
-document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>{currentAction=b.dataset.action;pulse(currentAction==='power');}));
+document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>{currentAction=b.dataset.action;pulse(currentAction==='power');if(mixer&&clips.Idle){Object.values(clips).forEach(a=>a.stop());clips.Idle.reset().play();}}));
 let touchStart=null;
 renderer.domElement.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,yaw:targetYaw};renderer.domElement.setPointerCapture(e.pointerId)});
 renderer.domElement.addEventListener('pointermove',e=>{if(drag){targetYaw=drag.yaw+(e.clientX-drag.x)*.008}});
 renderer.domElement.addEventListener('pointerup',()=>drag=null);
 renderer.domElement.addEventListener('wheel',e=>{zoom=THREE.MathUtils.clamp(zoom+e.deltaY*.004,3.4,8);},{passive:true});
-function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05), now=performance.now();yaw=THREE.MathUtils.damp(yaw,targetYaw,5,dt);if(fighter){fighter.rotation.y=yaw;const active=now<actionUntil;const t=now/1000;
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05), now=performance.now();if(mixer)mixer.update(dt);yaw=THREE.MathUtils.damp(yaw,targetYaw,5,dt);if(fighter){fighter.rotation.y=yaw;const active=now<actionUntil;const t=now/1000;
  // Safe whole-body response while the final combat clips are being integrated.
  const targetLean=active?(actionName==='kick'?.12:actionName==='punch'?.16:actionName==='power'?-.06:0):0;
  fighter.rotation.x=THREE.MathUtils.damp(fighter.rotation.x,targetLean,8,dt);
