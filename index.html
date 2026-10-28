@@ -348,6 +348,19 @@ body.battle-mode .combat-guide{display:block}
  body.battle-mode .controls{display:flex!important}
  body.battle-mode .combat-guide{display:block!important}
 }
+
+/* Battle-first mobile experience: remove long-form panels from the live fight view. */
+@media(max-width:700px){
+ body.battle-mode .scripture-forge,
+ body.battle-mode .scripture-vault,
+ body.battle-mode .campaign-map,
+ body.battle-mode .verse-card,
+ body.battle-mode .foot{display:none!important}
+ body.battle-mode .app{height:100svh;overflow:hidden}
+ body.battle-mode .stage{flex-shrink:0}
+ body.battle-mode .below{min-height:0}
+ body.battle-mode .companion-panel{min-height:0}
+}
 </style></head><body><main class="app">
 <header class="top"><div><div class="eyebrow">A CINEMATIC BIBLICAL COMBAT JOURNEY</div><div class="brand">ARMOUR OF GOD <span>: THE SOLDIER</span></div></div><div class="pill">✦ DIVINE GOLD <span id="coins">◈ 0</span></div></header>
 <section class="stage"><canvas id="game" width="960" height="540" aria-label="Playable mountain-edge battle"></canvas>
@@ -1038,7 +1051,8 @@ let lastIdleDraw=0;
 function draw(){
   if(typeof document!=='undefined'&&document.hidden)return;
   if(running){
-    if((frame&1)===1)return;
+    if(mobilePerf&&frame%3!==0)return;
+    if(!mobilePerf&&(frame&1)===1)return;
     drawScene();
     return;
   }
