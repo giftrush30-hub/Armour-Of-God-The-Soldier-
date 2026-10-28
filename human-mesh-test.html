@@ -15,8 +15,8 @@ footer{position:fixed;z-index:2;bottom:0;left:0;right:0;text-align:center;paddin
 </head>
 <body>
 <div id="view"></div><div id="controls"><button id="poseBtn" disabled>Checking animation support…</button><button id="stanceBtn" disabled>Preparing safe stance test…</button></div>
-<header><div class="eyebrow">ARMOUR OF GOD: THE SOLDIER</div><div class="title">Human Mesh Test — Part 8</div><div id="status" class="status">Loading character and animation options…</div></header>
-<footer>Isolated test page · Corrected arm-direction test · Main campaign unchanged</footer>
+<header><div class="eyebrow">ARMOUR OF GOD: THE SOLDIER</div><div class="title">Human Mesh Test — Part 9</div><div id="status" class="status">Loading character and animation options…</div></header>
+<footer>Isolated test page · World-space arm-down test · Main campaign unchanged</footer>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.module.js"}}
 </script>
@@ -51,10 +51,10 @@ loader.load(modelURL,function(gltf){
  const upperR=boneMap['upperarm_r']||boneMap['upperarm.r']||boneMap['rightupperarm'];
  const lowerL=boneMap['lowerarm_l']||boneMap['lowerarm.l']||boneMap['leftlowerarm'];
  const lowerR=boneMap['lowerarm_r']||boneMap['lowerarm.r']||boneMap['rightlowerarm'];
- [[upperL,-0.85],[upperR,0.85],[lowerL,-0.12],[lowerR,0.12]].forEach(([b,a])=>{if(b)stanceBones.push({bone:b,original:b.quaternion.clone(),angle:a})});
+ [[upperL,0.72],[upperR,-0.72],[lowerL,0.08],[lowerR,-0.08]].forEach(([b,a])=>{if(b)stanceBones.push({bone:b,original:b.quaternion.clone(),angle:a,originalWorld:new THREE.Quaternion()})});
  if(upperL&&upperR){
-   stanceBtn.disabled=false;stanceBtn.textContent='Try corrected arm-direction test';
-   stanceBtn.onclick=()=>{stanceApplied=!stanceApplied;stanceBones.forEach(item=>{item.bone.quaternion.copy(item.original);if(stanceApplied){const q=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),item.angle);item.bone.quaternion.multiply(q)}});stanceBtn.textContent=stanceApplied?'Reset original pose':'Try relaxed combat stance';status.textContent=stanceApplied?'Corrected arm-direction experiment applied. Check whether arms lower naturally; if they still rise or twist, reset and we will map the rig axes instead of guessing.':'Original pose restored. Main campaign remains unchanged.'};
+   stanceBtn.disabled=false;stanceBtn.textContent='Try arm-down pose';
+   stanceBtn.onclick=()=>{stanceApplied=!stanceApplied;model.updateMatrixWorld(true);stanceBones.forEach(item=>{item.bone.quaternion.copy(item.original);if(stanceApplied){const parentQ=new THREE.Quaternion();if(item.bone.parent)item.bone.parent.getWorldQuaternion(parentQ);const originalWorld=new THREE.Quaternion();item.bone.getWorldQuaternion(originalWorld);const worldTurn=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),item.angle);const targetWorld=worldTurn.multiply(originalWorld);item.bone.quaternion.copy(parentQ.invert().multiply(targetWorld))}});model.updateMatrixWorld(true);stanceBtn.textContent=stanceApplied?'Reset original pose':'Try arm-down pose';status.textContent=stanceApplied?'World-space arm-down test applied. Check whether the arms now angle down. This remains a pose test, not a combat animation.':'Original pose restored. Main campaign remains unchanged.'};
  }else{stanceBtn.disabled=true;stanceBtn.textContent='Arm joint names need mapping';}
  const clipNames=clips.length?clips.map(a=>a.name||'(unnamed)').slice(0,5).join(', '):'none bundled';
  if(clips.length){
