@@ -15,8 +15,8 @@ footer{position:fixed;z-index:2;bottom:0;left:0;right:0;text-align:center;paddin
 </head>
 <body>
 <div id="view"></div>
-<header><div class="eyebrow">ARMOUR OF GOD: THE SOLDIER</div><div class="title">Human Mesh Test — Part 1</div><div id="status" class="status">Preparing the real human model…</div></header>
-<footer>Isolated test page · Main campaign and existing character lab are unchanged</footer>
+<header><div class="eyebrow">ARMOUR OF GOD: THE SOLDIER</div><div class="title">Human Mesh Test — Part 2</div><div id="status" class="status">Preparing the human body and skin-tone pass…</div></header>
+<footer>Isolated test page · Skin-tone test only · Main campaign unchanged</footer>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.module.js"}}
 </script>
@@ -39,12 +39,12 @@ const loader=new GLTFLoader();
 const modelURL='https://raw.githubusercontent.com/programasweights/avatar/main/public/assets/character.glb';
 status.textContent='3D viewer ready. Requesting the human model file…';
 loader.load(modelURL,function(gltf){
- model=gltf.scene;model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false;if(o.material){o.material.side=THREE.DoubleSide}}});
+ model=gltf.scene;model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false;if(o.material){const mats=Array.isArray(o.material)?o.material:[o.material];mats.forEach(m=>{m.side=THREE.DoubleSide;if(m.color){m.color.set(0x754326);m.needsUpdate=true}if('roughness' in m)m.roughness=0.82;if('metalness' in m)m.metalness=0.0})}}});
  const box=new THREE.Box3().setFromObject(model),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());
  if(!isFinite(size.y)||size.y===0){status.textContent='The file loaded, but its body dimensions could not be read.';return}
  model.position.sub(center);model.position.y+=size.y/2;model.scale.setScalar(2.15/size.y);scene.add(model);
  camera.position.set(2.7,1.9,4.9);camera.lookAt(0,1.03,0);
- status.textContent='Human mesh loaded. Drag to rotate; pinch or use two fingers to zoom. Checking the body before armour.';
+ status.textContent='Human mesh loaded. Skin-tone test applied. Drag to rotate; pinch or use two fingers to zoom. Body only — armour comes later.';
 },function(xhr){status.textContent=xhr.total>0?'Downloading human mesh… '+Math.round(xhr.loaded/xhr.total*100)+'%':'Waiting for the human model file…';},function(err){console.error(err);status.textContent='The alternate model file could not be loaded either. We will stop this 3D attempt and move to a 2D character approach rather than keep repeating broken tests.';});
 renderer.domElement.addEventListener('pointerdown',e=>{drag=true;lastX=e.clientX;lastY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});
 renderer.domElement.addEventListener('pointermove',e=>{if(!drag||!model)return;rotY+=(e.clientX-lastX)*.008;rotX+=(e.clientY-lastY)*.004;rotX=Math.max(-.5,Math.min(.5,rotX));lastX=e.clientX;lastY=e.clientY;model.rotation.set(rotX,rotY,0)});
