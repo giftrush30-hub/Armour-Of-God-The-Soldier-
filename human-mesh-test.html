@@ -35,9 +35,9 @@ const fill=new THREE.DirectionalLight(0x9bbdff,1.3);fill.position.set(-4,3,-3);s
 const floor=new THREE.Mesh(new THREE.CircleGeometry(4,64),new THREE.MeshStandardMaterial({color:0x17212a,roughness:.95}));floor.rotation.x=-Math.PI/2;floor.position.y=-.025;scene.add(floor);
 const grid=new THREE.GridHelper(8,16,0x57482d,0x29323b);grid.position.y=-.015;scene.add(grid);
 let model=null,drag=false,lastX=0,lastY=0,rotY=0,rotX=0.0;
-const loader=new THREE.GLTFLoader();
+const loader=new GLTFLoader();
 const modelURL='https://www.innerscene.com/api/library/male-base-mesh-3d-person-rigged-a-pose-380e6d89/download';
-status.textContent='Loading an actual rigged human body (about 4.3 MB)…';
+status.textContent='3D viewer ready. Requesting the human model file…';
 loader.load(modelURL,function(gltf){
  model=gltf.scene;model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false;if(o.material){o.material.side=THREE.DoubleSide}}});
  const box=new THREE.Box3().setFromObject(model),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());
@@ -45,7 +45,7 @@ loader.load(modelURL,function(gltf){
  model.position.sub(center);model.position.y+=size.y/2;model.scale.setScalar(2.15/size.y);scene.add(model);
  camera.position.set(2.7,1.9,4.9);camera.lookAt(0,1.03,0);
  status.textContent='Human mesh loaded. Drag to rotate; pinch or use two fingers to zoom. Checking the body before armour.';
-},function(xhr){if(xhr.total>0){status.textContent='Downloading human mesh… '+Math.round(xhr.loaded/xhr.total*100)+'%'}},function(err){console.error(err);status.textContent='Could not load the model from its source. This test page is isolated; the main campaign and character lab remain untouched. We will use another reliable asset route if needed.'});
+},function(xhr){status.textContent=xhr.total>0?'Downloading human mesh… '+Math.round(xhr.loaded/xhr.total*100)+'%':'Waiting for the human model file…';},function(err){console.error(err);status.textContent='The viewer started, but the model source did not provide a usable file (network, access, or file-format error). Next we will bundle a model locally instead of relying on this external download.';});
 renderer.domElement.addEventListener('pointerdown',e=>{drag=true;lastX=e.clientX;lastY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});
 renderer.domElement.addEventListener('pointermove',e=>{if(!drag||!model)return;rotY+=(e.clientX-lastX)*.008;rotX+=(e.clientY-lastY)*.004;rotX=Math.max(-.5,Math.min(.5,rotX));lastX=e.clientX;lastY=e.clientY;model.rotation.set(rotX,rotY,0)});
 renderer.domElement.addEventListener('pointerup',()=>drag=false);renderer.domElement.addEventListener('pointercancel',()=>drag=false);
