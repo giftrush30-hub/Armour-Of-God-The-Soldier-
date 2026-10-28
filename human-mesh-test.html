@@ -17,13 +17,14 @@ footer{position:fixed;z-index:2;bottom:0;left:0;right:0;text-align:center;paddin
 <div id="view"></div>
 <header><div class="eyebrow">ARMOUR OF GOD: THE SOLDIER</div><div class="title">Human Mesh Test — Part 1</div><div id="status" class="status">Preparing the real human model…</div></header>
 <footer>Isolated test page · Main campaign and existing character lab are unchanged</footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/examples/js/loaders/GLTFLoader.js"></script>
-<script>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.module.js"}}
+</script>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.149.0/examples/jsm/loaders/GLTFLoader.js";
 (function(){
 const status=document.getElementById('status'),host=document.getElementById('view');
-if(!window.THREE){status.textContent='3D engine failed to load. Please check the internet connection and reload.';return}
-if(!THREE.GLTFLoader){status.textContent='The model loader failed to load. The main game is unaffected.';return}
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x080d13);
 scene.fog=new THREE.Fog(0x080d13,8,22);
 const camera=new THREE.PerspectiveCamera(35,innerWidth/innerHeight,.1,100);camera.position.set(3.6,2.7,6.8);camera.lookAt(0,1,0);
