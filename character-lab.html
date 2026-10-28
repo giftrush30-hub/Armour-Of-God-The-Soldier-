@@ -1,78 +1,67 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#080d13"><title>Armour of God — Character Lab</title>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#080d13"><title>Armour of God — Warrior Character Lab</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080d13;color:#f3eee4;font-family:system-ui,-apple-system,Segoe UI,sans-serif}#view{position:fixed;inset:0}canvas{display:block;width:100%;height:100%}.top{position:fixed;z-index:2;top:0;left:0;right:0;padding:15px 16px;background:linear-gradient(#080d13f0,transparent)}.eyebrow{font-size:10px;letter-spacing:.2em;color:#e0bd70;font-weight:900}.title{font-size:22px;font-weight:900}.status{font-size:12px;color:#b9c4d0;margin-top:3px}.bottom{position:fixed;z-index:2;bottom:0;left:0;right:0;padding:14px;background:linear-gradient(transparent,#080d13f2);display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.btn{background:#1b2631;color:#f8f2e7;border:1px solid #74613c;border-radius:10px;padding:12px 16px;font-weight:800}.note{position:fixed;top:112px;left:14px;right:14px;z-index:2;font-size:12px;line-height:1.45;color:#d5dce3;max-width:540px}.tag{color:#e3c476;font-weight:800}@media(min-width:700px){.title{font-size:28px}.note{top:126px;font-size:13px}}
-</style></head><body><div id="view"></div><div class="top"><div class="eyebrow">ARMOUR OF GOD · STAGE 1</div><div class="title">Warrior Character Lab</div><div class="status" id="status">Preparing model viewer…</div></div><div class="note">Replacing the toy placeholder with a <span class="tag">high-detail rigged human anatomy mesh</span>. This is the body foundation only; the muscular warrior silhouette, fitted armour and combat rig are the next art pass. Drag to rotate the view.</div><div class="bottom"><button class="btn" id="front">FRONT VIEW</button><button class="btn" id="side">SIDE VIEW</button><button class="btn" id="back">BACK VIEW</button><button class="btn" id="reset">RESET</button></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script><script src="https://cdn.jsdelivr.net/npm/three@0.149.0/examples/js/loaders/GLTFLoader.js"></script>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080d13;color:#f3eee4;font-family:system-ui,-apple-system,Segoe UI,sans-serif}#view{position:fixed;inset:0}canvas{display:block;width:100%;height:100%}.top{position:fixed;z-index:3;top:0;left:0;right:0;padding:14px 16px;background:linear-gradient(#080d13ed,transparent);pointer-events:none}.eyebrow{font-size:10px;letter-spacing:.2em;color:#e0bd70;font-weight:900}.title{font-size:22px;font-weight:900}.status{font-size:12px;color:#b9c4d0;margin-top:3px}.note{position:fixed;z-index:3;top:98px;left:14px;right:14px;max-width:520px;font-size:12px;line-height:1.4;color:#d5dce3;pointer-events:none}.bottom{position:fixed;z-index:3;bottom:0;left:0;right:0;padding:14px;background:linear-gradient(transparent,#080d13f2);display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.btn{background:#1b2631;color:#f8f2e7;border:1px solid #74613c;border-radius:10px;padding:12px 16px;font-weight:800}.fallback{display:none;position:fixed;inset:0;align-items:center;justify-content:center;padding-top:55px}.cssman{position:relative;width:230px;height:430px;filter:drop-shadow(0 14px 18px #0009);transform:scale(.9)}.c-head{position:absolute;top:20px;left:85px;width:60px;height:68px;border-radius:46% 46% 43% 43%;background:#98613f;border:2px solid #4e3325}.c-helmet{position:absolute;top:8px;left:77px;width:76px;height:38px;border-radius:50% 50% 12% 12%;background:linear-gradient(90deg,#67421e,#d6ad58,#8c5b25);border:2px solid #e5c87e}.c-crest{position:absolute;top:-12px;left:108px;width:14px;height:26px;background:#d8b45e;clip-path:polygon(50% 0,100% 100%,0 100%)}.eye{position:absolute;top:47px;width:7px;height:5px;background:#15100d;border-radius:50%}.eye.l{left:98px}.eye.r{left:126px}.nose{position:absolute;top:49px;left:113px;width:7px;height:15px;background:#b67d55;clip-path:polygon(50% 0,100% 100%,0 100%)}.beard{position:absolute;top:67px;left:97px;width:37px;height:23px;background:#302019;clip-path:polygon(0 0,100% 0,78% 75%,50% 100%,22% 75%)}.neck{position:absolute;top:81px;left:103px;width:25px;height:27px;background:#98613f}.torso{position:absolute;top:96px;left:62px;width:106px;height:128px;background:linear-gradient(90deg,#253c59,#547eaa 45%,#243b57);clip-path:polygon(24% 0,76% 0,100% 15%,85% 100%,15% 100%,0 15%);border:2px solid #d6ad58}.chestline{position:absolute;top:124px;left:76px;width:78px;height:5px;background:#d6ad58;transform:rotate(-5deg);border-radius:4px}.belt{position:absolute;top:211px;left:65px;width:100px;height:15px;background:#3a261b;border:2px solid #b68a42}.buckle{position:absolute;top:211px;left:107px;width:17px;height:15px;background:#e2bd65;border:2px solid #7b5424}.shoulder{position:absolute;top:101px;width:48px;height:39px;border-radius:45%;background:linear-gradient(#d6ad58,#75481e);border:2px solid #f0d27c}.shoulder.l{left:28px;transform:rotate(-20deg)}.shoulder.r{left:154px;transform:rotate(20deg)}.arm{position:absolute;top:131px;width:28px;height:89px;border-radius:16px;background:linear-gradient(90deg,#76482e,#a8754d,#6b402a);border:2px solid #39291e}.arm.l{left:36px;transform:rotate(8deg)}.arm.r{left:166px;transform:rotate(-8deg)}.bracer{position:absolute;top:172px;width:33px;height:40px;background:linear-gradient(90deg,#593d24,#c29a4d,#72501f);border:2px solid #e0bd70;border-radius:8px}.bracer.l{left:32px;transform:rotate(8deg)}.bracer.r{left:165px;transform:rotate(-8deg)}.hand{position:absolute;top:212px;width:27px;height:31px;border-radius:40% 40% 45% 45%;background:#98613f;border:2px solid #4e3325}.hand.l{left:37px}.hand.r{left:166px}.thigh{position:absolute;top:220px;width:43px;height:94px;border-radius:16px;background:linear-gradient(90deg,#563a23,#b18a49,#63421f);border:2px solid #e0bd70}.thigh.l{left:69px}.thigh.r{left:119px}.shin{position:absolute;top:304px;width:34px;height:82px;border-radius:12px;background:linear-gradient(90deg,#4e3622,#9e7a3f,#54391f);border:2px solid #d0a34c}.shin.l{left:73px}.shin.r{left:123px}.foot{position:absolute;top:377px;width:49px;height:27px;border-radius:9px 15px 7px 7px;background:#38261b;border:2px solid #a17a3d}.foot.l{left:61px}.foot.r{left:119px}@media(min-width:700px){.title{font-size:28px}.note{top:112px;font-size:13px}.cssman{transform:scale(1.05)}}
+</style></head>
+<body><div id="view"></div>
+<div class="fallback" id="fallback"><div class="cssman"><div class="c-crest"></div><div class="c-helmet"></div><div class="c-head"></div><div class="eye l"></div><div class="eye r"></div><div class="nose"></div><div class="beard"></div><div class="neck"></div><div class="shoulder l"></div><div class="shoulder r"></div><div class="torso"></div><div class="chestline"></div><div class="belt"></div><div class="buckle"></div><div class="arm l"></div><div class="arm r"></div><div class="bracer l"></div><div class="bracer r"></div><div class="hand l"></div><div class="hand r"></div><div class="thigh l"></div><div class="thigh r"></div><div class="shin l"></div><div class="shin r"></div><div class="foot l"></div><div class="foot r"></div></div></div>
+<div class="top"><div class="eyebrow">ARMOUR OF GOD · STAGE 1</div><div class="title">Warrior Character Lab</div><div class="status" id="status">Building the warrior from built-in shapes…</div></div>
+<div class="note">Procedural warrior prototype — no external character model or model loader. Drag to rotate the 3D warrior when the 3D engine is available.</div>
+<div class="bottom"><button class="btn" id="front">FRONT</button><button class="btn" id="side">SIDE</button><button class="btn" id="back">BACK</button><button class="btn" id="reset">RESET</button></div>
 <script>
 (function(){
-const status=document.getElementById('status');
-if(!window.THREE){status.textContent='3D engine did not load. Open in Chrome and reload.';return}
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x080d13);scene.fog=new THREE.Fog(0x080d13,18,40);
-const camera=new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.1,100);camera.position.set(0,1.5,3.2);camera.lookAt(0,1.05,0);
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setSize(innerWidth,innerHeight);renderer.outputEncoding=THREE.sRGBEncoding;renderer.shadowMap.enabled=true;document.getElementById('view').appendChild(renderer.domElement);
-scene.add(new THREE.AmbientLight(0xffffff,1.2));
-scene.add(new THREE.HemisphereLight(0xc8d9ff,0x362a1b,1.1));
-const key=new THREE.DirectionalLight(0xffe4b2,1.8);key.position.set(5,10,5);key.castShadow=true;scene.add(key);
-const rim=new THREE.DirectionalLight(0x477fd0,2.2);rim.position.set(-5,4,-4);scene.add(rim);
-const floor=new THREE.Mesh(new THREE.CylinderGeometry(4.8,4.8,.25,64),new THREE.MeshStandardMaterial({color:0x30363d,roughness:.9,metalness:.08}));floor.position.y=-.14;floor.receiveShadow=true;scene.add(floor);
-const ring=new THREE.Mesh(new THREE.TorusGeometry(3.6,.035,8,80),new THREE.MeshStandardMaterial({color:0xc5a45d,metalness:.65,roughness:.4}));ring.rotation.x=Math.PI/2;ring.position.y=.005;scene.add(ring);
-const grid=new THREE.GridHelper(9,18,0x55504a,0x353b42);grid.position.y=.005;scene.add(grid);
-let model=null,mixer=null,clips=[],clock=new THREE.Clock(),targetYaw=0,dragging=false,lastX=0,autoRotate=true,fallbackObject=null;
-function ellipsoid(parent,x,y,z,sx,sy,sz,mat){const m=new THREE.Mesh(new THREE.SphereGeometry(1,20,14),mat);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
-function segment(parent,a,b,r1,r2,mat){const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),d=B.clone().sub(A);const m=new THREE.Mesh(new THREE.CylinderGeometry(r2,r1,d.length(),12,1),mat);m.position.copy(A).add(B).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());m.castShadow=true;parent.add(m);ellipsoid(parent,...a,r1,r1,r1,mat);ellipsoid(parent,...b,r2,r2,r2,mat);return m}
-function fallbackHumanoid(){const root=new THREE.Group();scene.add(root);
-const skin=new THREE.MeshStandardMaterial({color:0x98613f,roughness:.82}),darkSkin=new THREE.MeshStandardMaterial({color:0x70452f,roughness:.86}),bronze=new THREE.MeshStandardMaterial({color:0x8c6534,metalness:.68,roughness:.38}),gold=new THREE.MeshStandardMaterial({color:0xe0bd70,metalness:.72,roughness:.3}),cloth=new THREE.MeshStandardMaterial({color:0x263b4b,roughness:.8}),leather=new THREE.MeshStandardMaterial({color:0x3b2920,roughness:.92}),white=new THREE.MeshStandardMaterial({color:0xf0e7d4,roughness:.3}),black=new THREE.MeshStandardMaterial({color:0x161311,roughness:.7});
-ellipsoid(root,0,1.53,0,.29,.39,.19,cloth);ellipsoid(root,0,1.67,.015,.31,.24,.205,bronze);ellipsoid(root,0,1.67,.02,.285,.205,.195,cloth);
-for(const side of [-1,1]){ellipsoid(root,side*.35,1.79,0,.17,.13,.18,bronze);ellipsoid(root,side*.35,1.78,.02,.13,.105,.145,gold);segment(root,[side*.34,1.69,0],[side*.43,1.42,.015],.095,.075,skin);ellipsoid(root,side*.43,1.42,.015,.08,.08,.08,bronze);segment(root,[side*.43,1.42,.015],[side*.46,1.18,.06],.072,.052,skin);ellipsoid(root,side*.46,1.13,.09,.07,.085,.045,skin);ellipsoid(root,side*.46,1.22,.065,.073,.07,.06,bronze);
-segment(root,[side*.14,1.28,0],[side*.15,.87,0],.105,.085,cloth);ellipsoid(root,side*.15,.86,0,.095,.09,.09,bronze);segment(root,[side*.15,.86,0],[side*.16,.38,.025],.078,.055,skin);ellipsoid(root,side*.16,.61,.015,.082,.12,.075,bronze);ellipsoid(root,side*.16,.36,.055,.065,.055,.07,skin);ellipsoid(root,side*.16,.12,.13,.085,.09,.16,leather)}
-ellipsoid(root,0,1.97,0,.105,.13,.105,skin);ellipsoid(root,0,2.15,0,.19,.225,.17,skin);
-ellipsoid(root,-.072,2.17,.15,.027,.024,.016,white);ellipsoid(root,.072,2.17,.15,.027,.024,.016,white);ellipsoid(root,-.072,2.17,.165,.011,.015,.008,black);ellipsoid(root,.072,2.17,.165,.011,.015,.008,black);ellipsoid(root,0,2.12,.17,.035,.05,.035,skin);ellipsoid(root,0,2.055,.15,.075,.027,.025,darkSkin);ellipsoid(root,0,2.025,.145,.08,.038,.025,darkSkin);
-const helmet=ellipsoid(root,0,2.31,0,.205,.085,.19,bronze);ellipsoid(root,0,2.38,-.01,.035,.075,.035,gold);ellipsoid(root,0,2.21,.15,.13,.035,.03,bronze);
-ellipsoid(root,0,1.36,.02,.22,.09,.18,leather);ellipsoid(root,0,1.37,.19,.055,.055,.025,gold);
-return root}
-function loadFallback(reason){if(model)return;status.textContent='Model could not load ('+reason+'). Showing a visible diagnostic fallback instead.';if(fallbackObject)return;fallbackObject=new THREE.Group();scene.add(fallbackObject);const mat=new THREE.MeshStandardMaterial({color:0xd5ad58,metalness:.45,roughness:.4});const body=new THREE.Mesh(new THREE.BoxGeometry(.65,1.25,.35),mat);body.position.y=1.05;body.castShadow=true;fallbackObject.add(body);const head=new THREE.Mesh(new THREE.SphereGeometry(.23,18,12),mat);head.position.y=1.86;head.castShadow=true;fallbackObject.add(head);const limbMat=new THREE.MeshStandardMaterial({color:0x477fd0,wireframe:true});const marker=new THREE.Mesh(new THREE.BoxGeometry(1.25,2.25,.42),limbMat);marker.position.y=1.12;fallbackObject.add(marker);}
-if(THREE.GLTFLoader){const loader=new THREE.GLTFLoader();status.textContent='Loading the human model… this can take a little while on mobile data.';
-loader.load('https://www.innerscene.com/api/library/male-base-mesh-3d-person-rigged-a-pose-380e6d89/download',g=>{
-model=g.scene;scene.add(model);model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});const box=new THREE.Box3().setFromObject(model);const size=box.getSize(new THREE.Vector3());const center=box.getCenter(new THREE.Vector3());model.position.x=-center.x;model.position.z=-center.z;model.position.y=-box.min.y;const h=size.y||1;model.scale.setScalar(2.65/h);model.position.y=0;
-// Keep the armor overlay aligned to the normalized character. It remains separate from the rig until fit is verified.
-if(g.animations&&g.animations.length){mixer=new THREE.AnimationMixer(model);clips=g.animations;const idle=clips.find(c=>/idle/i.test(c.name))||clips[0];if(idle)mixer.clipAction(idle).play()}
-
-// Stage 1 armour overlay: separate, removable meshes fitted around the human base.
-const armourGroup=new THREE.Group(); scene.add(armourGroup);
-const bronzeMat=new THREE.MeshStandardMaterial({color:0x8a5526,metalness:.78,roughness:.3});
-const goldMat=new THREE.MeshStandardMaterial({color:0xd5ad58,metalness:.82,roughness:.24});
-const darkMat=new THREE.MeshStandardMaterial({color:0x252b30,metalness:.42,roughness:.58});
-const leatherMat=new THREE.MeshStandardMaterial({color:0x39251b,metalness:.08,roughness:.88});
-function plate(parent,geo,mat,pos,rot){const m=new THREE.Mesh(geo,mat);m.position.set(pos[0],pos[1],pos[2]);if(rot)m.rotation.set(rot[0],rot[1],rot[2]);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
-function armorBall(pos,scale,mat){return plate(armourGroup,new THREE.SphereGeometry(1,24,16),mat,pos,null).scale.set(scale[0],scale[1],scale[2])}
-// scale is set from the known 2.65m viewer height; armor is intentionally a separate art layer for safe tuning.
-armorBall([0,1.49,.02],[.36,.31,.23],darkMat);
-armorBall([0,1.52,.155],[.32,.25,.105],bronzeMat);
-plate(armourGroup,new THREE.BoxGeometry(.42,.045,.035),goldMat,[0,1.69,.225],[0,0,0]);
-plate(armourGroup,new THREE.BoxGeometry(.07,.20,.045),goldMat,[0,1.48,.26],[0,0,0]);
-armorBall([-.34,1.72,0],[.19,.13,.19],bronzeMat);armorBall([.34,1.72,0],[.19,.13,.19],bronzeMat);
-armorBall([-.34,1.735,.025],[.145,.085,.16],goldMat);armorBall([.34,1.735,.025],[.145,.085,.16],goldMat);
+const status=document.getElementById('status'),fallback=document.getElementById('fallback');
+function showFallback(msg){fallback.style.display='flex';status.textContent=msg+' Showing built-in warrior illustration instead.'}
+if(!window.THREE){showFallback('3D engine did not load.');return}
+try{
+const T=THREE,scene=new T.Scene();scene.background=new T.Color(0x080d13);
+const camera=new T.PerspectiveCamera(36,innerWidth/innerHeight,.1,100);camera.position.set(0,1.45,4.2);camera.lookAt(0,1.03,0);
+const renderer=new T.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setSize(innerWidth,innerHeight);renderer.outputEncoding=T.sRGBEncoding;document.getElementById('view').appendChild(renderer.domElement);
+scene.add(new T.AmbientLight(0xffffff,1.2));scene.add(new T.HemisphereLight(0xd7e5ff,0x44301d,.8));const light=new T.DirectionalLight(0xffe4b2,1.5);light.position.set(5,10,5);scene.add(light);const rim=new T.DirectionalLight(0x527fc4,1.4);rim.position.set(-4,4,-4);scene.add(rim);
+const floor=new T.Mesh(new T.CircleGeometry(4,48),new T.MeshStandardMaterial({color:0x252b31,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.04;scene.add(floor);const grid=new T.GridHelper(8,16,0x65563b,0x343b43);grid.position.y=-.025;scene.add(grid);
+const root=new T.Group();scene.add(root);
+const mat=(color,metalness=0,roughness=.65)=>new T.MeshStandardMaterial({color,metalness,roughness});
+const skin=mat(0x98613f,0,.8),skinLight=mat(0xb67d55,0,.78),beard=mat(0x302019,0,.9),armor=mat(0x31547b,.55,.35),bronze=mat(0x8d5c28,.72,.32),gold=mat(0xd9b45e,.8,.25),leather=mat(0x3b271b,.08,.88),dark=mat(0x1b2026,.25,.55),white=mat(0xf0e5d0,0,.35),black=mat(0x100d0b,0,.3);
+function mesh(geo,material,parent=root,pos=[0,0,0],scale=null){const m=new T.Mesh(geo,material);m.position.set(...pos);if(scale)m.scale.set(...scale);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
+function ball(pos,scale,material,parent=root){return mesh(new T.SphereGeometry(1,24,18),material,parent,pos,scale)}
+function limb(a,b,rA,rB,material,parent=root){const A=new T.Vector3(...a),B=new T.Vector3(...b),d=B.clone().sub(A);const m=mesh(new T.CylinderGeometry(rB,rA,d.length(),16,1),material,parent,A.clone().add(B).multiplyScalar(.5).toArray());m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.normalize());return m}
+function roundedBox(w,h,d,r,material,pos,parent=root){const g=new T.BoxGeometry(w,h,d,3,4,3);const m=mesh(g,material,parent,pos);return m}
+const body=new T.Group();root.add(body);
+ball([0,1.47,0],[.245,.34,.155],skin,body);ball([0,1.50,.035],[.26,.24,.17],armor,body);
+roundedBox(.45,.045,.035,.02,gold,[0,1.68,.18],body);roundedBox(.045,.19,.025,.01,gold,[0,1.49,.205],body);
+ball([-.255,1.62,0],[.15,.12,.145],bronze,body);ball([.255,1.62,0],[.15,.12,.145],bronze,body);
+ball([-.255,1.64,.02],[.115,.078,.14],gold,body);ball([.255,1.64,.02],[.115,.078,.14],gold,body);
+roundedBox(.34,.13,.20,.02,leather,[0,1.22,0],body);roundedBox(.49,.07,.21,.02,bronze,[0,1.25,.01],body);roundedBox(.075,.075,.035,.01,gold,[0,1.25,.13],body);
+limb([0,1.78,0],[0,1.9,0],.075,.075,skin,body);
+ball([0,2.00,.005],[.132,.155,.12],skin,body);
+ball([-.049,2.025,.105],[.022,.018,.012],white,body);ball([.049,2.025,.105],[.022,.018,.012],white,body);ball([-.049,2.025,.116],[.009,.012,.007],black,body);ball([.049,2.025,.116],[.009,.012,.007],black,body);
+ball([0,1.995,.12],[.022,.038,.022],skinLight,body);roundedBox(.085,.018,.018,.005,beard,[0,1.955,.115],body);ball([0,1.927,.105],[.052,.047,.035],beard,body);
+ball([0,2.105,0],[.145,.055,.132],bronze,body);ball([0,2.135,-.005],[.04,.07,.04],gold,body);roundedBox(.22,.028,.045,.01,gold,[0,2.065,.11],body);
 for(const side of [-1,1]){
- plate(armourGroup,new THREE.CylinderGeometry(.085,.07,.22,8),bronzeMat,[side*.43,1.29,.02],[0,0,side*.12]);
- plate(armourGroup,new THREE.CylinderGeometry(.064,.052,.24,8),darkMat,[side*.45,1.06,.035],[0,0,side*.04]);
- plate(armourGroup,new THREE.CylinderGeometry(.105,.095,.12,8),leatherMat,[side*.15,.96,.015],[0,0,side*.01]);
- plate(armourGroup,new THREE.CylinderGeometry(.078,.06,.25,8),bronzeMat,[side*.16,.48,.02],[0,0,side*.01]);
- plate(armourGroup,new THREE.CylinderGeometry(.065,.05,.19,8),goldMat,[side*.16,.32,.02],[0,0,side*.01]);
+// arms are joined directly into the shoulder plates; visible elbows separate upper and lower sections
+limb([side*.29,1.62,0],[side*.36,1.37,.015],.095,.075,skin,body);ball([side*.36,1.37,.015],[.075,.075,.075],bronze,body);
+limb([side*.36,1.37,.015],[side*.39,1.13,.04],.068,.052,skin,body);ball([side*.39,1.10,.06],[.06,.075,.045],skin,body);
+limb([side*.13,1.20,0],[side*.14,.87,0],.105,.082,skin,body);ball([side*.14,.86,.01],[.09,.08,.085],bronze,body);
+limb([side*.14,.86,.01],[side*.15,.49,.02],.078,.06,skin,body);ball([side*.15,.64,.025],[.084,.12,.075],bronze,body);
+limb([side*.15,.49,.02],[side*.15,.18,.04],.065,.052,skin,body);ball([side*.15,.35,.03],[.072,.10,.07],bronze,body);
+ball([side*.15,.09,.09],[.09,.065,.15],leather,body);
 }
-plate(armourGroup,new THREE.CylinderGeometry(.235,.22,.10,12),leatherMat,[0,1.27,0],[0,0,0]);
-plate(armourGroup,new THREE.BoxGeometry(.12,.11,.035),goldMat,[0,1.27,.23],[0,0,0]);
-armorBall([0,1.86,0],[.19,.055,.19],bronzeMat);
-armorBall([0,1.9,0],[.045,.07,.045],goldMat);
-status.textContent='Human base loaded · first bronze-and-gold armour fit added (static test; not yet rig-bound)';
-},undefined,e=>{console.error(e);loadFallback('model download failed')});setTimeout(()=>loadFallback('download timed out after 15 seconds'),15000);
-}else{loadFallback('model loader script did not load')}
-const ground=new THREE.Mesh(new THREE.CircleGeometry(1.1,48),new THREE.MeshStandardMaterial({color:0x171b20,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=.012;scene.add(ground);
-function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05);if(mixer)mixer.update(dt);if(autoRotate){targetYaw+=dt*.22}if(model)model.rotation.y+=(targetYaw-model.rotation.y)*.12;if(fallbackObject)fallbackObject.rotation.y+=(targetYaw-fallbackObject.rotation.y)*.12;renderer.render(scene,camera)}animate();
-function setView(yaw){targetYaw=yaw;autoRotate=true;camera.position.set(Math.sin(yaw)*3.2,1.5,Math.cos(yaw)*3.2);camera.lookAt(0,1.05,0)}
-document.getElementById('front').onclick=()=>setView(0);document.getElementById('side').onclick=()=>setView(Math.PI/2);document.getElementById('back').onclick=()=>setView(Math.PI);
-document.getElementById('reset').onclick=()=>{targetYaw=0;autoRotate=true;camera.position.set(0,1.5,3.2);camera.lookAt(0,1.05,0)};
-renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;renderer.domElement.setPointerCapture(e.pointerId)});renderer.domElement.addEventListener('pointermove',e=>{if(dragging){autoRotate=false;targetYaw+=(e.clientX-lastX)*.008;lastX=e.clientX}});renderer.domElement.addEventListener('pointerup',()=>dragging=false);renderer.domElement.addEventListener('pointercancel',()=>dragging=false);
+// Add chest plate edging and a central raised emblem
+roundedBox(.055,.22,.026,.01,gold,[0,1.49,.222],body);ball([0,1.56,.242],[.055,.07,.018],gold,body);
+// Slightly muscular chest overlays, attached directly to the torso
+ball([-.105,1.57,.18],[.14,.115,.06],armor,body);ball([.105,1.57,.18],[.14,.115,.06],armor,body);
+let yaw=0,auto=true,lastX=0,drag=false;const clock=new T.Clock();
+function view(a){yaw=a;auto=false;camera.position.set(Math.sin(a)*4.2,1.45,Math.cos(a)*4.2);camera.lookAt(0,1.03,0)}
+document.getElementById('front').onclick=()=>view(0);document.getElementById('side').onclick=()=>view(Math.PI/2);document.getElementById('back').onclick=()=>view(Math.PI);document.getElementById('reset').onclick=()=>{yaw=0;auto=true;camera.position.set(0,1.45,4.2);camera.lookAt(0,1.03,0)};
+renderer.domElement.addEventListener('pointerdown',e=>{drag=true;lastX=e.clientX;renderer.domElement.setPointerCapture(e.pointerId)});renderer.domElement.addEventListener('pointermove',e=>{if(drag){auto=false;yaw+=(e.clientX-lastX)*.008;lastX=e.clientX;root.rotation.y=yaw}});renderer.domElement.addEventListener('pointerup',()=>drag=false);renderer.domElement.addEventListener('pointercancel',()=>drag=false);
+status.textContent='Procedural 3D warrior ready · no character files or model loader';
+function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();if(auto){yaw=t*.18;root.rotation.y=yaw}body.scale.y=1+.008*Math.sin(t*2.2);body.rotation.z=.012*Math.sin(t*1.1);renderer.render(scene,camera)}animate();
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+}catch(e){console.error(e);showFallback('3D rendering unavailable.')}
 })();
-</script></body></html>
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js" onerror="document.getElementById('fallback').style.display='flex';document.getElementById('status').textContent='3D engine blocked; showing built-in warrior illustration.'"></script>
+</body></html>
