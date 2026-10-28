@@ -15,6 +15,7 @@
 <script type="module">
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {SkeletonUtils} from 'three/addons/utils/SkeletonUtils.js';
 const mount=document.querySelector('#view'), status=document.querySelector('#status'), loading=document.querySelector('#loading'), loadtext=document.querySelector('#loadtext');
 const scene=new THREE.Scene();scene.background=new THREE.Color('#080d13');scene.fog=new THREE.FogExp2('#080d13',.035);
 const camera=new THREE.PerspectiveCamera(37,innerWidth/innerHeight,.1,100);camera.position.set(0,1.75,5.8);
@@ -64,7 +65,7 @@ async function loadFighter(){
  const url='https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Soldier.glb';
  try{
   const gltf=await new GLTFLoader().loadAsync(url);
-  fighter=gltf.scene; enemy=gltf.scene.clone(true); enemy.rotation.y=Math.PI; enemy.position.x=1.15;
+  fighter=gltf.scene; enemy=SkeletonUtils.clone(gltf.scene); enemy.rotation.y=Math.PI; enemy.position.x=1.15;
   enemy.traverse(o=>{if(o.isMesh){o.frustumCulled=false;const old=o.material;const mats=Array.isArray(old)?old:[old];const tinted=mats.map(m=>{const c=m.clone();c.color.set('#7b3538');return c});o.material=Array.isArray(old)?tinted:tinted[0]}});
   const box=new THREE.Box3().setFromObject(fighter), size=box.getSize(new THREE.Vector3());
   const scale=1.82/Math.max(size.y,.01);fighter.scale.setScalar(scale);
