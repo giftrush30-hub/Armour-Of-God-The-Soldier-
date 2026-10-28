@@ -9,15 +9,15 @@
 const status=document.getElementById('status');
 if(!window.THREE){status.textContent='3D engine did not load. Open in Chrome and reload.';return}
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x080d13);scene.fog=new THREE.Fog(0x080d13,18,40);
-const camera=new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.1,100);camera.position.set(0,2.5,7.5);
+const camera=new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.1,100);camera.position.set(0,1.5,3.2);camera.lookAt(0,1.05,0);
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setSize(innerWidth,innerHeight);renderer.outputEncoding=THREE.sRGBEncoding;renderer.shadowMap.enabled=true;document.getElementById('view').appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xc8d9ff,0x362a1b,2));
-const key=new THREE.DirectionalLight(0xffe4b2,3);key.position.set(4,8,5);key.castShadow=true;scene.add(key);
+scene.add(new THREE.AmbientLight(0xffffff,1.2));\nscene.add(new THREE.HemisphereLight(0xc8d9ff,0x362a1b,1.1));
+const key=new THREE.DirectionalLight(0xffe4b2,1.8);key.position.set(5,10,5);key.castShadow=true;scene.add(key);
 const rim=new THREE.DirectionalLight(0x477fd0,2.2);rim.position.set(-5,4,-4);scene.add(rim);
 const floor=new THREE.Mesh(new THREE.CylinderGeometry(4.8,4.8,.25,64),new THREE.MeshStandardMaterial({color:0x30363d,roughness:.9,metalness:.08}));floor.position.y=-.14;floor.receiveShadow=true;scene.add(floor);
 const ring=new THREE.Mesh(new THREE.TorusGeometry(3.6,.035,8,80),new THREE.MeshStandardMaterial({color:0xc5a45d,metalness:.65,roughness:.4}));ring.rotation.x=Math.PI/2;ring.position.y=.005;scene.add(ring);
 const grid=new THREE.GridHelper(9,18,0x55504a,0x353b42);grid.position.y=.005;scene.add(grid);
-let model=null,mixer=null,clips=[],clock=new THREE.Clock(),targetYaw=0,dragging=false,lastX=0;
+let model=null,mixer=null,clips=[],clock=new THREE.Clock(),targetYaw=0,dragging=false,lastX=0,autoRotate=true,fallbackObject=null;
 function ellipsoid(parent,x,y,z,sx,sy,sz,mat){const m=new THREE.Mesh(new THREE.SphereGeometry(1,20,14),mat);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
 function segment(parent,a,b,r1,r2,mat){const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),d=B.clone().sub(A);const m=new THREE.Mesh(new THREE.CylinderGeometry(r2,r1,d.length(),12,1),mat);m.position.copy(A).add(B).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());m.castShadow=true;parent.add(m);ellipsoid(parent,...a,r1,r1,r1,mat);ellipsoid(parent,...b,r2,r2,r2,mat);return m}
 function fallbackHumanoid(){const root=new THREE.Group();scene.add(root);
@@ -30,8 +30,8 @@ ellipsoid(root,-.072,2.17,.15,.027,.024,.016,white);ellipsoid(root,.072,2.17,.15
 const helmet=ellipsoid(root,0,2.31,0,.205,.085,.19,bronze);ellipsoid(root,0,2.38,-.01,.035,.075,.035,gold);ellipsoid(root,0,2.21,.15,.13,.035,.03,bronze);
 ellipsoid(root,0,1.36,.02,.22,.09,.18,leather);ellipsoid(root,0,1.37,.19,.055,.055,.025,gold);
 return root}
-function loadFallback(reason){if(model)return;status.textContent='Opening the source model viewer because this phone/browser could not load the model directly ('+reason+').';const frame=document.createElement('iframe');frame.title='Rigged human base mesh 3D viewer';frame.src='https://www.innerscene.com/v/V0ZdMq61oT7IZ8LVA7ACZ';frame.allow='fullscreen';frame.style.cssText='position:fixed;inset:0;width:100%;height:100%;border:0;background:#080d13;z-index:1';document.getElementById('view').replaceChildren(frame);document.querySelector('.top').style.zIndex='3';document.querySelector('.bottom').style.zIndex='3';document.querySelector('.note').style.zIndex='3';}
-if(THREE.GLTFLoader){const loader=new THREE.GLTFLoader();status.textContent='Loading high-detail rigged human mesh (4.3 MB)…';
+function loadFallback(reason){if(model)return;status.textContent='Model could not load ('+reason+'). Showing a visible diagnostic fallback instead.';if(fallbackObject)return;fallbackObject=new THREE.Group();scene.add(fallbackObject);const mat=new THREE.MeshStandardMaterial({color:0xd5ad58,metalness:.45,roughness:.4});const body=new THREE.Mesh(new THREE.BoxGeometry(.65,1.25,.35),mat);body.position.y=1.05;body.castShadow=true;fallbackObject.add(body);const head=new THREE.Mesh(new THREE.SphereGeometry(.23,18,12),mat);head.position.y=1.86;head.castShadow=true;fallbackObject.add(head);const limbMat=new THREE.MeshStandardMaterial({color:0x477fd0,wireframe:true});const marker=new THREE.Mesh(new THREE.BoxGeometry(1.25,2.25,.42),limbMat);marker.position.y=1.12;fallbackObject.add(marker);}
+if(THREE.GLTFLoader){const loader=new THREE.GLTFLoader();status.textContent='Loading the human model… this can take a little while on mobile data.';
 loader.load('https://www.innerscene.com/api/library/male-base-mesh-3d-person-rigged-a-pose-380e6d89/download',g=>{
 model=g.scene;scene.add(model);model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});const box=new THREE.Box3().setFromObject(model);const size=box.getSize(new THREE.Vector3());const center=box.getCenter(new THREE.Vector3());model.position.x=-center.x;model.position.z=-center.z;model.position.y=-box.min.y;const h=size.y||1;model.scale.setScalar(2.65/h);model.position.y=0;\n// Keep the armor overlay aligned to the normalized character. It remains separate from the rig until fit is verified.\narmourGroup.position.set(0,0,0);
 if(g.animations&&g.animations.length){mixer=new THREE.AnimationMixer(model);clips=g.animations;const idle=clips.find(c=>/idle/i.test(c.name))||clips[0];if(idle)mixer.clipAction(idle).play()}
@@ -63,14 +63,14 @@ plate(armourGroup,new THREE.BoxGeometry(.12,.11,.035),goldMat,[0,1.27,.23],[0,0,
 armorBall([0,1.86,0],[.19,.055,.19],bronzeMat);
 armorBall([0,1.9,0],[.045,.07,.045],goldMat);
 status.textContent='Human base loaded · first bronze-and-gold armour fit added (static test; not yet rig-bound)';
-},undefined,e=>{console.error(e);loadFallback('model download failed')});setTimeout(()=>loadFallback('download timed out'),5000);
+},undefined,e=>{console.error(e);loadFallback('model download failed')});setTimeout(()=>loadFallback('download timed out after 15 seconds'),15000);
 }else{loadFallback('model loader script did not load')}
 const ground=new THREE.Mesh(new THREE.CircleGeometry(1.1,48),new THREE.MeshStandardMaterial({color:0x171b20,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=.012;scene.add(ground);
-function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05);if(mixer)mixer.update(dt);if(model)model.rotation.y+= (targetYaw-model.rotation.y)*.12;renderer.render(scene,camera)}animate();
-function setView(yaw){targetYaw=yaw;camera.position.set(Math.sin(yaw)*7.5,2.35,Math.cos(yaw)*7.5);camera.lookAt(0,1.25,0)}
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05);if(mixer)mixer.update(dt);if(autoRotate){targetYaw+=dt*.22}if(model)model.rotation.y+=(targetYaw-model.rotation.y)*.12;if(fallbackObject)fallbackObject.rotation.y+=(targetYaw-fallbackObject.rotation.y)*.12;renderer.render(scene,camera)}animate();
+function setView(yaw){targetYaw=yaw;autoRotate=true;camera.position.set(Math.sin(yaw)*3.2,1.5,Math.cos(yaw)*3.2);camera.lookAt(0,1.05,0)}
 document.getElementById('front').onclick=()=>setView(0);document.getElementById('side').onclick=()=>setView(Math.PI/2);document.getElementById('back').onclick=()=>setView(Math.PI);
-document.getElementById('reset').onclick=()=>{targetYaw=0;camera.position.set(0,2.5,7.5);camera.lookAt(0,1.25,0)};
-renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;renderer.domElement.setPointerCapture(e.pointerId)});renderer.domElement.addEventListener('pointermove',e=>{if(dragging){targetYaw+=(e.clientX-lastX)*.008;lastX=e.clientX}});renderer.domElement.addEventListener('pointerup',()=>dragging=false);renderer.domElement.addEventListener('pointercancel',()=>dragging=false);
+document.getElementById('reset').onclick=()=>{targetYaw=0;autoRotate=true;camera.position.set(0,1.5,3.2);camera.lookAt(0,1.05,0)};
+renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;renderer.domElement.setPointerCapture(e.pointerId)});renderer.domElement.addEventListener('pointermove',e=>{if(dragging){autoRotate=false;targetYaw+=(e.clientX-lastX)*.008;lastX=e.clientX}});renderer.domElement.addEventListener('pointerup',()=>dragging=false);renderer.domElement.addEventListener('pointercancel',()=>dragging=false);
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 })();
 </script></body></html>
