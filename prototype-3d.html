@@ -11,6 +11,8 @@
 <script>
 (function(){
 const status=document.getElementById('status'),world=document.getElementById('world');
+window.addEventListener('error',function(e){if(status)status.textContent='Game error: '+(e.message||'graphics startup failed')+' (reload once)';});
+window.addEventListener('unhandledrejection',function(e){if(status)status.textContent='Game loading error: '+String(e.reason||'unknown error');});
 if(!window.THREE){status.textContent='3D engine could not download. Check connection and reload.';return}
 const T=THREE,scene=new T.Scene();scene.background=new T.Color('#111a26');scene.fog=new T.Fog('#111a26',15,34);
 const camera=new T.PerspectiveCamera(42,innerWidth/innerHeight,.1,100);camera.position.set(0,3.4,8.7);
