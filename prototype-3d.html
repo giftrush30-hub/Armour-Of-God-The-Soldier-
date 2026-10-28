@@ -11,6 +11,49 @@
 <body><div id="view"></div>
 <div class="top"><div><div class="brand">ARMOUR OF GOD · DEVELOPMENT BUILD</div><div class="headline">The Soldier — 3D Combat Lab</div><div id="status" class="status">Preparing the 3D scene…</div></div><div class="pill">PROTOTYPE 01</div></div>
 <div class="battlehud"><div><div class="healthlabel">YOUR VITALITY</div><div class="health"><i id="playerHealth"></i></div></div><div style="text-align:right"><div class="healthlabel" id="enemyLabel">MOUNTAIN OPPONENT</div><div class="health enemyhealth"><i id="enemyHealth"></i></div></div></div><div id="loading" class="loading"><div><div class="spinner"></div><strong>BUILDING THE 3D BATTLEFIELD</strong><p id="loadtext">Loading a rigged 3D soldier with built-in animation clips…</p></div></div>
+<script>
+/* Emergency mobile fallback: this runs even if Three.js or its module imports never load. */
+(function(){
+ let shown=false;
+ function emergency(){
+  if(shown||!document.getElementById('loading')||document.getElementById('loading').classList.contains('hide'))return;
+  shown=true;
+  const c=document.createElement('canvas');c.id='emergency-fallback';c.style.cssText='position:fixed;inset:0;width:100%;height:100%;z-index:3;pointer-events:none';
+  document.body.insertBefore(c,document.querySelector('.bottom'));
+  const ctx=c.getContext('2d');
+  function draw(){
+   const dpr=Math.min(window.devicePixelRatio||1,1.5),w=innerWidth,h=innerHeight;c.width=w*dpr;c.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+   const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#101a27');g.addColorStop(1,'#080d13');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+   ctx.strokeStyle='#343d46';ctx.lineWidth=1;for(let i=0;i<12;i++){ctx.beginPath();ctx.moveTo(w/2-230+i*42,h*.72);ctx.lineTo(w/2+(i-5.5)*100,h*.91);ctx.stroke()}
+   function warrior(x,y,flip,red){
+    ctx.save();ctx.translate(x,y);ctx.scale(flip?-1:1,1);
+    const armor=red?'#7b3538':'#526575',gold='#c7a65c',skin='#986d50';
+    ctx.fillStyle=skin;ctx.beginPath();ctx.arc(0,-100,17,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=gold;ctx.fillRect(-17,-119,34,7);
+    ctx.fillStyle=armor;ctx.beginPath();ctx.moveTo(-23,-80);ctx.lineTo(23,-80);ctx.lineTo(29,-35);ctx.lineTo(-29,-35);ctx.closePath();ctx.fill();
+    ctx.fillStyle=gold;ctx.fillRect(-25,-76,50,5);ctx.fillRect(-24,-40,48,5);
+    ctx.strokeStyle=armor;ctx.lineWidth=13;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(-20,-74);ctx.lineTo(-40,-47);ctx.lineTo(-47,-24);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(20,-74);ctx.lineTo(39,-58);ctx.lineTo(45,-39);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(-13,-35);ctx.lineTo(-17,-7);ctx.lineTo(-20,18);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(13,-35);ctx.lineTo(20,-7);ctx.lineTo(24,18);ctx.stroke();
+    ctx.fillStyle='#171e25';ctx.fillRect(-33,16,25,7);ctx.fillRect(12,16,25,7);
+    ctx.restore();
+   }
+   ctx.fillStyle='#a98a4e';ctx.beginPath();ctx.ellipse(w/2,h*.78,Math.min(w*.32,180),18,0,0,Math.PI*2);ctx.stroke();
+   warrior(w*.34,h*.68,false,false);warrior(w*.68,h*.68,true,true);
+  }
+  draw();window.addEventListener('resize',draw);
+  document.getElementById('loading').classList.add('hide');
+  const st=document.getElementById('status');if(st)st.textContent='Offline-safe battle view · reconnect or reload to try the full 3D model';
+  const lt=document.getElementById('loadtext');if(lt)lt.textContent='The 3D engine did not start in time. A lightweight battle view is shown instead.';
+ }
+ window.setTimeout(emergency,8000);
+ window.addEventListener('error',function(e){if(e&&e.message&&/module|three|import/i.test(e.message))emergency()});
+ window.addEventListener('unhandledrejection',function(){emergency()});
+ window.__clearEmergency=function(){shown=true;const c=document.getElementById('emergency-fallback');if(c)c.remove()};
+})();
+</script>
 <div class="bottom"><div class="verse" aria-live="polite"><strong id="verseTitle">WORD FOR THE BATTLE</strong><span id="verseText">“Be strong in the Lord, and in the power of his might.” — Ephesians 6:10</span></div><div id="battlemsg" class="battlemsg">Your first trial awaits. Strike, defend, and endure.</div><div class="hint">Tap an action to fight · drag to orbit · scroll to zoom</div><div class="controls"><button data-action="guard">GUARD</button><button data-action="punch">PUNCH</button><button data-action="kick">KICK</button><button class="special" data-action="power">SCRIPTURE POWER</button></div><div class="foot">Prototype sandbox — separate from the live game until tested.</div></div>
 <script type="module">
 import * as THREE from 'three';
@@ -92,6 +135,7 @@ async function loadFighter(){
   loadtext.textContent='The online soldier model could not load. A built-in fighter is shown so you can still enter the battle.';
  }
  loading.classList.add('hide');
+  if(window.__clearEmergency)window.__clearEmergency();
 }
 let currentAction='guard';
 const verses={guard:['STAND FIRM','“Put on the whole armour of God.” — Ephesians 6:11'],punch:['COURAGE TO ADVANCE','“Be strong and of a good courage.” — Joshua 1:9'],kick:['THE BATTLE IS THE LORD’S','“The battle is the LORD’s.” — 1 Samuel 17:47'],power:['SCRIPTURE POWER','“The sword of the Spirit, which is the word of God.” — Ephesians 6:17']};
