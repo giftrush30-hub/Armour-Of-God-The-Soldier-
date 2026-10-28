@@ -11,6 +11,7 @@
 <div class="top"><div class="eyebrow">ARMOUR OF GOD · STAGE 1</div><div class="title">Warrior Character Lab</div><div class="status" id="status">Building the warrior from built-in shapes…</div></div>
 <div class="note">Procedural warrior prototype — no external character model or model loader. Drag to rotate the 3D warrior when the 3D engine is available.</div>
 <div class="bottom"><button class="btn" id="front">FRONT</button><button class="btn" id="side">SIDE</button><button class="btn" id="back">BACK</button><button class="btn" id="reset">RESET</button></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js" onerror="document.getElementById('fallback').style.display='flex';document.getElementById('status').textContent='3D engine blocked; showing built-in warrior illustration.'"></script>
 <script>
 (function(){
 const status=document.getElementById('status'),fallback=document.getElementById('fallback');
@@ -63,5 +64,4 @@ addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updat
 }catch(e){console.error(e);showFallback('3D rendering unavailable.')}
 })();
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js" onerror="document.getElementById('fallback').style.display='flex';document.getElementById('status').textContent='3D engine blocked; showing built-in warrior illustration.'"></script>
 </body></html>
