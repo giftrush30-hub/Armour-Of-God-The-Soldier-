@@ -63,8 +63,15 @@ async function loadFighter(){
  status.textContent='Loading rigged 3D soldier and motion clips…';
  // Three.js example Soldier.glb is a public, MIT-licensed rigged character with Idle, Walk and Run clips.
  const url='https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Soldier.glb';
+ // Give slow mobile connections a visible timeout, and try a second official CDN if GitHub raw is blocked.
+ const loadWithTimeout=(src,ms)=>Promise.race([new GLTFLoader().loadAsync(src),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Model download timed out')),ms))]);
  try{
-  const gltf=await new GLTFLoader().loadAsync(url);
+  let gltf;
+  try{gltf=await loadWithTimeout(url,12000)}catch(firstError){
+   status.textContent='Trying an alternate model source…';
+   loadtext.textContent='The first model source did not respond. Trying a backup source; this may take a moment.';
+   gltf=await loadWithTimeout('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r169/examples/models/gltf/Soldier.glb',12000);
+  }
   fighter=gltf.scene; enemy=SkeletonUtils.clone(gltf.scene); enemy.rotation.y=Math.PI; enemy.position.x=1.15;
   enemy.traverse(o=>{if(o.isMesh){o.frustumCulled=false;const old=o.material;const mats=Array.isArray(old)?old:[old];const tinted=mats.map(m=>{const c=m.clone();c.color.set('#7b3538');return c});o.material=Array.isArray(old)?tinted:tinted[0]}});
   const box=new THREE.Box3().setFromObject(fighter), size=box.getSize(new THREE.Vector3());
@@ -78,8 +85,11 @@ async function loadFighter(){
   status.textContent='3D trial ready · defeat the opponent';
  }catch(e){
   console.warn('Rigged character could not load; displaying local 3D fallback.',e);
-  fighter=buildFallback();status.textContent='3D scene active · fallback model shown (external mesh unavailable)';
-  loadtext.textContent='The external model could not load on this connection, so a local 3D fallback is shown.';
+  fighter=buildFallback();fighter.position.x=-1.15;
+  enemy=buildFallback();enemy.position.x=1.15;enemy.rotation.y=Math.PI;
+  enemy.traverse(o=>{if(o.isMesh){const m=o.material.clone();m.color.set('#7b3538');o.material=m}});
+  status.textContent='3D scene active · local fallback fighters';
+  loadtext.textContent='The online soldier model could not load. A built-in fighter is shown so you can still enter the battle.';
  }
  loading.classList.add('hide');
 }
