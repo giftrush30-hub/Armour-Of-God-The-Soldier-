@@ -33,9 +33,36 @@ return root}
 function loadFallback(reason){if(model)return;status.textContent='Opening the source model viewer because this phone/browser could not load the model directly ('+reason+').';const frame=document.createElement('iframe');frame.title='Rigged human base mesh 3D viewer';frame.src='https://www.innerscene.com/v/V0ZdMq61oT7IZ8LVA7ACZ';frame.allow='fullscreen';frame.style.cssText='position:fixed;inset:0;width:100%;height:100%;border:0;background:#080d13;z-index:1';document.getElementById('view').replaceChildren(frame);document.querySelector('.top').style.zIndex='3';document.querySelector('.bottom').style.zIndex='3';document.querySelector('.note').style.zIndex='3';}
 if(THREE.GLTFLoader){const loader=new THREE.GLTFLoader();status.textContent='Loading high-detail rigged human mesh (4.3 MB)…';
 loader.load('https://www.innerscene.com/api/library/male-base-mesh-3d-person-rigged-a-pose-380e6d89/download',g=>{
-model=g.scene;scene.add(model);model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});const box=new THREE.Box3().setFromObject(model);const size=box.getSize(new THREE.Vector3());const center=box.getCenter(new THREE.Vector3());model.position.x=-center.x;model.position.z=-center.z;model.position.y=-box.min.y;const h=size.y||1;model.scale.setScalar(2.65/h);model.position.y=0;
+model=g.scene;scene.add(model);model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});const box=new THREE.Box3().setFromObject(model);const size=box.getSize(new THREE.Vector3());const center=box.getCenter(new THREE.Vector3());model.position.x=-center.x;model.position.z=-center.z;model.position.y=-box.min.y;const h=size.y||1;model.scale.setScalar(2.65/h);model.position.y=0;\n// Keep the armor overlay aligned to the normalized character. It remains separate from the rig until fit is verified.\narmourGroup.position.set(0,0,0);
 if(g.animations&&g.animations.length){mixer=new THREE.AnimationMixer(model);clips=g.animations;const idle=clips.find(c=>/idle/i.test(c.name))||clips[0];if(idle)mixer.clipAction(idle).play()}
-status.textContent='High-detail human anatomy mesh loaded · '+(clips.length?clips.length+' animation clips':'rigged skeleton present; combat animations not yet added');
+
+// Stage 1 armour overlay: separate, removable meshes fitted around the human base.
+const armourGroup=new THREE.Group(); scene.add(armourGroup);
+const bronzeMat=new THREE.MeshStandardMaterial({color:0x8a5526,metalness:.78,roughness:.3});
+const goldMat=new THREE.MeshStandardMaterial({color:0xd5ad58,metalness:.82,roughness:.24});
+const darkMat=new THREE.MeshStandardMaterial({color:0x252b30,metalness:.42,roughness:.58});
+const leatherMat=new THREE.MeshStandardMaterial({color:0x39251b,metalness:.08,roughness:.88});
+function plate(parent,geo,mat,pos,rot){const m=new THREE.Mesh(geo,mat);m.position.set(pos[0],pos[1],pos[2]);if(rot)m.rotation.set(rot[0],rot[1],rot[2]);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
+function armorBall(pos,scale,mat){return plate(armourGroup,new THREE.SphereGeometry(1,24,16),mat,pos,null).scale.set(scale[0],scale[1],scale[2])}
+// scale is set from the known 2.65m viewer height; armor is intentionally a separate art layer for safe tuning.
+armorBall([0,1.49,.02],[.36,.31,.23],darkMat);
+armorBall([0,1.52,.155],[.32,.25,.105],bronzeMat);
+plate(armourGroup,new THREE.BoxGeometry(.42,.045,.035),goldMat,[0,1.69,.225],[0,0,0]);
+plate(armourGroup,new THREE.BoxGeometry(.07,.20,.045),goldMat,[0,1.48,.26],[0,0,0]);
+armorBall([-.34,1.72,0],[.19,.13,.19],bronzeMat);armorBall([.34,1.72,0],[.19,.13,.19],bronzeMat);
+armorBall([-.34,1.735,.025],[.145,.085,.16],goldMat);armorBall([.34,1.735,.025],[.145,.085,.16],goldMat);
+for(const side of [-1,1]){
+ plate(armourGroup,new THREE.CylinderGeometry(.085,.07,.22,8),bronzeMat,[side*.43,1.29,.02],[0,0,side*.12]);
+ plate(armourGroup,new THREE.CylinderGeometry(.064,.052,.24,8),darkMat,[side*.45,1.06,.035],[0,0,side*.04]);
+ plate(armourGroup,new THREE.CylinderGeometry(.105,.095,.12,8),leatherMat,[side*.15,.96,.015],[0,0,side*.01]);
+ plate(armourGroup,new THREE.CylinderGeometry(.078,.06,.25,8),bronzeMat,[side*.16,.48,.02],[0,0,side*.01]);
+ plate(armourGroup,new THREE.CylinderGeometry(.065,.05,.19,8),goldMat,[side*.16,.32,.02],[0,0,side*.01]);
+}
+plate(armourGroup,new THREE.CylinderGeometry(.235,.22,.10,12),leatherMat,[0,1.27,0],[0,0,0]);
+plate(armourGroup,new THREE.BoxGeometry(.12,.11,.035),goldMat,[0,1.27,.23],[0,0,0]);
+armorBall([0,1.86,0],[.19,.055,.19],bronzeMat);
+armorBall([0,1.9,0],[.045,.07,.045],goldMat);
+status.textContent='Human base loaded · first bronze-and-gold armour fit added (static test; not yet rig-bound)';
 },undefined,e=>{console.error(e);loadFallback('model download failed')});setTimeout(()=>loadFallback('download timed out'),5000);
 }else{loadFallback('model loader script did not load')}
 const ground=new THREE.Mesh(new THREE.CircleGeometry(1.1,48),new THREE.MeshStandardMaterial({color:0x171b20,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=.012;scene.add(ground);
