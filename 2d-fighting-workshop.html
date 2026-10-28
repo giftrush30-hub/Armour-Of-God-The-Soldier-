@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Armour of God — 2D Combat Workshop</title>
+<style>
+:root{color-scheme:dark;--gold:#e8bd63;--ink:#0b1018;--panel:#171e29;--muted:#a9b5c6}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#080c12;color:#f6f2e8;font-family:system-ui,-apple-system,Segoe UI,sans-serif}body{padding:14px}
+main{max-width:1100px;margin:auto}.top{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px}.brand{font-size:clamp(19px,4vw,29px);font-weight:900;letter-spacing:.03em}.brand span{color:var(--gold)}.sub{color:var(--muted);font-size:13px;margin-top:3px}
+.pill{border:1px solid #475164;border-radius:999px;padding:7px 11px;font-size:12px;color:#dbe2ec}
+.stage{position:relative;border:1px solid #374154;border-radius:16px;overflow:hidden;background:#101722;box-shadow:0 18px 50px #0008}
+canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;touch-action:none}
+.hud{position:absolute;left:3%;right:3%;top:5%;display:flex;align-items:center;gap:12px;pointer-events:none}.fighterhud{width:42%;min-width:0}.fighterhud.right{text-align:right;margin-left:auto}.name{font-weight:900;font-size:clamp(10px,2vw,15px);letter-spacing:.07em;text-shadow:0 2px 5px #000}.bar{height:clamp(8px,1.7vw,15px);background:#292f3c;border:1px solid #b3a07877;border-radius:4px;overflow:hidden;margin-top:5px}.fill{height:100%;width:100%;background:linear-gradient(90deg,#9a3028,#f1bd5d);transition:width .16s}.right .fill{margin-left:auto;background:linear-gradient(90deg,#f1bd5d,#9a3028)}.round{font-weight:900;color:var(--gold);font-size:clamp(10px,1.8vw,14px);white-space:nowrap;text-shadow:0 2px 5px #000}
+.verse{position:absolute;left:50%;bottom:5%;transform:translateX(-50%);width:88%;text-align:center;color:#ffe7a7;font-size:clamp(10px,1.8vw,15px);font-weight:750;text-shadow:0 2px 6px #000;pointer-events:none}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.btn{border:1px solid #4a5669;border-radius:10px;background:#1a2330;color:#f5f0e6;padding:10px 13px;font-weight:750;cursor:pointer}.btn:active,.btn.active{background:#6f4d20;border-color:var(--gold)}.btn.gold{background:#a8792e;color:#130e06;border-color:#e8bd63}
+.controls{display:grid;grid-template-columns:1.1fr 1fr;gap:12px}.panel{background:var(--panel);border:1px solid #303b4c;border-radius:14px;padding:13px}.panel h2{font-size:14px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin:0 0 10px}.pad{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.control{min-height:47px;border-radius:10px;background:#252f3e;border:1px solid #48566a;color:#fff;font-weight:800;font-size:14px;touch-action:manipulation}.control.attack{background:#593126;border-color:#a45b40}.control.guard{background:#244338;border-color:#4b8d70}.hint{color:var(--muted);font-size:12px;line-height:1.55}.status{font-size:13px;line-height:1.5;margin-top:8px;color:#e3e8f0}.footer{margin:12px 2px 4px;color:#7f8da2;font-size:11px}
+@media(max-width:640px){body{padding:8px}.controls{grid-template-columns:1fr}.panel{padding:10px}.control{min-height:43px}.pill{font-size:10px}.hud{gap:6px}.round{font-size:9px}}
+</style>
+</head>
+<body><main>
+<header class="top"><div><div class="brand">ARMOUR OF GOD <span> / 2D WORKSHOP</span></div><div class="sub">Side-view combat lab · built for phone screens · 3D work preserved separately</div></div><div class="pill">WORKSHOP BUILD 01 · NOT THE MAIN CAMPAIGN</div></header>
+<section class="stage" aria-label="2D fighting game preview">
+<canvas id="game" width="960" height="540" aria-label="Side view combat arena"></canvas>
+<div class="hud"><div class="fighterhud"><div class="name">THE SOLDIER</div><div class="bar"><div id="pbar" class="fill"></div></div></div><div class="round">ROUND 1</div><div class="fighterhud right"><div class="name">SHADOW WARRIOR</div><div class="bar"><div id="ebar" class="fill"></div></div></div></div>
+<div class="verse" id="verse">“Be strong in the Lord, and in the power of his might.” — Ephesians 6:10</div>
+</section>
+<div class="toolbar"><button class="btn gold" id="reset">↻ Restart fight</button><button class="btn" id="pause">Ⅱ Pause</button><button class="btn" id="ai">Enemy: Training</button><button class="btn" id="sound">Sound: Off</button></div>
+<section class="controls">
+<div class="panel"><h2>Soldier controls</h2><div class="pad">
+<button class="control" data-act="left">← LEFT</button><button class="control" data-act="jump">↑ JUMP</button><button class="control" data-act="right">RIGHT →</button>
+<button class="control attack" data-act="punch">✊ PUNCH</button><button class="control guard" data-act="block">🛡 BLOCK</button><button class="control attack" data-act="kick">🦵 KICK</button>
+</div><p class="hint">Touch the buttons or use keyboard: ← → move · ↑ jump · A punch · S kick · D block. Keep distance, then time your strikes.</p></div>
+<div class="panel"><h2>Workshop notes</h2><div class="hint">This is the first 2D-only prototype. The fighters face sideways, so no camera rotation or 3D model loading is required. This build tests movement, hit timing, health, blocking, enemy response and Scripture encouragement before we add polished character sprite art.</div><div class="status" id="status">Ready. Move the Soldier and try a punch or kick.</div></div>
+</section>
+<div class="footer">Development workshop only. Main campaign remains untouched. 3D Character Workshop and model work are retained for a future upgrade.</div>
+</main>
+<script>
+(()=>{'use strict';
+const c=document.getElementById('game'),ctx=c.getContext('2d'),pbar=document.getElementById('pbar'),ebar=document.getElementById('ebar'),verse=document.getElementById('verse'),status=document.getElementById('status');
+const W=960,H=540,FLOOR=448;
+let paused=false,enemyAI=false,sound=false,last=performance.now(),tick=0,flash=0,roundOver=false;
+const words=[
+['“Be strong in the Lord, and in the power of his might.”','Ephesians 6:10'],
+['“Above all, taking the shield of faith.”','Ephesians 6:16'],
+['“The Lord is my strength and my shield.”','Psalm 28:7'],
+['“No weapon that is formed against thee shall prosper.”','Isaiah 54:17'],
+['“The battle is the Lord’s.”','1 Samuel 17:47'],
+['“Watch ye, stand fast in the faith, quit you like men, be strong.”','1 Corinthians 16:13']
+];
+const player={x:235,y:FLOOR,vx:0,vy:0,hp:100,face:1,act:'idle',timer:0,cd:0,block:false,jump:false,hit:false,kind:'player'};
+const enemy={x:700,y:FLOOR,vx:0,vy:0,hp:100,face:-1,act:'idle',timer:0,cd:0,block:false,jump:false,hit:false,kind:'enemy'};
+function say(s){status.textContent=s}
+function scripture(){const w=words[Math.floor(Math.random()*words.length)];verse.textContent=w[0]+' — '+w[1]}
+function reset(){Object.assign(player,{x:235,y:FLOOR,vx:0,vy:0,hp:100,face:1,act:'idle',timer:0,cd:0,block:false,jump:false,hit:false});Object.assign(enemy,{x:700,y:FLOOR,vx:0,vy:0,hp:100,face:-1,act:'idle',timer:0,cd:0,block:false,jump:false,hit:false});roundOver=false;paused=false;document.getElementById('pause').textContent='Ⅱ Pause';verse.textContent='“Be strong in the Lord, and in the power of his might.” — Ephesians 6:10';say('Fight restarted. The Soldier is ready.');updateBars()}
+function updateBars(){pbar.style.width=Math.max(0,player.hp)+'%';ebar.style.width=Math.max(0,enemy.hp)+'%'}
+function startAct(f,a){if(paused||roundOver)return;if(f.cd>0&&a!=='block')return;f.act=a;f.timer=a==='punch'?.25:a==='kick'?.38:a==='hit'?.22:a==='jump'?.42:a==='block'?.12:.2;if(a==='punch'||a==='kick'){f.cd=a==='punch'?.38:.58;f.hit=false;if(f===player){say(a==='punch'?'Quick punch!':'Heavy kick!');} }}
+function attack(f,o,damage,range){if(f.hit||f.timer<.10)return;const dx=(o.x-f.x)*f.face;if(dx>0&&dx<range&&Math.abs(o.y-f.y)<75){f.hit=true;if(o.block&&o.face===-f.face){damage=Math.max(1,Math.round(damage*.16));say('Guard held! The strike was mostly blocked.')}else{say(f===player?'Clean hit! Keep your guard up.':'The Soldier was struck — block or move away.');o.act='hit';o.timer=.22;flash=0.12;}o.hp=Math.max(0,o.hp-damage);updateBars();if(f===player)scripture();if(o.hp<=0){roundOver=true;verse.textContent=f===player?'“The battle is the Lord’s.” — 1 Samuel 17:47':'“The Lord is my strength and my shield.” — Psalm 28:7';say(f===player?'Victory! The Soldier stands firm. Press Restart to train again.':'The Soldier has fallen. Restart and try blocking or timing attacks.')}}}
+function step(f,o,dt){f.cd=Math.max(0,f.cd-dt);f.timer=Math.max(0,f.timer-dt);if(f.timer===0&&!['idle','walk'].includes(f.act)){f.act='idle';f.block=false}if(f.act==='punch')attack(f,o,7,112);if(f.act==='kick')attack(f,o,12,140);if(f.act==='jump'&&f.y>=FLOOR){f.vy=-500;f.jump=true}f.vy+=1100*dt;f.y+=f.vy*dt;if(f.y>=FLOOR){f.y=FLOOR;f.vy=0;f.jump=false}f.x+=f.vx*dt;f.x=Math.max(90,Math.min(870,f.x));f.vx*=Math.pow(.001,dt);if(f===player)f.face=player.x<enemy.x?1:-1;else f.face=enemy.x<player.x?1:-1;}
+function drawBackdrop(){let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#111a2a');g.addColorStop(.62,'#263044');g.addColorStop(1,'#111720');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ctx.save();ctx.globalAlpha=.24;for(let i=0;i<7;i++){let x=i*165+30;ctx.fillStyle=i%2?'#9a7541':'#7e8ba0';ctx.beginPath();ctx.moveTo(x-38,300);ctx.lineTo(x,180+(i%3)*25);ctx.lineTo(x+45,300);ctx.fill();ctx.fillRect(x-33,300,66,100)}ctx.restore();
+ctx.fillStyle='#0b111b';ctx.fillRect(0,FLOOR,W,H-FLOOR);ctx.strokeStyle='#c59b54';ctx.lineWidth=2;ctx.globalAlpha=.55;ctx.beginPath();ctx.moveTo(0,FLOOR);ctx.lineTo(W,FLOOR);ctx.stroke();ctx.globalAlpha=1;
+for(let x=0;x<W;x+=80){ctx.strokeStyle='#657087';ctx.globalAlpha=.12;ctx.beginPath();ctx.moveTo(x,FLOOR);ctx.lineTo(x+25,H);ctx.stroke()}ctx.globalAlpha=1;
+ctx.fillStyle='#d7b36b';ctx.globalAlpha=.12;ctx.beginPath();ctx.arc(480,190,105,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
+function rounded(x,y,w,h,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
+function limb(x1,y1,x2,y2,width,color){ctx.strokeStyle='#211c1a';ctx.lineWidth=width+4;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
+function drawFighter(f){ctx.save();ctx.translate(Math.round(f.x),Math.round(f.y-(f.jump?0:0)));ctx.scale(f.face,1);
+let moving=f.act==='walk'||Math.abs(f.vx)>15,att=f.act==='punch'||f.act==='kick',guard=f.block||f.act==='block',hurt=f.act==='hit',t=tick;
+ctx.globalAlpha=.28;ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(0,0,48,9,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+// rear leg and boot
+let stride=moving?Math.sin(t*13)*11:0;
+limb(-8,-48,-19+stride,-18,15,'#49392e');limb(-19+stride,-18,-25+stride,-4,13,'#202630');rounded(-38+stride,-8,25,8,3,'#11151b');
+// near leg
+limb(10,-48,19-stride,-18,17,'#624431');limb(19-stride,-18,26-stride,-4,14,'#28313b');rounded(17-stride,-8,28,8,3,'#11151b');
+// torso shape
+ctx.fillStyle=f.kind==='player'?'#432c22':'#262b37';ctx.strokeStyle='#0b0e13';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-20,-116);ctx.quadraticCurveTo(-30,-101,-23,-70);ctx.lineTo(-15,-47);ctx.lineTo(16,-47);ctx.lineTo(26,-76);ctx.lineTo(22,-105);ctx.lineTo(11,-119);ctx.closePath();ctx.fill();ctx.stroke();
+// chest armour plates
+ctx.fillStyle=f.kind==='player'?'#7d633f':'#545d6c';ctx.beginPath();ctx.moveTo(-17,-111);ctx.lineTo(0,-105);ctx.lineTo(17,-111);ctx.lineTo(13,-82);ctx.lineTo(0,-73);ctx.lineTo(-13,-82);ctx.closePath();ctx.fill();ctx.stroke();
+ctx.strokeStyle='#e3c17b';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-11,-101);ctx.lineTo(0,-94);ctx.lineTo(11,-101);ctx.stroke();
+// belt
+rounded(-20,-62,40,9,2,'#171b22');rounded(-5,-64,10,12,2,'#d4ae5e');
+// arms
+limb(-18,-108,-30,-86,13,'#704c36');limb(-30,-86,-23,-67,12,'#704c36');rounded(-30,-72,15,12,4,'#4a382b');
+let punchX=guard?18:att&&f.act==='punch'?56:8,punchY=guard?-96:att&&f.act==='punch'?-94:-78;
+limb(17,-107,27,-88,14,'#704c36');limb(27,-88,punchX,punchY,13,'#704c36');rounded(punchX-5,punchY-5,17,13,5,'#242a32');
+if(att&&f.act==='kick'){limb(7,-48,34,-31,16,'#704c36');limb(34,-31,73,-29,13,'#202630');rounded(65,-34,24,9,3,'#11151b')}
+else limb(8,-48,10+stride,-18,15,'#624431');
+// neck and head
+rounded(-7,-130,15,18,4,'#704c36');ctx.fillStyle='#603e2c';ctx.strokeStyle='#0b0e13';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(1,-143,17,21,-.08,0,Math.PI*2);ctx.fill();ctx.stroke();
+// hair / head wrap
+ctx.fillStyle=f.kind==='player'?'#17191d':'#161a24';ctx.beginPath();ctx.moveTo(-15,-149);ctx.quadraticCurveTo(-8,-171,9,-162);ctx.quadraticCurveTo(20,-160,17,-146);ctx.lineTo(8,-153);ctx.lineTo(-5,-154);ctx.closePath();ctx.fill();
+// eye + beard
+ctx.fillStyle='#f2d4a5';ctx.fillRect(8,-146,4,3);ctx.fillStyle='#211a17';ctx.beginPath();ctx.moveTo(-7,-135);ctx.lineTo(9,-135);ctx.lineTo(8,-128);ctx.lineTo(-1,-125);ctx.closePath();ctx.fill();
+if(f.kind==='player'){ctx.strokeStyle='#d8b66e';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,-100,25,-2.7,-.4);ctx.stroke()}
+if(hurt){ctx.globalAlpha=.18;ctx.fillStyle='#ff554d';ctx.fillRect(-36,-170,110,170)}
+ctx.restore()}
+function render(now){const dt=Math.min(.032,(now-last)/1000||.016);last=now;if(!paused&&!roundOver){tick+=dt*7;step(player,enemy,dt);if(enemyAI){if(enemy.cd<=0&&Math.abs(enemy.x-player.x)<125){startAct(enemy,Math.random()<.55?'punch':'kick')}else if(Math.abs(enemy.x-player.x)>145){enemy.vx+=(player.x>enemy.x?1:-1)*65;enemy.act='walk'}else if(Math.random()<.02){enemy.block=true;enemy.act='block'}}step(enemy,player,dt);if(enemy.act==='block')enemy.block=true;}drawBackdrop();drawFighter(player);drawFighter(enemy);if(flash>0){ctx.fillStyle='#ffb46a';ctx.globalAlpha=flash*1.8;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;flash-=dt}requestAnimationFrame(render)}
+function move(dir,on){if(roundOver)return;player.vx=on?dir*230:player.vx;if(on){player.act='walk';player.block=false}}
+document.querySelectorAll('[data-act]').forEach(b=>{const a=b.dataset.act;const down=e=>{e.preventDefault();if(a==='left'||a==='right'){move(a==='left'?-1:1,true);b.classList.add('active')}else if(a==='block'){player.block=true;player.act='block';b.classList.add('active')}else if(a==='jump'){if(player.y>=FLOOR-1)startAct(player,'jump')}else startAct(player,a)};const up=e=>{e.preventDefault();if(a==='left'||a==='right'){if((a==='left'&&player.vx<0)||(a==='right'&&player.vx>0))player.vx=0;b.classList.remove('active')}if(a==='block'){player.block=false;if(player.act==='block')player.act='idle';b.classList.remove('active')}};b.addEventListener('pointerdown',down);['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,up))});
+window.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp',' '].includes(e.key))e.preventDefault();if(e.repeat)return;if(e.key==='ArrowLeft')move(-1,true);if(e.key==='ArrowRight')move(1,true);if(e.key==='ArrowUp'||e.key===' ')startAct(player,'jump');if(e.key.toLowerCase()==='a')startAct(player,'punch');if(e.key.toLowerCase()==='s')startAct(player,'kick');if(e.key.toLowerCase()==='d'){player.block=true;player.act='block'}});window.addEventListener('keyup',e=>{if(e.key==='ArrowLeft'&&player.vx<0)player.vx=0;if(e.key==='ArrowRight'&&player.vx>0)player.vx=0;if(e.key.toLowerCase()==='d'){player.block=false;if(player.act==='block')player.act='idle'}});
+document.getElementById('reset').onclick=reset;document.getElementById('pause').onclick=()=>{paused=!paused;document.getElementById('pause').textContent=paused?'▶ Resume':'Ⅱ Pause';say(paused?'Training paused.':'Training resumed.')};document.getElementById('ai').onclick=()=>{enemyAI=!enemyAI;document.getElementById('ai').textContent='Enemy: '+(enemyAI?'Active':'Training');say(enemyAI?'Enemy AI enabled. Watch for attacks.':'Enemy returned to training mode.')};document.getElementById('sound').onclick=()=>{sound=!sound;document.getElementById('sound').textContent='Sound: '+(sound?'On':'Off');say(sound?'Sound toggle is a placeholder for a later audio pass.':'Sound off.')};
+requestAnimationFrame(render);
+})();
+</script></body></html>
