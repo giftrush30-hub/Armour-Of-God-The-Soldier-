@@ -14,9 +14,9 @@ footer{position:fixed;z-index:2;bottom:0;left:0;right:0;text-align:center;paddin
 </style>
 </head>
 <body>
-<div id="view"></div><div id="controls"><button id="poseBtn" disabled>Checking animation support…</button><button id="stanceBtn" disabled>Preparing safe stance test…</button></div>
-<header><div class="eyebrow">ARMOUR OF GOD: THE SOLDIER</div><div class="title">Human Mesh Test — Part 10</div><div id="status" class="status">Loading character and animation options…</div></header>
-<footer>Isolated test page · Rig-axis diagnosis · Main campaign unchanged</footer>
+<div id="view"></div><div id="controls"><button id="poseBtn" disabled>Checking animation support…</button><button id="stanceBtn" disabled>Preparing lowered-arm pose…</button><button id="resetBtn" disabled>Reset original pose</button></div>
+<header><div class="eyebrow">ARMOUR OF GOD: THE SOLDIER</div><div class="title">Human Mesh Test — Part 11</div><div id="status" class="status">Loading character and animation options…</div></header>
+<footer>Isolated test page · Reusable lowered-arm pose · Main campaign unchanged</footer>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.module.js"}}
 </script>
@@ -24,7 +24,7 @@ footer{position:fixed;z-index:2;bottom:0;left:0;right:0;text-align:center;paddin
 import * as THREE from "three";
 import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.149.0/examples/jsm/loaders/GLTFLoader.js";
 (function(){
-const status=document.getElementById('status'),host=document.getElementById('view'),stanceBtn=document.getElementById('stanceBtn');
+const status=document.getElementById('status'),host=document.getElementById('view'),stanceBtn=document.getElementById('stanceBtn'),resetBtn=document.getElementById('resetBtn');
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x080d13);
 scene.fog=new THREE.Fog(0x080d13,8,22);
 const camera=new THREE.PerspectiveCamera(35,innerWidth/innerHeight,.1,100);camera.position.set(3.6,2.7,6.8);camera.lookAt(0,1,0);
@@ -52,24 +52,13 @@ loader.load(modelURL,function(gltf){
  const lowerL=boneMap['lowerarm_l']||boneMap['lowerarm.l']||boneMap['leftlowerarm'];
  const lowerR=boneMap['lowerarm_r']||boneMap['lowerarm.r']||boneMap['rightlowerarm'];
  [[upperL,0],[upperR,0],[lowerL,0],[lowerR,0]].forEach(([b])=>{if(b)stanceBones.push({bone:b,original:b.quaternion.clone()})});
- let poseMode=0;
- const applyPose=(mode)=>{
-   stanceBones.forEach(item=>item.bone.quaternion.copy(item.original));
-   if(mode>0){
-     const axis=mode===1?new THREE.Vector3(1,0,0):mode===2?new THREE.Vector3(0,1,0):new THREE.Vector3(0,0,1);
-     stanceBones.forEach(item=>{
-       const isLeft=item.bone.name.toLowerCase().includes('_l')||item.bone.name.toLowerCase().includes('.l');
-       const sign=isLeft?-1:1;
-       const angle=(item.bone.name.toLowerCase().includes('lowerarm')?0.20:0.72)*sign;
-       item.bone.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(axis,angle));
-     });
-   }
-   model.updateMatrixWorld(true);
- };
+ const applyLoweredPose=()=>{stanceBones.forEach(item=>{item.bone.quaternion.copy(item.original);const isLeft=item.bone.name.toLowerCase().includes('_l')||item.bone.name.toLowerCase().includes('.l');const sign=isLeft?-1:1;const angle=(item.bone.name.toLowerCase().includes('lowerarm')?0.20:0.72)*sign;item.bone.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),angle));});model.updateMatrixWorld(true);};
+ const resetPose=()=>{stanceBones.forEach(item=>item.bone.quaternion.copy(item.original));model.updateMatrixWorld(true);status.textContent='Original T-pose restored. Main campaign remains unchanged.';};
  if(upperL&&upperR){
-   stanceBtn.disabled=false;stanceBtn.textContent='Try pose A (axis X)';
-   stanceBtn.onclick=()=>{poseMode=poseMode>=3?0:poseMode+1;applyPose(poseMode);stanceBtn.textContent=poseMode===0?'Try pose A (axis X)':poseMode===1?'Try pose B (axis Y)':poseMode===2?'Try pose C (axis Z)':'Reset original pose';status.textContent=poseMode===0?'Original pose restored.':('Rig-axis test '+String.fromCharCode(64+poseMode)+' applied. Compare whether both arms lower; use the button again to compare another axis.');if(poseMode===3){poseMode=0;stanceBtn.textContent='Try pose A (axis X)'}};
- }else{stanceBtn.disabled=true;stanceBtn.textContent='Arm joint names need mapping';}
+   stanceBtn.disabled=false;resetBtn.disabled=false;stanceBtn.textContent='Apply lowered-arm pose';
+   stanceBtn.onclick=()=>{applyLoweredPose();status.textContent='Lowered-arm pose applied using the axis that produced the promising result. This is a starting stance, not a finished fighting animation.';};
+   resetBtn.onclick=resetPose;
+ }else{stanceBtn.disabled=true;resetBtn.disabled=true;stanceBtn.textContent='Arm joint names need mapping';}
  const clipNames=clips.length?clips.map(a=>a.name||'(unnamed)').slice(0,5).join(', '):'none bundled';
  if(clips.length){
    mixer=new THREE.AnimationMixer(model);
