@@ -26,7 +26,7 @@ function mesh(parent,geo,mat,pos,scale,rot){const o=new T.Mesh(geo,mat);o.positi
 function limb(parent,mat,r1,r2,len){return mesh(parent,new T.CylinderGeometry(r1,r2,len,12,1),mat,[0,-len/2,0])}
 function joint(parent,mat,pos,scale){return mesh(parent,sph,mat,pos,scale)}
 function makeWarrior(isEnemy){
- const root=new T.Group();scene.add(root);root.position.set(isEnemy?1.55:-1.55,0,0);root.rotation.y=isEnemy?-Math.PI*.28:Math.PI*.12;
+ const root=new T.Group();scene.add(root);root.position.set(isEnemy?1.55:-1.55,0,0);root.rotation.y=isEnemy?-Math.PI*.45:Math.PI/2;
  const rig=new T.Group();root.add(rig);
  // Feet, articulated legs, thighs, knees, greaves and boots
  const legs=[];
@@ -44,14 +44,14 @@ function makeWarrior(isEnemy){
  }
  // Torso: waist, broad rib cage, chest plates and shoulder silhouette
  const torso=new T.Group();torso.position.y=1.38;rig.add(torso);
- joint(torso,cloth,[0,.02,0],[.32,.31,.19]);joint(torso,cloth,[0,.29,0],[.43,.35,.22]);
+ joint(torso,cloth,[0,.02,0],[.29,.28,.17]);joint(torso,cloth,[0,.29,0],[.38,.32,.19]);
  mesh(torso,new T.BoxGeometry(.58,.12,.31),leather,[0,-.17,0]);
  mesh(torso,new T.BoxGeometry(.66,.10,.29),gold,[0,-.12,.012]);
  // overlapping breastplate panels, centre ridge and etched trim
- mesh(torso,new T.SphereGeometry(1,20,16),steel,[0,.26,.015],[.39,.32,.22]);
+ mesh(torso,new T.SphereGeometry(1,20,16),steel,[0,.26,.015],[.35,.29,.19]);
  mesh(torso,new T.BoxGeometry(.08,.47,.035),gold,[0,.26,.229]);
  for(const side of [-1,1]){
-  mesh(torso,new T.SphereGeometry(1,16,12),darkSteel,[side*.19,.32,.18],[.19,.18,.09],[0,0,side*-.18]);
+  mesh(torso,new T.SphereGeometry(1,16,12),darkSteel,[side*.17,.32,.16],[.16,.15,.075],[0,0,side*-.18]);
   mesh(torso,new T.BoxGeometry(.22,.045,.035),gold,[side*.18,.14,.235],[1,1,1],[0,0,side*.22]);
  }
  mesh(torso,new T.BoxGeometry(.53,.11,.29),leather,[0,-.02,0]);
@@ -59,9 +59,10 @@ function makeWarrior(isEnemy){
  // Neck and head with face, ears, hair/beard, brow and helmet
  const neck=joint(torso,skin,[0,.57,0],[.105,.13,.105]);
  const head=new T.Group();head.position.set(0,.75,.015);torso.add(head);
- joint(head,skinLight,[0,0,0],[.155,.205,.145]);
- joint(head,skin,[0,-.11,.11],[.105,.08,.075]);
- for(const side of [-1,1]){joint(head,skin,[side*.158,.015,0],[.035,.06,.035]);mesh(head,new T.BoxGeometry(.065,.022,.025),leather,[side*.065,.055,.132]);}
+ joint(head,skinLight,[0,0,0],[.145,.19,.135]);
+ joint(head,skin,[0,-.105,.09],[.09,.065,.065]);
+ for(const side of [-1,1]){joint(head,skin,[side*.145,.005,0],[.03,.05,.03]);joint(head,darkSteel,[side*.052,.035,.119],[.021,.015,.012]);joint(head,skin,[side*.052,.055,.12],[.035,.009,.014]);}
+ joint(head,skin,[0,.005,.132],[.025,.035,.025]);mesh(head,new T.BoxGeometry(.065,.012,.012),leather,[0,-.055,.145]);
  joint(head,leather,[0,.135,-.005],[.16,.095,.15]);
  mesh(head,new T.SphereGeometry(1,16,12),steel,[0,.12,.005],[.17,.12,.16]);
  mesh(head,new T.BoxGeometry(.37,.045,.22),gold,[0,.09,.09]);
@@ -72,7 +73,7 @@ function makeWarrior(isEnemy){
  const arms=[];
  for(const side of [-1,1]){
   const shoulder=new T.Group();shoulder.position.set(side*.43,.34,0);torso.add(shoulder);
-  joint(shoulder,steel,[0,0,0],[.18,.18,.18]);mesh(shoulder,new T.SphereGeometry(1,16,12),gold,[0,.015,.08],[.16,.13,.15]);
+  joint(shoulder,steel,[0,0,0],[.145,.15,.145]);mesh(shoulder,new T.SphereGeometry(1,16,12),gold,[0,.015,.055],[.12,.105,.105]);
   limb(shoulder,cloth,.12,.16,.32);shoulder.children[2].position.y=-.19;
   const elbow=new T.Group();elbow.position.y=-.37;shoulder.add(elbow);joint(elbow,steel,[0,0,0],[.12,.12,.12]);
   limb(elbow,steel,.085,.12,.29);elbow.children[1].position.y=-.16;
@@ -95,7 +96,7 @@ function makeWarrior(isEnemy){
  return {root,rig,torso,head,legs,arms,sword,cape,halo,isEnemy,phase:0,act:'idle',actTime:0,hp:100};
 }
 const player=makeWarrior(false),enemy=makeWarrior(true);if(enemy){enemy.root.traverse(o=>{if(o.isMesh&&o.material!==gold&&o.material!==skin&&o.material!==skinLight&&o.material!==leather){o.material=o.material.clone();if(o.material.color)o.material.color.lerp(new T.Color('#7d2e37'),.45)}})}
-let playerHP=100,enemyHP=100,keys={},runHeld=false,guarding=false,camYaw=0,camZoom=8.7,drag=null,last=performance.now(),enemyTimer=0;
+let playerHP=100,enemyHP=100,keys={},runHeld=false,guarding=false,camYaw=0,camZoom=5.9,drag=null,last=performance.now(),enemyTimer=0;
 const vtitle=document.getElementById('vtitle'),vtext=document.getElementById('vtext'),msg=document.getElementById('msg');
 const words={guard:['STAND FIRM','“Put on the whole armour of God.” — Ephesians 6:11'],punch:['COURAGE TO ADVANCE','“Be strong and of a good courage.” — Joshua 1:9'],kick:['THE BATTLE IS THE LORD’S','“The battle is the LORD’s.” — 1 Samuel 17:47'],power:['SWORD OF THE SPIRIT','“The sword of the Spirit, which is the word of God.” — Ephesians 6:17']};
 function say(k){vtitle.textContent=words[k][0];vtext.textContent=words[k][1]}
@@ -109,15 +110,15 @@ function action(k){if(enemyHP<=0||playerHP<=0){playerHP=enemyHP=100;document.get
 say(k);player.act=k;player.actTime=0;guarding=k==='guard';if(k==='punch'||k==='kick'||k==='power'){const d=k==='power'?26:k==='kick'?17:13;enemyHP=Math.max(0,enemyHP-d);enemy.hp=enemyHP;document.getElementById('ehp').style.width=enemyHP+'%';enemy.root.position.x+=.1;msg.textContent=k==='power'?'Scripture power drives the darkness back.':k==='kick'?'The kick lands!':'The punch lands!';if(enemyHP===0)msg.textContent='VICTORY — The battle is the LORD’S!'}else msg.textContent='Guard raised — brace yourself.'}
 document.querySelectorAll('[data-act]').forEach(b=>b.addEventListener('click',()=>action(b.dataset.act)));
 document.querySelectorAll('[data-move]').forEach(b=>{const k=b.dataset.move;b.addEventListener('pointerdown',e=>{e.preventDefault();keys[k]=true;b.classList.add('active');b.setPointerCapture(e.pointerId)});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>b.addEventListener(ev,()=>{keys[k]=false;b.classList.remove('active')}))});
-renderer.domElement.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,yaw:camYaw};renderer.domElement.setPointerCapture(e.pointerId)});renderer.domElement.addEventListener('pointermove',e=>{if(drag){camYaw=drag.yaw+(e.clientX-drag.x)*.008}});renderer.domElement.addEventListener('pointerup',()=>drag=null);renderer.domElement.addEventListener('pointercancel',()=>drag=null);
+renderer.domElement.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,yaw:camYaw};renderer.domElement.setPointerCapture(e.pointerId)});renderer.domElement.addEventListener('pointermove',e=>{if(drag){camYaw=T.MathUtils.clamp(drag.yaw+(e.clientX-drag.x)*.006,-1.1,1.1)}});renderer.domElement.addEventListener('pointerup',()=>drag=null);renderer.domElement.addEventListener('pointercancel',()=>drag=null);
 renderer.domElement.addEventListener('wheel',e=>{camZoom=T.MathUtils.clamp(camZoom+e.deltaY*.008,5,12)},{passive:true});
 function loop(now){requestAnimationFrame(loop);const dt=Math.min((now-last)/1000,.05);last=now;
 let dx=0,dz=0;if(keys.forward)dz-=1;if(keys.back)dz+=1;if(keys.left)dx-=1;if(keys.right)dx+=1;const moving=!!(dx||dz),running=!!keys.run;const speed=running?2.65:1.35;
-if(moving){const n=Math.hypot(dx,dz);dx/=n;dz/=n;player.root.position.x+=dx*speed*dt;player.root.position.z+=dz*speed*dt;player.root.position.x=T.MathUtils.clamp(player.root.position.x,-4,4);player.root.position.z=T.MathUtils.clamp(player.root.position.z,-3,3);player.root.rotation.y=Math.atan2(dx,dz)+Math.PI}
+if(moving){const n=Math.hypot(dx,dz);dx/=n;dz/=n;player.root.position.x+=dx*speed*dt;player.root.position.z+=dz*speed*dt;player.root.position.x=T.MathUtils.clamp(player.root.position.x,-4,4);player.root.position.z=T.MathUtils.clamp(player.root.position.z,-3,3);player.root.rotation.y=T.MathUtils.dampAngle(player.root.rotation.y,Math.atan2(dx,dz),8,dt)}
 if(keys.turnleft)player.root.rotation.y+=dt*1.8;if(keys.turnright)player.root.rotation.y-=dt*1.8;
 pose(player,dt,now,moving,running);pose(enemy,dt,now,false,false);
 enemyTimer+=dt;if(enemyTimer>3.2&&enemyHP>0&&playerHP>0){enemyTimer=0;playerHP=Math.max(0,playerHP-(guarding?3:8));document.getElementById('php').style.width=playerHP+'%';if(playerHP===0)msg.textContent='You have fallen. Tap an action to rise and try again.';else if(!guarding)msg.textContent='The opponent counters — guard to reduce damage.'}
-const target=new T.Vector3(player.root.position.x*.35,1.2,0);camera.position.set(target.x+Math.sin(camYaw)*camZoom*.45,3.2+camZoom*.12,target.z+Math.cos(camYaw)*camZoom);camera.lookAt(target);renderer.render(scene,camera)}
+const yaw=player.root.rotation.y+camYaw;const forwardX=Math.sin(yaw),forwardZ=Math.cos(yaw);const target=new T.Vector3(player.root.position.x+forwardX*1.0,1.45,player.root.position.z+forwardZ*1.0);const desired=new T.Vector3(player.root.position.x-forwardX*camZoom,2.7,player.root.position.z-forwardZ*camZoom);camera.position.lerp(desired,1-Math.exp(-5*dt));camera.lookAt(target);renderer.render(scene,camera)}
 status.textContent='3D engine running · articulated warriors · movement and combat enabled';requestAnimationFrame(loop);
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setSize(innerWidth,innerHeight)});
 })();
