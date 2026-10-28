@@ -11,7 +11,8 @@ if(!window.THREE){status.textContent='3D engine did not load. Open in Chrome and
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x080d13);scene.fog=new THREE.Fog(0x080d13,18,40);
 const camera=new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.1,100);camera.position.set(0,1.5,3.2);camera.lookAt(0,1.05,0);
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setSize(innerWidth,innerHeight);renderer.outputEncoding=THREE.sRGBEncoding;renderer.shadowMap.enabled=true;document.getElementById('view').appendChild(renderer.domElement);
-scene.add(new THREE.AmbientLight(0xffffff,1.2));\nscene.add(new THREE.HemisphereLight(0xc8d9ff,0x362a1b,1.1));
+scene.add(new THREE.AmbientLight(0xffffff,1.2));
+scene.add(new THREE.HemisphereLight(0xc8d9ff,0x362a1b,1.1));
 const key=new THREE.DirectionalLight(0xffe4b2,1.8);key.position.set(5,10,5);key.castShadow=true;scene.add(key);
 const rim=new THREE.DirectionalLight(0x477fd0,2.2);rim.position.set(-5,4,-4);scene.add(rim);
 const floor=new THREE.Mesh(new THREE.CylinderGeometry(4.8,4.8,.25,64),new THREE.MeshStandardMaterial({color:0x30363d,roughness:.9,metalness:.08}));floor.position.y=-.14;floor.receiveShadow=true;scene.add(floor);
@@ -33,7 +34,8 @@ return root}
 function loadFallback(reason){if(model)return;status.textContent='Model could not load ('+reason+'). Showing a visible diagnostic fallback instead.';if(fallbackObject)return;fallbackObject=new THREE.Group();scene.add(fallbackObject);const mat=new THREE.MeshStandardMaterial({color:0xd5ad58,metalness:.45,roughness:.4});const body=new THREE.Mesh(new THREE.BoxGeometry(.65,1.25,.35),mat);body.position.y=1.05;body.castShadow=true;fallbackObject.add(body);const head=new THREE.Mesh(new THREE.SphereGeometry(.23,18,12),mat);head.position.y=1.86;head.castShadow=true;fallbackObject.add(head);const limbMat=new THREE.MeshStandardMaterial({color:0x477fd0,wireframe:true});const marker=new THREE.Mesh(new THREE.BoxGeometry(1.25,2.25,.42),limbMat);marker.position.y=1.12;fallbackObject.add(marker);}
 if(THREE.GLTFLoader){const loader=new THREE.GLTFLoader();status.textContent='Loading the human model… this can take a little while on mobile data.';
 loader.load('https://www.innerscene.com/api/library/male-base-mesh-3d-person-rigged-a-pose-380e6d89/download',g=>{
-model=g.scene;scene.add(model);model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});const box=new THREE.Box3().setFromObject(model);const size=box.getSize(new THREE.Vector3());const center=box.getCenter(new THREE.Vector3());model.position.x=-center.x;model.position.z=-center.z;model.position.y=-box.min.y;const h=size.y||1;model.scale.setScalar(2.65/h);model.position.y=0;\n// Keep the armor overlay aligned to the normalized character. It remains separate from the rig until fit is verified.\narmourGroup.position.set(0,0,0);
+model=g.scene;scene.add(model);model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});const box=new THREE.Box3().setFromObject(model);const size=box.getSize(new THREE.Vector3());const center=box.getCenter(new THREE.Vector3());model.position.x=-center.x;model.position.z=-center.z;model.position.y=-box.min.y;const h=size.y||1;model.scale.setScalar(2.65/h);model.position.y=0;
+// Keep the armor overlay aligned to the normalized character. It remains separate from the rig until fit is verified.
 if(g.animations&&g.animations.length){mixer=new THREE.AnimationMixer(model);clips=g.animations;const idle=clips.find(c=>/idle/i.test(c.name))||clips[0];if(idle)mixer.clipAction(idle).play()}
 
 // Stage 1 armour overlay: separate, removable meshes fitted around the human base.
