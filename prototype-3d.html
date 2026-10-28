@@ -6,7 +6,7 @@
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080d13;color:#eee;font-family:system-ui,-apple-system,Segoe UI,sans-serif}#view{position:fixed;inset:0}canvas{display:block;width:100%;height:100%;touch-action:none}.top{z-index:2;position:fixed;top:0;left:0;right:0;padding:14px 16px;display:flex;justify-content:space-between;align-items:flex-start;background:linear-gradient(#070a10dc,transparent);pointer-events:none}.brand{font-size:11px;letter-spacing:.2em;color:#c9a968;font-weight:800}.headline{font-size:18px;font-weight:800;margin-top:3px}.status{font-size:11px;color:#b9c1ca;margin-top:5px;max-width:70vw}.pill{border:1px solid #8b7446;color:#e5c98a;border-radius:99px;padding:7px 10px;font-size:10px;letter-spacing:.1em;background:#15130f99}.bottom{z-index:2;position:fixed;bottom:0;left:0;right:0;padding:12px 12px max(14px,env(safe-area-inset-bottom));background:linear-gradient(transparent,#070a10f5 26%)}.hint{text-align:center;font-size:11px;color:#aeb6c0;margin-bottom:10px}.controls{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:700px;margin:auto}.controls button{min-height:50px;border:1px solid #45515e;border-radius:10px;background:linear-gradient(#202a35,#111820);color:#f4f0e8;font-size:12px;font-weight:750;letter-spacing:.03em;touch-action:manipulation}.controls button:active{transform:scale(.97);border-color:#d0b16d;background:#342b1c}.controls .special{border-color:#967b42;color:#f1d99c}.battlehud{z-index:2;position:fixed;top:88px;left:12px;right:12px;display:flex;justify-content:space-between;gap:16px;pointer-events:none}.health{width:42%;max-width:300px;background:#171b20;border:1px solid #6e624b;height:10px;border-radius:3px;overflow:hidden}.health i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#4e9d67,#a9e2a2);transition:width .18s}.enemyhealth i{background:linear-gradient(90deg,#9e2634,#f06a66)}.healthlabel{font-size:9px;color:#e3d7be;letter-spacing:.12em;margin-bottom:4px}.battlemsg{font-size:10px;color:#e6c87f;text-align:center;min-height:14px;margin:4px 0 8px}.verse{max-width:700px;margin:0 auto 10px;padding:10px 12px;border:1px solid #75613a;border-radius:10px;background:#100f0ddd;text-align:center;min-height:52px}.verse strong{display:block;color:#e6c87f;font-size:11px;letter-spacing:.08em;margin-bottom:3px}.verse span{font-size:12px;color:#f0eee8;line-height:1.4}.foot{text-align:center;font-size:10px;color:#687481;margin-top:9px}.loading{position:fixed;inset:0;display:grid;place-items:center;background:#080d13;z-index:4;padding:25px;text-align:center}.loading strong{display:block;color:#e4c77e;letter-spacing:.12em;font-size:12px}.loading p{font-size:13px;color:#aab3bd;max-width:330px;line-height:1.5}.spinner{width:30px;height:30px;border:2px solid #34404d;border-top-color:#d2b36f;border-radius:50%;margin:0 auto 18px;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.hide{display:none!important}@media(min-width:700px){.headline{font-size:22px}.bottom{padding-bottom:18px}.controls button{font-size:13px;min-height:56px}}
 </style>
-<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.169.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.169.0/examples/jsm/"}}</script>
+<script async src="https://ga.jspm.io/npm:es-module-shims@1.10.0/dist/es-module-shims.js"></script><script type="importmap-shim">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
 </head>
 <body><div id="view"></div>
 <div class="top"><div><div class="brand">ARMOUR OF GOD · DEVELOPMENT BUILD</div><div class="headline">The Soldier — 3D Combat Lab</div><div id="status" class="status">Preparing the 3D scene…</div></div><div class="pill">PROTOTYPE 01</div></div>
@@ -55,7 +55,7 @@
 })();
 </script>
 <div class="bottom"><div class="verse" aria-live="polite"><strong id="verseTitle">WORD FOR THE BATTLE</strong><span id="verseText">“Be strong in the Lord, and in the power of his might.” — Ephesians 6:10</span></div><div id="battlemsg" class="battlemsg">Your first trial awaits. Strike, defend, and endure.</div><div class="hint">Tap an action to fight · drag to orbit · scroll to zoom</div><div class="controls"><button data-action="guard">GUARD</button><button data-action="punch">PUNCH</button><button data-action="kick">KICK</button><button class="special" data-action="power">SCRIPTURE POWER</button></div><div class="foot">Prototype sandbox — separate from the live game until tested.</div></div>
-<script type="module">
+<script type="module-shim">
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {SkeletonUtils} from 'three/addons/utils/SkeletonUtils.js';
@@ -104,8 +104,8 @@ function boneLike(part){return Object.keys(bones).find(n=>n.includes(part))}
 function applyBodySuit(root){root.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=false;const mats=Array.isArray(o.material)?o.material:[o.material];mats.forEach(m=>{if(m){m.color.set('#18212a');m.roughness=.72;m.metalness=.12}})}})}
 async function loadFighter(){
  status.textContent='Loading rigged 3D soldier and motion clips…';
- // Three.js example Soldier.glb is a public, MIT-licensed rigged character with Idle, Walk and Run clips.
- const url='https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Soldier.glb';
+ // Load a rigged soldier model with Idle, Walk, Run, Jump, Fire, Reload and Death clips; fitted armour is added in-scene.
+ const url='https://www.shanebrumback.com/models/soldier_rigged.glb';
  // Give slow mobile connections a visible timeout, and try a second official CDN if GitHub raw is blocked.
  const loadWithTimeout=(src,ms)=>Promise.race([new GLTFLoader().loadAsync(src),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Model download timed out')),ms))]);
  try{
@@ -113,7 +113,7 @@ async function loadFighter(){
   try{gltf=await loadWithTimeout(url,12000)}catch(firstError){
    status.textContent='Trying an alternate model source…';
    loadtext.textContent='The first model source did not respond. Trying a backup source; this may take a moment.';
-   gltf=await loadWithTimeout('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r169/examples/models/gltf/Soldier.glb',12000);
+   gltf=await loadWithTimeout('https://www.shanebrumback.com/models/soldier_rigged.glb',12000);
   }
   fighter=gltf.scene; enemy=SkeletonUtils.clone(gltf.scene); enemy.rotation.y=Math.PI; enemy.position.x=1.15;
   enemy.traverse(o=>{if(o.isMesh){o.frustumCulled=false;const old=o.material;const mats=Array.isArray(old)?old:[old];const tinted=mats.map(m=>{const c=m.clone();c.color.set('#7b3538');return c});o.material=Array.isArray(old)?tinted:tinted[0]}});
