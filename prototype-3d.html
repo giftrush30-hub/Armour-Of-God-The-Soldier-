@@ -73,7 +73,7 @@ async function loadFighter(){
   mixer=new THREE.AnimationMixer(fighter);
   for(const clip of gltf.animations) clips[clip.name]=mixer.clipAction(clip);
   if(clips.Idle) clips.Idle.play();
-  status.textContent='Rigged 3D soldier loaded · Idle/Walk/Run clips active · combat tests ready';
+  status.textContent='Rigged 3D soldier loaded · stable idle pose · combat motion being refined';
  }catch(e){
   console.warn('Rigged character could not load; displaying local 3D fallback.',e);
   fighter=buildFallback();status.textContent='3D scene active · fallback model shown (external mesh unavailable)';
@@ -91,11 +91,11 @@ renderer.domElement.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.cli
 renderer.domElement.addEventListener('pointermove',e=>{if(drag){targetYaw=drag.yaw+(e.clientX-drag.x)*.008}});
 renderer.domElement.addEventListener('pointerup',()=>drag=null);
 renderer.domElement.addEventListener('wheel',e=>{zoom=THREE.MathUtils.clamp(zoom+e.deltaY*.004,3.4,8);},{passive:true});
-function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05),now=performance.now();if(mixer)mixer.update(dt);yaw=THREE.MathUtils.damp(yaw,targetYaw,5,dt);if(fighter){fighter.rotation.y=yaw;const active=now<actionUntil,p=active?THREE.MathUtils.clamp((now-actionStart)/(actionUntil-actionStart),0,1):1;const wave=active?Math.sin(p*Math.PI):0,strike=active?Math.sin(p*Math.PI*2):0;const lean=active?(actionName==='kick'?.10*wave:actionName==='punch'?.12*wave:actionName==='power'?-.04*wave:0):0;fighter.rotation.x=THREE.MathUtils.damp(fighter.rotation.x,lean,8,dt);
- const get=part=>bones[boneLike(part)],lArm=get('leftarm'),rArm=get('rightarm'),lFore=get('leftforearm'),rFore=get('rightforearm'),lLeg=get('leftupleg'),rLeg=get('rightupleg'),hips=get('hips'),spine=get('spine');
- const pose=(bone,axis,offset)=>{if(!bone)return;const base=baseBoneRotations.get(bone);if(base)bone.rotation[axis]=THREE.MathUtils.damp(bone.rotation[axis],base[axis]+offset,12,dt)};
- const guard=active&&actionName==='guard',punch=active&&actionName==='punch',kick=active&&actionName==='kick',power=active&&actionName==='power';
- pose(lArm,'x',guard?-.8:punch?-.35-.9*Math.max(0,strike):power?-.25*wave:0);pose(rArm,'x',guard?-.8:punch?-.4-1.25*Math.max(0,strike):power?-.25*wave:0);pose(lArm,'z',guard?.28:0);pose(rArm,'z',guard?-.28:0);pose(lFore,'x',guard?-1:punch?-.35-.6*Math.max(0,strike):0);pose(rFore,'x',guard?-1:punch?-.3-.8*Math.max(0,strike):0);pose(rLeg,'x',kick?-.95*Math.max(0,Math.sin(p*Math.PI*1.35)):0);pose(lLeg,'x',kick?.18*wave:0);pose(hips,'y',punch?.18*strike:kick?-.12*wave:power?.05*wave:0);pose(spine,'x',punch?-.12*wave:kick?.08*wave:power?-.08*wave:0);
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05),now=performance.now();if(mixer)mixer.update(dt);yaw=THREE.MathUtils.damp(yaw,targetYaw,5,dt);if(fighter){fighter.rotation.y=yaw;
+ // Keep the imported rig's natural pose intact. Earlier experimental bone offsets could
+ // rotate the wrong local axes on this asset and make the soldier look seated or tilted.
+ fighter.rotation.x=THREE.MathUtils.damp(fighter.rotation.x,0,10,dt);
+ fighter.rotation.z=THREE.MathUtils.damp(fighter.rotation.z,0,10,dt);
  }camera.position.z=THREE.MathUtils.damp(camera.position.z,zoom,5,dt);camera.lookAt(0,1.02,0);ring.rotation.z+=dt*.15;ring.material.opacity=now<actionUntil&&actionName==='power'?.95:.65;ring.material.color.lerp(new THREE.Color(now<actionUntil&&actionName==='power'?'#f3d17c':'#a98a4e'),.08);renderer.render(scene,camera)}
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight)});
 loadFighter();animate();
