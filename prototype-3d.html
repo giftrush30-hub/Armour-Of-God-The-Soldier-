@@ -7,13 +7,13 @@
 <div class="hud"><div class="barwrap">YOUR VITALITY<div class="bar"><i id="php"></i></div></div><div class="barwrap" style="text-align:right">MOUNTAIN OPPONENT<div class="bar red"><i id="ehp"></i></div></div></div>
 <div class="bottom"><div class="verse"><b id="vtitle">WORD FOR THE BATTLE</b><span id="vtext">“Be strong in the Lord, and in the power of his might.” — Ephesians 6:10</span></div><div class="msg" id="msg">Move, turn, defend, and strike.</div>
 <div class="layout"><div class="movegrid"><span></span><button class="btn" data-move="forward">▲</button><span></span><button class="btn" data-move="left">◀</button><button class="btn" data-move="back">▼</button><button class="btn" data-move="right">▶</button><button class="btn" data-move="turnleft">↶</button><button class="btn" data-move="run">RUN</button><button class="btn" data-move="turnright">↷</button></div><div class="actions"><button class="btn" data-act="guard">GUARD</button><button class="btn" data-act="punch">PUNCH</button><button class="btn" data-act="kick">KICK</button><button class="btn" data-act="power">SCRIPTURE</button></div></div><div class="foot">Drag to orbit camera · movement controls hold while pressed · WebGL 3D scene</div></div>
-<script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script>
 <script>
 (function(){
 const status=document.getElementById('status'),world=document.getElementById('world');
 window.addEventListener('error',function(e){if(status)status.textContent='Game error: '+(e.message||'graphics startup failed')+' (reload once)';});
 window.addEventListener('unhandledrejection',function(e){if(status)status.textContent='Game loading error: '+String(e.reason||'unknown error');});
-if(!window.THREE){status.textContent='3D engine could not download. Check connection and reload.';return}
+if(!window.THREE){status.textContent='3D engine could not download. Trying backup engine…';const backup=document.createElement('script');backup.src='https://unpkg.com/three@0.149.0/build/three.min.js';backup.onload=()=>location.reload();backup.onerror=()=>{status.textContent='3D engine blocked by this browser or network. Open in Chrome and reload.'};document.head.appendChild(backup);return}
 const T=THREE,scene=new T.Scene();scene.background=new T.Color('#111a26');scene.fog=new T.Fog('#111a26',15,34);
 const camera=new T.PerspectiveCamera(42,innerWidth/innerHeight,.1,100);camera.position.set(0,3.4,8.7);
 let renderer;try{renderer=new T.WebGLRenderer({antialias:false,powerPreference:'high-performance'});}catch(e){status.textContent='This browser could not start WebGL 3D graphics.';return}
