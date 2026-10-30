@@ -48,13 +48,14 @@ loader.load(modelURL,function(gltf){
  let boneCount=0,skinnedCount=0,boneNames=[],boneMap={};
  model.traverse(o=>{if(o.isSkinnedMesh&&o.skeleton){skinnedCount++;boneCount+=o.skeleton.bones.length;o.skeleton.bones.forEach(b=>{boneMap[b.name.toLowerCase()]=b;if(boneNames.length<12&&!boneNames.includes(b.name))boneNames.push(b.name)})}});
  const clips=gltf.animations||[];
- const findSideBone=(part,side)=>{const entries=Object.entries(boneMap);return (entries.find(([n])=>n.includes(part)&&((side==='l'&&(n.includes('left')||n.endsWith('_l')||n.endsWith('.l')||n.endsWith(' l')))||(side==='r'&&(n.includes('right')||n.endsWith('_r')||n.endsWith('.r')||n.endsWith(' r')))))||[])[1]||null;};
- const upperL=findSideBone('upperarm','l')||findSideBone('upper_arm','l')||findSideBone('arm','l');
- const upperR=findSideBone('upperarm','r')||findSideBone('upper_arm','r')||findSideBone('arm','r');
- const lowerL=findSideBone('lowerarm','l')||findSideBone('lower_arm','l')||findSideBone('forearm','l');
- const lowerR=findSideBone('lowerarm','r')||findSideBone('lower_arm','r')||findSideBone('forearm','r');
+ const sideMatches=(name,side)=>{const n=name.toLowerCase().replace(/[^a-z0-9]+/g,'_');return side==='l'?/(^|_)(left|l)(_|$)/.test(n):/(^|_)(right|r)(_|$)/.test(n);};
+ const findSideBone=(parts,side)=>{const wanted=Array.isArray(parts)?parts:[parts];const entries=Object.entries(boneMap);for(const part of wanted){const hit=entries.find(([n])=>n.includes(part)&&sideMatches(n,side));if(hit)return hit[1]}return null;};
+ const upperL=findSideBone(['upperarm','upper_arm','arm'], 'l');
+ const upperR=findSideBone(['upperarm','upper_arm','arm'], 'r');
+ const lowerL=findSideBone(['lowerarm','lower_arm','forearm'], 'l');
+ const lowerR=findSideBone(['lowerarm','lower_arm','forearm'], 'r');
  [[upperL,0],[upperR,0],[lowerL,0],[lowerR,0]].forEach(([b])=>{if(b)stanceBones.push({bone:b,original:b.quaternion.clone()})});
- const applyLoweredPose=()=>{const armAngle=Number(armRange.value)*Math.PI/180,elbowAngle=Number(elbowRange.value)*Math.PI/180;stanceBones.forEach(item=>{item.bone.quaternion.copy(item.original);const n=item.bone.name.toLowerCase();const isLeft=n.includes('_l')||n.includes('.l');const sign=isLeft?-1:1;const angle=n.includes('lowerarm')?elbowAngle*sign:armAngle*sign;item.bone.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),angle));});model.updateMatrixWorld(true);armValue.textContent=armRange.value+'°';elbowValue.textContent=elbowRange.value+'°';};
+ const applyLoweredPose=()=>{const armAngle=Number(armRange.value)*Math.PI/180,elbowAngle=Number(elbowRange.value)*Math.PI/180;stanceBones.forEach(item=>{item.bone.quaternion.copy(item.original);const n=item.bone.name.toLowerCase();const side=sideMatches(n,'l')?'l':'r';const sign=side==='l'?-1:1;const isElbow=/lowerarm|lower_arm|forearm/.test(n);const angle=isElbow?elbowAngle*sign:armAngle*sign;item.bone.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),angle));});model.updateMatrixWorld(true);armValue.textContent=armRange.value+'°';elbowValue.textContent=elbowRange.value+'°';};
  const resetPose=()=>{stanceBones.forEach(item=>item.bone.quaternion.copy(item.original));model.updateMatrixWorld(true);armRange.value=40;elbowRange.value=10;armValue.textContent='40°';elbowValue.textContent='10°';status.textContent='Original T-pose restored. Adjust the sliders to test a different arm angle.';};
  if(upperL&&upperR){
    stanceBtn.disabled=false;resetBtn.disabled=false;armRange.disabled=false;elbowRange.disabled=false;guardBtn.disabled=false;readyBtn.disabled=false;faceBtn.disabled=false;stanceBtn.textContent='Apply current stance';
@@ -71,11 +72,11 @@ loader.load(modelURL,function(gltf){
  if(clips.length){
    mixer=new THREE.AnimationMixer(model);
    poseBtn.disabled=false;poseBtn.textContent='Play: '+(clips[0].name||'built-in animation');
-   poseBtn.onclick=()=>{if(activeAction){activeAction.stop();activeAction=null;poseBtn.textContent='Play: '+(clips[0].name||'built-in animation');return}activeAction=mixer.clipAction(clips[0]);activeAction.reset().play();poseBtn.textContent='Stop animation'};
+   poseBtn.onclick=()=>{if(activeAction){activeAction.stop();activeAction=null;stanceBones.forEach(item=>item.bone.quaternion.copy(item.original));model.updateMatrixWorld(true);poseBtn.textContent='Play: '+(clips[0].name||'built-in animation');return}stanceApplied=false;activeAction=mixer.clipAction(clips[0]);activeAction.reset().play();poseBtn.textContent='Stop animation'};
  }else{
    poseBtn.disabled=true;poseBtn.textContent='No built-in animation — manual pose controls';
  }
- status.textContent='Real human mesh loaded in fixed 2.5D side view. Rig: '+boneCount+' joints / '+skinnedCount+' skinned mesh(es). Built-in animations: '+clipNames+'. '+(upperL&&upperR?'Ready and guard stance previews are available in the bottom strip.':'This rig uses different arm-joint names; pose controls need further mapping.')+' Camera rotation is disabled to preserve the side-view fighter framing.';
+ status.textContent='Real human mesh loaded in fixed 2.5D side view. Rig: '+boneCount+' joints / '+skinnedCount+' skinned mesh(es). Built-in animations: '+clipNames+'. '+(upperL&&upperR?'Both upper-arm joints were found; arm and elbow pose previews are enabled.': 'Arm joints were not fully identified; manual pose sliders remain disabled to avoid damaging the rig.')+' Camera rotation is disabled to preserve the side-view fighter framing.';
 },function(xhr){status.textContent=xhr.total>0?'Downloading human mesh… '+Math.round(xhr.loaded/xhr.total*100)+'%':'Waiting for the human model file…';},function(err){console.error(err);status.textContent='The character model could not be loaded. This is an isolated test; the main campaign is unchanged.';});
 // Fixed side-view camera for a 2.5D fighting-game presentation; no free rotation.
 document.getElementById('skinSelect').addEventListener('change',e=>{if(!model)return;model.traverse(o=>{if(o.isMesh&&o.material){const mats=Array.isArray(o.material)?o.material:[o.material];mats.forEach(m=>{if(m.color){m.color.set(e.target.value);m.needsUpdate=true}})}});status.textContent='Skin tone updated on the real human mesh.';});
